@@ -1,6 +1,13 @@
+import { LayerCollection } from '../collections/layer-collection'
+
+import { createFlattenedLayers, createLayers } from '../utils/layer-factories'
+import { memoize } from '../utils/memoize'
+
 import type { IArtboard } from '../types/artboard.iface'
 import type { IFile } from '../types/file.iface'
 import type { ArtboardId, LayerId, PageId } from '../types/ids.type'
+import type { ILayer } from '../types/layer.iface'
+import type { ILayerCollection } from '../types/layer-collection.iface'
 import type { ArtboardOctopusData, RgbaColor } from '../types/octopus.type'
 
 export class Artboard implements IArtboard {
@@ -30,6 +37,33 @@ export class Artboard implements IArtboard {
 
   getFile(): IFile | null {
     return this._file
+  }
+
+  getRootLayers = memoize(
+    (): ILayerCollection => {
+      const layerDataList = this.octopus['layers'] || []
+      const layerList = createLayers(layerDataList, { artboard: this })
+
+      return new LayerCollection(layerList)
+    }
+  )
+
+  getFlattenedLayers = memoize(
+    (options: Partial<{ depth: number }> = {}): ILayerCollection => {
+      const layerDataList = this.octopus['layers'] || []
+      const depth = options.depth || Infinity
+      const layerList = createFlattenedLayers(layerDataList, {
+        artboard: this,
+        depth,
+      })
+
+      return new LayerCollection(layerList)
+    },
+    2
+  )
+
+  getLayerById(layerId: LayerId): ILayer | null {
+    return this.getFlattenedLayers().getLayerById(layerId)
   }
 
   isComponent(): boolean {
