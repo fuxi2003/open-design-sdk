@@ -1,3 +1,4 @@
+import { Bitmap } from '../layer-info/bitmap'
 import { Effects } from '../layer-info/effects'
 import { LayerCollection } from '../collections/layer-collection'
 import { Shape } from '../layer-info/shape'
@@ -7,6 +8,7 @@ import { createLayers } from '../utils/layer-factories'
 import { memoize } from '../utils/memoize'
 
 import type { IArtboard } from '../types/artboard.iface'
+import type { IBitmap } from '../types/bitmap.iface'
 import type { IEffects } from '../types/effects.iface'
 import type { LayerId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
@@ -90,6 +92,19 @@ export class Layer implements ILayer {
       )
     }
   )
+
+
+  getBitmap = memoize((): IBitmap | null => {
+    return this.type === 'layer' && this.octopus['bitmap']
+      ? new Bitmap(this.octopus['bitmap'])
+      : null
+  })
+
+  getPrerenderedBitmap = memoize((): IBitmap | null => {
+    return this.type !== 'layer' && this.octopus['bitmap']
+      ? new Bitmap(this.octopus['bitmap'])
+      : null
+  })
 
   getShape = memoize((): IShape | null => {
     return this.octopus['shape'] ? new Shape(this.octopus['shape']) : null

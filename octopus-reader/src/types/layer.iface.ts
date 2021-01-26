@@ -1,4 +1,5 @@
 import type { IArtboard } from './artboard.iface'
+import type { IBitmap } from './bitmap.iface'
 import type { IEffects } from './effects.iface'
 import type { LayerId } from './ids.type'
 import type { ILayerCollection } from './layer-collection.iface'
@@ -25,7 +26,11 @@ export interface ILayer {
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
   ): ILayerCollection
+
+  getBitmap(): IBitmap | null
+  getPrerenderedBitmap(): IBitmap | null
   getShape(): IShape | null
   getText(): IText | null
+
   getEffects(): IEffects
 }
