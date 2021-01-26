@@ -1,3 +1,4 @@
+import type { FileLayerDescriptor } from '../types/file-layer-collection.iface'
 import type { ILayer } from '../types/layer.iface'
 import type { LayerSelector } from '../types/selectors.type'
 
@@ -128,6 +129,56 @@ export function findLayersInLayers(
 
     return matchLayer(selector, layer)
       ? [layer].concat(matchedNestedLayers)
+      : matchedNestedLayers
+  })
+}
+
+// --- file layers ---
+
+export function findLayerInFileLayers(
+  selector: LayerSelector,
+  layerSubtrees: Array<FileLayerDescriptor>,
+  options: Partial<{ depth: number }> = {}
+): FileLayerDescriptor | null {
+  const depth = options.depth || Infinity
+
+  for (const { artboardId, layer } of layerSubtrees) {
+    if (matchLayer(selector, layer)) {
+      return { artboardId, layer }
+    }
+
+    const nestedLayerMatch =
+      depth === 1
+        ? null
+        : layer.getNestedLayers({ depth: depth - 1 }).findLayer(selector)
+    if (nestedLayerMatch) {
+      return { artboardId, layer: nestedLayerMatch }
+    }
+  }
+
+  return null
+}
+
+export function findLayersInFileLayers(
+  selector: LayerSelector,
+  layerSubtrees: Array<FileLayerDescriptor>,
+  options: Partial<{ depth: number }> = {}
+): Array<FileLayerDescriptor> {
+  const depth = options.depth || Infinity
+
+  return layerSubtrees.flatMap(({ artboardId, layer }) => {
+    const matchedNestedLayers =
+      depth === 1
+        ? []
+        : layer
+            .getNestedLayers({ depth: depth - 1 })
+            .findLayers(selector)
+            .getLayers()
+            .map((nestedLayer) => {
+              return { artboardId, layer: nestedLayer }
+            })
+    return matchLayer(selector, layer)
+      ? [{ artboardId, layer }].concat(matchedNestedLayers)
       : matchedNestedLayers
   })
 }

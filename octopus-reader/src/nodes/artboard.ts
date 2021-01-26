@@ -9,6 +9,7 @@ import type { ArtboardId, LayerId, PageId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
 import type { ILayerCollection } from '../types/layer-collection.iface'
 import type { ArtboardOctopusData, RgbaColor } from '../types/octopus.type'
+import type { LayerSelector } from '../types/selectors.type'
 
 export class Artboard implements IArtboard {
   readonly id: ArtboardId
@@ -66,6 +67,13 @@ export class Artboard implements IArtboard {
     return this.getFlattenedLayers().getLayerById(layerId)
   }
 
+  findLayer(selector: LayerSelector): ILayer | null {
+    return this.getFlattenedLayers().findLayer(selector, { depth: 1 })
+  }
+
+  findLayers(selector: LayerSelector): ILayerCollection {
+    return this.getFlattenedLayers().findLayers(selector, { depth: 1 })
+  }
   isComponent(): boolean {
     return Boolean(this.octopus['symbolID'])
   }

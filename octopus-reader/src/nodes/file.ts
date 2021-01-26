@@ -1,4 +1,5 @@
 import { Artboard } from './artboard'
+import { FileLayerCollection } from '../collections/file-layer-collection'
 
 import { matchArtboard } from '../utils/artboard-lookup'
 
@@ -6,11 +7,13 @@ import type { IFile } from '../types/file.iface'
 import type {
   ArtboardId,
   ComponentId,
+  LayerId,
   PageId,
 } from '../types/ids.type'
 import type { IArtboard } from '../types/artboard.iface'
 import type { ArtboardOctopusData } from '../types/octopus.type'
 import type { ArtboardSelector, LayerSelector } from '../types/selectors.type'
+import type { FileLayerDescriptor } from '../types/file-layer-collection.iface'
 
 export class File implements IFile {
   private _artboardsById: Record<ArtboardId, IArtboard> = {}
@@ -162,5 +165,71 @@ export class File implements IFile {
     return this._artboardList.filter((artboard) => {
       return matchArtboard(selector, artboard)
     })
+  }
+
+  getFlattenedLayers = memoize(
+    (options: Partial<{ depth: number }> = {}): FileLayerCollection => {
+      return new FileLayerCollection(
+        this.getArtboards().flatMap((artboard) => {
+          return artboard.getFlattenedLayers(options).map((layer) => {
+            return { artboardId: artboard.id, layer }
+          })
+        }),
+        this
+      )
+    }
+  )
+
+  findLayerById(layerId: LayerId): FileLayerDescriptor | null {
+    for (const artboard of this._artboardList) {
+      const layer = artboard.getLayerById(layerId)
+      if (layer) {
+        return { artboardId: artboard.id, layer }
+      }
+    }
+
+    return null
+  }
+
+  findLayersById(layerId: LayerId): FileLayerCollection {
+    const layers = this._artboardList.flatMap((artboard) => {
+      const layer = artboard.getLayerById(layerId)
+      return layer ? [{ artboardId: artboard.id, layer }] : []
+    })
+
+    return new FileLayerCollection(layers, this)
+  }
+
+  findLayer(
+    selector: LayerSelector,
+    options: Partial<{ depth: number }> = {}
+  ): FileLayerDescriptor | null {
+    const depthWithinArtboard = options.depth || Infinity
+
+    for (const artboard of this._artboardList) {
+      const layer = artboard.findLayer(selector, { depth: depthWithinArtboard })
+      if (layer) {
+        return { artboardId: artboard.id, layer }
+      }
+    }
+
+    return null
+  }
+
+  findLayers(
+    selector: LayerSelector,
+    options: Partial<{ depth: number }> = {}
+  ): FileLayerCollection {
+    const depthWithinArtboard = options.depth || Infinity
+
+    const layers = this._artboardList.flatMap((artboard) => {
+      return artboard
+        .findLayers(selector, { depth: depthWithinArtboard })
+        .map((layer) => {
+          return { artboardId: artboard.id, layer }
+        })
+    })
+
+    return new FileLayerCollection(layers, this)
   }
 }

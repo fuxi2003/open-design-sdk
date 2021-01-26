@@ -14,3 +14,13 @@ export type LayerSelector = Partial<{
   bitmapAssetName: string | Array<string>
   fontPostScriptName: string | Array<string>
 }>
+
+export type FileLayerSelector = Partial<{
+  artboardId: ArtboardId | Array<ArtboardId>
+  id: LayerId | Array<LayerId>
+  type: LayerOctopusData['type'] | Array<LayerOctopusData['type']>
+  name: string | null | Array<string | null> | RegExp
+  text: string | Array<string> | RegExp
+  bitmapAssetName: string | Array<string>
+  fontPostScriptName: string | Array<string>
+}>
