@@ -28,5 +28,7 @@ export interface IArtboard {
     options?: Partial<{ depth: number }>
   ): ILayerCollection
 
+  getLayerDepth(layerId: LayerId): number | null
+
   isComponent(): boolean
 }

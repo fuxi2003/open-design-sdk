@@ -74,6 +74,11 @@ export class Artboard implements IArtboard {
   findLayers(selector: LayerSelector): ILayerCollection {
     return this.getFlattenedLayers().findLayers(selector, { depth: 1 })
   }
+  getLayerDepth(layerId: LayerId): number | null {
+    const layer = this.getLayerById(layerId)
+    return layer ? layer.getDepth() : null
+  }
+
   isComponent(): boolean {
     return Boolean(this.octopus['symbolID'])
   }

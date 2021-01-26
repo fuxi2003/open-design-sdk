@@ -25,10 +25,12 @@ export class Layer implements ILayer {
   readonly octopus: LayerOctopusData
 
   private _artboard: IArtboard | null
+  private _parentLayerId: LayerId | null
 
   constructor(
     layerOctopus: LayerOctopusData,
     params: Partial<{
+      parentLayerId: LayerId | null
       artboard: IArtboard | null
     }> = {}
   ) {
@@ -38,10 +40,84 @@ export class Layer implements ILayer {
     this.octopus = layerOctopus
 
     this._artboard = params.artboard || null
+    this._parentLayerId = params.parentLayerId || null
   }
 
   getArtboard(): IArtboard | null {
     return this._artboard
+  }
+
+  isRootLayer() {
+    return !this._parentLayerId
+  }
+
+  getDepth(): number {
+    const parentLayerId = this._parentLayerId
+    if (!parentLayerId) {
+      return 0
+    }
+
+    const artboard = this._artboard
+    if (!artboard) {
+      throw new Error('Cannot determine detached layer depth')
+    }
+
+    const parentLayerDepth = artboard.getLayerDepth(parentLayerId)
+    if (parentLayerDepth === null) {
+      throw new Error('Cannot determine parent layer depth')
+    }
+
+    return 1 + parentLayerDepth
+  }
+
+  getParentLayerId(): LayerId | null {
+    return this._parentLayerId
+  }
+
+  getParentLayer(): ILayer | null {
+    const parentLayerId = this._parentLayerId
+    if (!parentLayerId) {
+      return null
+    }
+
+    const artboard = this._artboard
+    if (!artboard) {
+      throw new Error('Cannot retrieve the parent layer of a detached layer')
+    }
+
+    const parentLayer = artboard.getLayerById(parentLayerId)
+    if (!parentLayer) {
+      throw new Error('Cannot retrieve the parent layer')
+    }
+
+    return parentLayer
+  }
+
+  getParentLayerIds(): Array<LayerId> {
+    const parentLayer = this.getParentLayer()
+
+    return parentLayer
+      ? [parentLayer.id, ...parentLayer.getParentLayerIds()]
+      : []
+  }
+
+  getParentLayers(): ILayerCollection {
+    const parentLayer = this.getParentLayer()
+    return parentLayer
+      ? new LayerCollection([parentLayer], this._artboard).concat(
+          parentLayer.getParentLayers()
+        )
+      : new LayerCollection([], this._artboard)
+  }
+
+  findParentLayer(selector: LayerSelector): ILayer | null {
+    const parentLayers = this.getParentLayers()
+    return parentLayers.findLayer(selector, { depth: 1 })
+  }
+
+  findParentLayers(selector: LayerSelector): ILayerCollection {
+    const parentLayers = this.getParentLayers()
+    return parentLayers.findLayers(selector, { depth: 1 })
   }
 
   hasNestedLayers(): boolean {

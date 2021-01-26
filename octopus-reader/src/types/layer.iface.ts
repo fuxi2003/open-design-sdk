@@ -16,6 +16,15 @@ export interface ILayer {
 
   getArtboard(): IArtboard | null
 
+  isRootLayer(): boolean
+  getDepth(): number
+
+  getParentLayer(): ILayer | null
+  getParentLayers(): ILayerCollection
+  getParentLayerIds(): Array<LayerId>
+  findParentLayer(selector: LayerSelector): ILayer | null
+  findParentLayers(selector: LayerSelector): ILayerCollection
+
   hasNestedLayers(): boolean
   getNestedLayers(options?: Partial<{ depth: number }>): ILayerCollection
   findNestedLayer(
