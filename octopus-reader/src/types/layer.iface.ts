@@ -36,6 +36,10 @@ export interface ILayer {
     options?: Partial<{ depth: number }>
   ): ILayerCollection
 
+  isMasked(): boolean
+  getMaskLayer(): ILayer | null
+  getMaskLayerId(): LayerId | null
+
   getBitmap(): IBitmap | null
   getPrerenderedBitmap(): IBitmap | null
   getShape(): IShape | null

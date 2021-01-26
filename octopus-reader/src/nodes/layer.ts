@@ -169,6 +169,33 @@ export class Layer implements ILayer {
     }
   )
 
+  isMasked(): boolean {
+    return Boolean(this.octopus['clipped'])
+  }
+
+  getMaskLayerId(): LayerId | null {
+    return this.octopus['maskedBy'] || null
+  }
+
+  getMaskLayer(): ILayer | null {
+    const maskLayerId = this.getMaskLayerId()
+    if (!maskLayerId) {
+      return null
+    }
+
+    const artboard = this._artboard
+    if (!artboard) {
+      throw new Error('Cannot retrieve a detached layer mask')
+    }
+
+    const maskLayer = artboard.getLayerById(maskLayerId)
+    if (!maskLayer) {
+      throw new Error('Cannot retrieve the mask layer')
+    }
+
+    return maskLayer
+  }
+
 
   getBitmap = memoize((): IBitmap | null => {
     return this.type === 'layer' && this.octopus['bitmap']
