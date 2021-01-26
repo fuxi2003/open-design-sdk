@@ -13,6 +13,7 @@ export interface IArtboard {
 
   getFile(): IFile | null
 
+  getBackgroundColor(): RgbaColor | null
 
   getRootLayers(): ILayerCollection
   getFlattenedLayers(options?: Partial<{ depth: number }>): ILayerCollection

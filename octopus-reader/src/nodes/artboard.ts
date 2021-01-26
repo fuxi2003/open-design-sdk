@@ -79,6 +79,12 @@ export class Artboard implements IArtboard {
     return layer ? layer.getDepth() : null
   }
 
+  getBackgroundColor(): RgbaColor | null {
+    return this.octopus['hasBackgroundColor']
+      ? this.octopus['backgroundColor'] || null
+      : null
+  }
+
   isComponent(): boolean {
     return Boolean(this.octopus['symbolID'])
   }
