@@ -1,6 +1,7 @@
 import type { IArtboard } from './artboard.iface'
 import type { ArtboardId, LayerId, PageId } from './ids.type'
 import type { ArtboardOctopusData } from './octopus.type'
+import type { ArtboardSelector, LayerSelector } from './selectors.type'
 
 export interface IFile {
   addArtboard(
@@ -21,4 +22,6 @@ export interface IFile {
   getArtboardByComponentId(
     componentId: ArtboardOctopusData['symbolID']
   ): IArtboard | null
+  findArtboard(selector: ArtboardSelector): IArtboard | null
+  findArtboards(selector: ArtboardSelector): Array<IArtboard>
 }

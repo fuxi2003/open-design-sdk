@@ -1,4 +1,7 @@
 import { Artboard } from './artboard'
+
+import { matchArtboard } from '../utils/artboard-lookup'
+
 import type { IFile } from '../types/file.iface'
 import type {
   ArtboardId,
@@ -7,6 +10,7 @@ import type {
 } from '../types/ids.type'
 import type { IArtboard } from '../types/artboard.iface'
 import type { ArtboardOctopusData } from '../types/octopus.type'
+import type { ArtboardSelector, LayerSelector } from '../types/selectors.type'
 
 export class File implements IFile {
   private _artboardsById: Record<ArtboardId, IArtboard> = {}
@@ -123,5 +127,40 @@ export class File implements IFile {
 
   getArtboardByComponentId(componentId: ComponentId): IArtboard | null {
     return this._artboardsByComponentId[componentId] || null
+  }
+
+  findArtboard(selector: ArtboardSelector): IArtboard | null {
+    const selectorKeys = Object.keys(selector)
+    if (
+      selectorKeys.length === 1 &&
+      selectorKeys[0] === 'id' &&
+      typeof selector['id'] === 'string'
+    ) {
+      return this.getArtboardById(selector['id'])
+    }
+
+    for (const artboard of this._artboardList) {
+      if (matchArtboard(selector, artboard)) {
+        return artboard
+      }
+    }
+
+    return null
+  }
+
+  findArtboards(selector: ArtboardSelector): Array<IArtboard> {
+    const selectorKeys = Object.keys(selector)
+    if (
+      selectorKeys.length === 1 &&
+      selectorKeys[0] === 'id' &&
+      typeof selector['id'] === 'string'
+    ) {
+      const artboard = this.getArtboardById(selector['id'])
+      return artboard ? [artboard] : []
+    }
+
+    return this._artboardList.filter((artboard) => {
+      return matchArtboard(selector, artboard)
+    })
   }
 }
