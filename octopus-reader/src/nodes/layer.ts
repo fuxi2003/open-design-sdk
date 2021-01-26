@@ -196,6 +196,40 @@ export class Layer implements ILayer {
     return maskLayer
   }
 
+  isInlineArtboard(): boolean {
+    return Boolean(this.octopus['artboard'])
+  }
+
+  isComponentInstance(): boolean {
+    return Boolean(this.octopus['symbolID'] || this.octopus['documentId'])
+  }
+
+  getComponentArtboard(): IArtboard | null {
+    const componentArtboardId = this.octopus['documentId']
+    if (!componentArtboardId) {
+      return null
+    }
+
+    const artboard = this._artboard
+    if (!artboard) {
+      throw new Error('Cannot retrieve detached layer component artboard info')
+    }
+
+    const file = artboard.getFile()
+    if (!file) {
+      throw new Error(
+        'Cannot retrieve detached artboard layer component artboard info'
+      )
+    }
+
+    return file.getArtboardById(componentArtboardId)
+  }
+
+  hasComponentOverrides(): boolean {
+    return Boolean(
+      this.octopus['overrides'] && this.octopus['overrides'].length > 0
+    )
+  }
 
   getBitmap = memoize((): IBitmap | null => {
     return this.type === 'layer' && this.octopus['bitmap']

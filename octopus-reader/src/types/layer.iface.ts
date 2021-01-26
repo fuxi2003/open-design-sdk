@@ -40,6 +40,12 @@ export interface ILayer {
   getMaskLayer(): ILayer | null
   getMaskLayerId(): LayerId | null
 
+  isInlineArtboard(): boolean
+
+  isComponentInstance(): boolean
+  hasComponentOverrides(): boolean
+  getComponentArtboard(): IArtboard | null
+
   getBitmap(): IBitmap | null
   getPrerenderedBitmap(): IBitmap | null
   getShape(): IShape | null
