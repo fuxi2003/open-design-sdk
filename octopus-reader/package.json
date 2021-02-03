@@ -2,6 +2,9 @@
   "name": "@opendesign/octopus-reader",
   "version": "0.0.0-dev",
   "scripts": {
+    "build": "yarn run clean-build && yarn run build:ts",
+    "build:ts": "tsc --outDir dist --sourceMap --declaration --project ./tsconfig-build.json",
+    "clean-build": "rm -rf dist",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\" }' mocha"
   },
   "devDependencies": {
