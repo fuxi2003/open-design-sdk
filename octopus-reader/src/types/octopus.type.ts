@@ -2,6 +2,7 @@ export type ArtboardId = string
 export type ComponentId = string
 export type ArtboardOctopusData = {
   'bounds': Bounds
+  'frame': { 'x': number; 'y': number }
   'layers'?: Array<LayerOctopusData>
   'hasBackgroundColor'?: boolean
   'backgroundColor'?: RgbaColor | null

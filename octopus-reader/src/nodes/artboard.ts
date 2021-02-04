@@ -10,32 +10,74 @@ import type { AggregatedFontDescriptor } from '../types/fonts.type'
 import type { ArtboardId, LayerId, PageId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
 import type { ILayerCollection } from '../types/layer-collection.iface'
-import type { ArtboardOctopusData, RgbaColor } from '../types/octopus.type'
+import type { ArtboardManifestData } from '../types/manifest.type'
+import type {
+  ArtboardOctopusData,
+  ComponentId,
+  RgbaColor,
+} from '../types/octopus.type'
 import type { LayerSelector } from '../types/selectors.type'
 
 export class Artboard implements IArtboard {
-  readonly id: ArtboardId
-  readonly pageId: PageId | null
-  readonly name: string | null
-  readonly octopus: ArtboardOctopusData
+  readonly octopus: ArtboardOctopusData | null
 
+  private _manifest: ArtboardManifestData
   private _file: IFile | null
 
   constructor(
     id: ArtboardId,
-    artboardOctopus: ArtboardOctopusData,
+    octopus: ArtboardOctopusData | null,
     params: Partial<{
+      manifest: ArtboardManifestData
       pageId: PageId | null
+      componentId: ComponentId | null
       name: string | null
       file: IFile | null
     }> = {}
   ) {
-    this.id = id
-    this.pageId = params.pageId || null
-    this.name = params.name || null
-    this.octopus = artboardOctopus
+    const { file, manifest, ...manifestParams } = params
 
-    this._file = params.file || null
+    this._manifest = this._createManifest(params.manifest || null, octopus, {
+      id,
+      ...manifestParams,
+    })
+    this.octopus = octopus || null
+
+    this._file = file || null
+  }
+
+  getManifest(): ArtboardManifestData {
+    return this._manifest
+  }
+
+  setManifest(nextManifest: ArtboardManifestData) {
+    if (nextManifest['artboard_original_id'] !== this.id) {
+      throw new Error('Cannot replace existing artboard ID')
+    }
+
+    this._manifest = this._createManifest(nextManifest, this.octopus, {
+      id: this.id,
+    })
+  }
+
+  get id(): ArtboardId {
+  }
+
+  get pageId(): PageId | null {
+    return this.manifest['page_original_id'] || null
+    return this._manifest['artboard_original_id']
+  }
+
+  get componentId(): ComponentId | null {
+    return this._manifest['symbol_id'] || null
+  }
+
+  get name(): string | null {
+    return this._manifest['artboard_name'] || null
+  }
+
+  isLoaded(): boolean {
+    return Boolean(this.octopus)
   }
 
   getFile(): IFile | null {
@@ -44,7 +86,7 @@ export class Artboard implements IArtboard {
 
   getRootLayers = memoize(
     (): ILayerCollection => {
-      const layerDataList = this.octopus['layers'] || []
+      const layerDataList = this.octopus?.['layers'] || []
       const layerList = createLayers(layerDataList, { artboard: this })
 
       return new LayerCollection(layerList)
@@ -53,7 +95,7 @@ export class Artboard implements IArtboard {
 
   getFlattenedLayers = memoize(
     (options: Partial<{ depth: number }> = {}): ILayerCollection => {
-      const layerDataList = this.octopus['layers'] || []
+      const layerDataList = this.octopus?.['layers'] || []
       const depth = options.depth || Infinity
       const layerList = createFlattenedLayers(layerDataList, {
         artboard: this,
@@ -102,12 +144,55 @@ export class Artboard implements IArtboard {
   }
 
   getBackgroundColor(): RgbaColor | null {
-    return this.octopus['hasBackgroundColor']
+    return this.octopus?.['hasBackgroundColor']
       ? this.octopus['backgroundColor'] || null
       : null
   }
 
   isComponent(): boolean {
-    return Boolean(this.octopus['symbolID'])
+    return Boolean(this.componentId)
+  }
+
+  _createManifest(
+    prevManifest: ArtboardManifestData | null,
+    octopus: ArtboardOctopusData | null,
+    params: {
+      id: ArtboardId
+      pageId?: PageId | null
+      componentId?: ComponentId | null
+      name?: string | null
+    }
+  ): ArtboardManifestData {
+    const {
+      id,
+      pageId = prevManifest?.['page_original_id'],
+      componentId = octopus?.['symbolID'] || prevManifest?.['symbol_id'],
+      name = prevManifest?.['artboard_name'],
+    } = params
+
+    return {
+      ...(prevManifest || {
+        'failed': false,
+        'url': null,
+        'preview_url': null,
+      }),
+
+      'artboard_original_id': id,
+      'artboard_name': name || null,
+
+      'is_symbol': Boolean(componentId),
+      'symbol_id': componentId || null,
+
+      'frame': octopus
+        ? octopus['frame']
+        : prevManifest?.['frame'] || { 'x': 0, 'y': 0 },
+
+      ...(pageId
+        ? {
+            'page_original_id': pageId,
+            'page_name': prevManifest?.['page_name'] || null,
+          }
+        : {}),
+    }
   }
 }

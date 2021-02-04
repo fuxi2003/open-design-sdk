@@ -21,6 +21,7 @@ import type { ArtboardSelector, LayerSelector } from '../types/selectors.type'
 import type { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
 import type { AggregatedFileFontDescriptor } from '../types/fonts.type'
 import type { FileLayerDescriptor } from '../types/file-layer-collection.iface'
+import type { ArtboardManifestData, ManifestData } from '../types/manifest.type'
 
 export class File implements IFile {
   private _artboardsById: Record<ArtboardId, IArtboard> = {}
@@ -28,11 +29,41 @@ export class File implements IFile {
   private _artboardsByPageId: Record<PageId, Array<IArtboard>> = {}
   private _artboardList: Array<IArtboard> = []
 
+  private _pageNames: Record<string, string> | null = null
+
+  getManifest = memoize(() => {
+    return {
+      'artboards': this._artboardList.map((artboard) => {
+        return artboard.getManifest()
+      }),
+      'pages': this._pageNames,
+    }
+  })
+
+  setManifest(nextManifest: ManifestData) {
+    this._pageNames = nextManifest['pages'] || null
+
+    nextManifest['artboards'].forEach((nextArtboardManifest) => {
+      const artboardId = nextArtboardManifest['artboard_original_id']
+      const artboard = this.getArtboardById(artboardId)
+
+      if (artboard) {
+        artboard.setManifest(nextArtboardManifest)
+      } else {
+        this.addArtboard(nextArtboardManifest['artboard_original_id'], null, {
+          manifest: nextArtboardManifest,
+        })
+      }
+    })
+  }
+
   addArtboard(
     artboardId: ArtboardId,
-    octopus: ArtboardOctopusData,
+    octopus: ArtboardOctopusData | null,
     params: Partial<{
+      manifest: ArtboardManifestData
       pageId: PageId | null
+      componentId: ComponentId | null
       name: string | null
     }> = {}
   ): Artboard {
@@ -48,17 +79,20 @@ export class File implements IFile {
     this._artboardsById[artboardId] = artboard
     this._artboardList = [...this._artboardList, artboard]
 
-    if (octopus['symbolID']) {
-      this._artboardsByComponentId[octopus['symbolID']] = artboard
+    const componentId = artboard.componentId
+    if (componentId) {
+      this._artboardsByComponentId[componentId] = artboard
     }
 
-    if (params.pageId) {
-      this._artboardsByPageId[params.pageId] = [
-        ...(this._artboardsByPageId[params.pageId] || []),
+    const pageId = artboard.pageId
+    if (pageId) {
+      this._artboardsByPageId[pageId] = [
+        ...(this._artboardsByPageId[pageId] || []),
         artboard,
       ]
     }
 
+    this.getManifest.clear()
     this.getFlattenedLayers.clear()
     this.getComponentArtboards.clear()
 
@@ -76,7 +110,7 @@ export class File implements IFile {
 
     this._artboardsById = remainingArtboards
 
-    const componentId = removedArtboard.octopus['symbolID']
+    const componentId = removedArtboard.componentId
     if (componentId) {
       const {
         [componentId]: removedComponentArtboard,
@@ -109,6 +143,7 @@ export class File implements IFile {
       }
     }
 
+    this.getManifest.clear()
     this.getFlattenedLayers.clear()
     this.getComponentArtboards.clear()
 

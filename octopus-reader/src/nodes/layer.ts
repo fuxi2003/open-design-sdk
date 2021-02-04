@@ -29,9 +29,6 @@ import type { IShape } from '../types/shape.iface'
 import type { IText } from '../types/text.iface'
 
 export class Layer implements ILayer {
-  readonly id: LayerId
-  readonly name: string | null
-  readonly type: LayerOctopusData['type']
   readonly octopus: LayerOctopusData
 
   private _artboard: IArtboard | null
@@ -44,13 +41,22 @@ export class Layer implements ILayer {
       artboard: IArtboard | null
     }> = {}
   ) {
-    this.id = layerOctopus['id']
-    this.name = layerOctopus['name']
-    this.type = layerOctopus['type']
     this.octopus = layerOctopus
 
     this._artboard = params.artboard || null
     this._parentLayerId = params.parentLayerId || null
+  }
+
+  get id() {
+    return this.octopus['id']
+  }
+
+  get name() {
+    return this.octopus['name']
+  }
+
+  get type() {
+    return this.octopus['type']
   }
 
   getArtboard(): IArtboard | null {

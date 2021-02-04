@@ -5,16 +5,22 @@ import type {
   IFileLayerCollection,
 } from './file-layer-collection.iface'
 import type { AggregatedFileFontDescriptor } from './fonts.type'
-import type { ArtboardId, LayerId, PageId } from './ids.type'
+import type { ArtboardId, ComponentId, LayerId, PageId } from './ids.type'
+import type { ArtboardManifestData, ManifestData } from './manifest.type'
 import type { ArtboardOctopusData } from './octopus.type'
 import type { ArtboardSelector, LayerSelector } from './selectors.type'
 
 export interface IFile {
+  getManifest(): ManifestData
+  setManifest(nextManifest: ManifestData): void
+
   addArtboard(
     artboardId: ArtboardId,
     octopus: ArtboardOctopusData,
     params?: Partial<{
+      manifest: ArtboardManifestData
       pageId: PageId | null
+      componentId: ComponentId | null
       name: string | null
     }>
   ): IArtboard
