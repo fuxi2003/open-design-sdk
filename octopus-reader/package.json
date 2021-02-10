@@ -1,6 +1,7 @@
 {
   "name": "@opendesign/octopus-reader",
   "version": "0.0.0-dev",
+  "main": "dist",
   "scripts": {
     "build": "yarn run clean-build && yarn run build:ts",
     "build:ts": "tsc --outDir dist --sourceMap --declaration --project ./tsconfig-build.json",
