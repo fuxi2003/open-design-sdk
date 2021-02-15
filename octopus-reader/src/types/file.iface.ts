@@ -16,6 +16,8 @@ import type {
 } from './selectors.type'
 
 export interface IFile {
+  isLoaded(): boolean
+
   /** @category Octopus File Manifest */
   getManifest(): ManifestData
   /** @category Octopus File Manifest */

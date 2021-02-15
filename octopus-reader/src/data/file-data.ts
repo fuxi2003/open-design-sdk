@@ -13,12 +13,17 @@ import type { IPage } from '../types/page.iface'
 export class FileData {
   private _file: IFile
 
+  private _loaded: boolean = false
   private _paged: boolean = false
   private _pageList: Array<IPage> = []
   private _artboardList: Array<IArtboard> = []
 
   constructor(file: IFile) {
     this._file = file
+  }
+
+  isLoaded(): boolean {
+    return this._loaded
   }
 
   getManifest = memoize(() => {
@@ -65,6 +70,8 @@ export class FileData {
         })
       }
     })
+
+    this._loaded = true
   }
 
   addPage(
