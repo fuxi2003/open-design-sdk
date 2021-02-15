@@ -1,0 +1,7 @@
+{
+  "name": "@opendesign/api",
+  "version": "0.0.0-dev",
+  "devDependencies": {
+    "typescript": "4.1.2"
+  }
+}
