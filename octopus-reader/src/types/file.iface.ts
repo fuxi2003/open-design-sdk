@@ -55,6 +55,8 @@ export interface IFile {
   removeArtboard(artboardId: ArtboardId): boolean
 
   /** @category Page Lookup */
+  isPaged(): boolean
+  /** @category Page Lookup */
   getPages(): Array<IPage>
   /** @category Page Lookup */
   getPageById(pageId: PageId): IPage | null

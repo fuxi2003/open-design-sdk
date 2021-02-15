@@ -74,6 +74,10 @@ export class FileData {
     this._loaded = true
   }
 
+  isPaged() {
+    return this._paged
+  }
+
   addPage(
     pageId: PageId,
     params?: Partial<{
@@ -233,6 +237,9 @@ export class FileData {
     if (prevPageList === nextPageList) {
       return false
     }
+
+    this._pageList = nextPageList
+    this._paged = true
 
     this.getPageMap.clear()
     this.getManifest.clear()

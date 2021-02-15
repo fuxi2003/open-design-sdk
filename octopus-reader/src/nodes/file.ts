@@ -38,6 +38,10 @@ import type { IPage } from '../types/page.iface'
 export class File implements IFile {
   private _fileData = new FileData(this)
 
+  isLoaded(): boolean {
+    return this._fileData.isLoaded()
+  }
+
   getManifest(): ManifestData {
     return this._fileData.getManifest()
   }
@@ -60,6 +64,10 @@ export class File implements IFile {
     options: Partial<{ unassignArtboards: boolean }> = {}
   ): boolean {
     return this._fileData.removePage(pageId, options)
+  }
+
+  isPaged(): boolean {
+    return this._fileData.isPaged()
   }
 
   getPages(): Array<IPage> {
