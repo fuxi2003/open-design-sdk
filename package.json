@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "workspaces": {
     "packages": [
-      "octopus-reader"
+      "octopus-reader",
+      "sdk"
     ],
     "nohoist": [
       "*"
