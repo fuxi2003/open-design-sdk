@@ -49,7 +49,7 @@ describe('Artboard', () => {
       const octopus = createOctopus({})
       const artboard = new Artboard('a', { ...octopus })
 
-      deepStrictEqual(artboard.octopus, octopus)
+      deepStrictEqual(artboard.getOctopus(), octopus)
     })
 
     it('should have the provided name', () => {

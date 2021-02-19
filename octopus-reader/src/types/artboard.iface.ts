@@ -10,8 +10,6 @@ import type { IPage } from './page.iface'
 import type { LayerSelector } from './selectors.type'
 
 export interface IArtboard {
-  readonly octopus: ArtboardOctopusData | null
-
   readonly id: ArtboardId
   readonly pageId: PageId | null
   readonly componentId: ComponentId | null
@@ -21,6 +19,8 @@ export interface IArtboard {
   setManifest(nextManifest: ArtboardManifestData): void
 
   isLoaded(): boolean
+  getOctopus(): ArtboardOctopusData | null
+  setOctopus(nextOctopus: ArtboardOctopusData): void
 
   getFile(): IFile | null
 

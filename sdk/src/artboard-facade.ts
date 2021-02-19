@@ -33,7 +33,7 @@ export class ArtboardFacade implements IArtboardFacade {
   }
 
   get octopus() {
-    return this._artboardEntity.octopus
+    return this._artboardEntity.getOctopus()
   }
 
   get pageId() {

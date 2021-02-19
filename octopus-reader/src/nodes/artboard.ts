@@ -20,10 +20,10 @@ import type { LayerSelector } from '../types/selectors.type'
 import { IPage } from '../types/page.iface'
 
 export class Artboard implements IArtboard {
-  readonly octopus: ArtboardOctopusData | null
   readonly pageId: PageId | null
 
   private _manifest: ArtboardManifestData
+  private _octopus: ArtboardOctopusData | null
   private _file: IFile | null
 
   constructor(
@@ -44,7 +44,7 @@ export class Artboard implements IArtboard {
       pageId,
       ...manifestParams,
     })
-    this.octopus = octopus || null
+    this._octopus = octopus || null
     this.pageId = pageId || null
 
     this._file = file || null
@@ -59,7 +59,7 @@ export class Artboard implements IArtboard {
       throw new Error('Cannot replace existing artboard ID')
     }
 
-    this._manifest = this._createManifest(nextManifest, this.octopus, {
+    this._manifest = this._createManifest(nextManifest, this._octopus, {
       id: this.id,
     })
   }
@@ -77,7 +77,22 @@ export class Artboard implements IArtboard {
   }
 
   isLoaded(): boolean {
-    return Boolean(this.octopus)
+    return Boolean(this._octopus)
+  }
+
+  getOctopus() {
+    return this._octopus
+  }
+
+  setOctopus(nextOctopus: ArtboardOctopusData) {
+    this._octopus = nextOctopus
+
+    this._manifest = this._createManifest(this._manifest, nextOctopus, {
+      id: this.id,
+    })
+
+    this.getRootLayers.clear()
+    this.getFlattenedLayers.clear()
   }
 
   getFile(): IFile | null {
@@ -99,14 +114,14 @@ export class Artboard implements IArtboard {
   }
 
   setPage(nextPageId: PageId) {
-    this._manifest = this._createManifest(this._manifest, this.octopus, {
+    this._manifest = this._createManifest(this._manifest, this._octopus, {
       id: this.id,
       pageId: nextPageId,
     })
   }
 
   unassignFromPage() {
-    this._manifest = this._createManifest(this._manifest, this.octopus, {
+    this._manifest = this._createManifest(this._manifest, this._octopus, {
       id: this.id,
       pageId: null,
     })
@@ -114,7 +129,7 @@ export class Artboard implements IArtboard {
 
   getRootLayers = memoize(
     (): ILayerCollection => {
-      const layerDataList = this.octopus?.['layers'] || []
+      const layerDataList = this._octopus?.['layers'] || []
       const layerList = createLayers(layerDataList, { artboard: this })
 
       return new LayerCollection(layerList)
@@ -123,7 +138,7 @@ export class Artboard implements IArtboard {
 
   getFlattenedLayers = memoize(
     (options: Partial<{ depth: number }> = {}): ILayerCollection => {
-      const layerDataList = this.octopus?.['layers'] || []
+      const layerDataList = this._octopus?.['layers'] || []
       const depth = options.depth || Infinity
       const layerList = createFlattenedLayers(layerDataList, {
         artboard: this,
@@ -172,8 +187,8 @@ export class Artboard implements IArtboard {
   }
 
   getBackgroundColor(): RgbaColor | null {
-    return this.octopus?.['hasBackgroundColor']
-      ? this.octopus['backgroundColor'] || null
+    return this._octopus?.['hasBackgroundColor']
+      ? this._octopus['backgroundColor'] || null
       : null
   }
 
