@@ -4,6 +4,7 @@
     "emitDecoratorMetadata": true,
     "strict": true,
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "resolveJsonModule": true,
     "noUncheckedIndexedAccess": true,
     "lib": ["es2020", "dom"],
