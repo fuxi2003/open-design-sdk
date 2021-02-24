@@ -11,9 +11,14 @@ import type { ArtboardOctopusData } from './octopus.type'
 import type { ArtboardSelector, LayerSelector } from './selectors.type'
 
 export interface IFile {
+  /** @category Octopus File Manifest */
   getManifest(): ManifestData
+  /** @category Octopus File Manifest */
   setManifest(nextManifest: ManifestData): void
 
+  /**
+   * @category Artboard Management
+   */
   addArtboard(
     artboardId: ArtboardId,
     octopus: ArtboardOctopusData,
@@ -25,35 +30,47 @@ export interface IFile {
     }>
   ): IArtboard
 
+  /** @category Artboard Management */
   removeArtboard(artboardId: ArtboardId): boolean
 
+  /** @category Artboard Lookup */
   getArtboards(): Array<IArtboard>
+  /** @category Artboard Lookup */
   getPageArtboards(pageId: PageId): Array<IArtboard>
+  /** @category Artboard Lookup */
   getComponentArtboards(): Array<IArtboard>
+  /** @category Artboard Lookup */
   getArtboardById(artboardId: ArtboardId): IArtboard | null
-  getArtboardByComponentId(
-    componentId: ArtboardOctopusData['symbolID']
-  ): IArtboard | null
+  /** @category Artboard Lookup */
+  getArtboardByComponentId(componentId: ComponentId): IArtboard | null
+  /** @category Artboard Lookup */
   findArtboard(selector: ArtboardSelector): IArtboard | null
+  /** @category Artboard Lookup */
   findArtboards(selector: ArtboardSelector): Array<IArtboard>
 
+  /** @category Layer Lookup */
+  getFlattenedLayers(options?: Partial<{ depth: number }>): IFileLayerCollection
+  /** @category Layer Lookup */
+  findLayerById(layerId: LayerId): FileLayerDescriptor | null
+  /** @category Layer Lookup */
+  findLayersById(layerId: LayerId): IFileLayerCollection
+  /** @category Layer Lookup */
+  findLayer(
+    selector: FileLayerSelector,
+    options?: Partial<{ depth: number }>
+  ): FileLayerDescriptor | null
+  /** @category Layer Lookup */
+  findLayers(
+    selector: FileLayerSelector,
+    options?: Partial<{ depth: number }>
+  ): IFileLayerCollection
+
+  /** @category Asset Aggregation */
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
   ): Array<AggregatedFileBitmapAssetDescriptor>
+  /** @category Asset Aggregation */
   getFonts(
     options?: Partial<{ depth: number }>
   ): Array<AggregatedFileFontDescriptor>
-
-  getFlattenedLayers(options?: Partial<{ depth: number }>): IFileLayerCollection
-
-  findLayerById(layerId: LayerId): FileLayerDescriptor | null
-  findLayersById(layerId: LayerId): IFileLayerCollection
-  findLayer(
-    selector: LayerSelector,
-    options?: Partial<{ depth: number }>
-  ): FileLayerDescriptor | null
-  findLayers(
-    selector: LayerSelector,
-    options?: Partial<{ depth: number }>
-  ): IFileLayerCollection
 }
