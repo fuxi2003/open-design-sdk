@@ -13,6 +13,7 @@ import {
 } from '../utils/aggregation'
 import { matchArtboard } from '../utils/artboard-lookup'
 import { memoize } from '../utils/memoize'
+import { matchPage } from '../utils/page-lookup'
 
 import type { IFile } from '../types/file.iface'
 import type {
@@ -23,11 +24,16 @@ import type {
 } from '../types/ids.type'
 import type { IArtboard } from '../types/artboard.iface'
 import type { ArtboardOctopusData } from '../types/octopus.type'
-import type { ArtboardSelector, LayerSelector } from '../types/selectors.type'
+import type {
+  ArtboardSelector,
+  LayerSelector,
+  PageSelector,
+} from '../types/selectors.type'
 import type { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
 import type { AggregatedFileFontDescriptor } from '../types/fonts.type'
 import type { FileLayerDescriptor } from '../types/file-layer-collection.iface'
 import type { ArtboardManifestData, ManifestData } from '../types/manifest.type'
+import type { IPage } from '../types/page.iface'
 
 export class File implements IFile {
   private _fileData = new FileData(this)
@@ -38,6 +44,66 @@ export class File implements IFile {
 
   setManifest(nextManifest: ManifestData) {
     this._fileData.setManifest(nextManifest)
+  }
+
+  addPage(
+    pageId: PageId,
+    params: Partial<{
+      name: string | null
+    }> = {}
+  ): IPage {
+    return this._fileData.addPage(pageId, params)
+  }
+
+  removePage(
+    pageId: PageId,
+    options: Partial<{ unassignArtboards: boolean }> = {}
+  ): boolean {
+    return this._fileData.removePage(pageId, options)
+  }
+
+  getPages(): Array<IPage> {
+    return this._fileData.getPageList()
+  }
+
+  getPageById(pageId: PageId): IPage | null {
+    const pagesById = this._fileData.getPageMap()
+    return pagesById[pageId] || null
+  }
+
+  findPage(selector: PageSelector): IPage | null {
+    const selectorKeys = Object.keys(selector)
+    if (
+      selectorKeys.length === 1 &&
+      selectorKeys[0] === 'id' &&
+      typeof selector['id'] === 'string'
+    ) {
+      return this.getPageById(selector['id'])
+    }
+
+    for (const page of this.getPages()) {
+      if (matchPage(selector, page)) {
+        return page
+      }
+    }
+
+    return null
+  }
+
+  findPages(selector: PageSelector): Array<IPage> {
+    const selectorKeys = Object.keys(selector)
+    if (
+      selectorKeys.length === 1 &&
+      selectorKeys[0] === 'id' &&
+      typeof selector['id'] === 'string'
+    ) {
+      const page = this.getPageById(selector['id'])
+      return page ? [page] : []
+    }
+
+    return this.getPages().filter((page) => {
+      return matchPage(selector, page)
+    })
   }
 
   addArtboard(

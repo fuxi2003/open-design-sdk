@@ -6,6 +6,7 @@ import type { ILayerCollection } from './layer-collection.iface'
 import type { ILayer } from './layer.iface'
 import type { ArtboardManifestData } from './manifest.type'
 import type { ArtboardOctopusData, RgbaColor } from './octopus.type'
+import type { IPage } from './page.iface'
 import type { LayerSelector } from './selectors.type'
 
 export interface IArtboard {
@@ -22,6 +23,10 @@ export interface IArtboard {
   isLoaded(): boolean
 
   getFile(): IFile | null
+
+  getPage(): IPage | null
+  setPage(nextPageId: PageId | null): void
+  unassignFromPage(): void
 
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>

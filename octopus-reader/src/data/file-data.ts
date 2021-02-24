@@ -1,4 +1,5 @@
 import { Artboard } from '../nodes/artboard'
+import { Page } from '../nodes/page'
 
 import { memoize } from '../utils/memoize'
 
@@ -7,10 +8,13 @@ import type { IFile } from '../types/file.iface'
 import type { ArtboardId, PageId } from '../types/ids.type'
 import type { ArtboardManifestData, ManifestData } from '../types/manifest.type'
 import type { ArtboardOctopusData, ComponentId } from '../types/octopus.type'
+import type { IPage } from '../types/page.iface'
 
 export class FileData {
   private _file: IFile
 
+  private _paged: boolean = false
+  private _pageList: Array<IPage> = []
   private _artboardList: Array<IArtboard> = []
 
   constructor(file: IFile) {
@@ -22,10 +26,33 @@ export class FileData {
       'artboards': this._artboardList.map((artboard) => {
         return artboard.getManifest()
       }),
+
+      'pages': this._paged
+        ? this._pageList.reduce((pageNameMap, page) => {
+            return { ...pageNameMap, [page.id]: page.name }
+          }, {})
+        : null,
     }
   })
 
   setManifest(nextManifest: ManifestData) {
+    const pageNames = nextManifest['pages']
+
+    this._paged = Boolean(pageNames)
+
+    if (pageNames) {
+      Object.keys(pageNames).forEach((pageId) => {
+        const pageName = pageNames[pageId] || null
+        const prevPage = this.getPageById(pageId)
+
+        if (prevPage) {
+          prevPage.name = pageName
+        } else {
+          this.addPage(pageId, { name: pageName })
+        }
+      })
+    }
+
     nextManifest['artboards'].forEach((nextArtboardManifest) => {
       const artboardId = nextArtboardManifest['artboard_original_id']
       const prevArtboard = this.getArtboardById(artboardId)
@@ -38,6 +65,66 @@ export class FileData {
         })
       }
     })
+  }
+
+  addPage(
+    pageId: PageId,
+    params?: Partial<{
+      name: string | null
+    }>
+  ): IPage {
+    const index = this._pageList.findIndex((page) => page.id === pageId)
+    if (index > -1) {
+      throw new Error('Duplicate page')
+    }
+
+    const page = new Page(pageId, { ...params, file: this._file })
+    this._replacePageList((prevPageList) => {
+      return [...prevPageList, page]
+    })
+
+    return page
+  }
+
+  removePage(
+    pageId: PageId,
+    options: Partial<{ unassignArtboards: boolean }> = {}
+  ): boolean {
+    return this._replacePageList((pageList) => {
+      const index = pageList.findIndex((page) => page.id === pageId)
+      const removedPage = index > -1 ? pageList[index] : null
+      if (!removedPage) {
+        return pageList
+      }
+
+      removedPage.getArtboards().forEach((artboard) => {
+        if (options.unassignArtboards) {
+          artboard.unassignFromPage()
+        } else {
+          this.removeArtboard(artboard.id)
+        }
+      })
+
+      return [...pageList.slice(0, index), ...pageList.slice(index + 1)]
+    })
+  }
+
+  getPageList(): Array<IPage> {
+    return this._pageList
+  }
+
+  getPageMap = memoize(() => {
+    const pagesById: Record<PageId, IPage> = {}
+    this._pageList.forEach((page) => {
+      pagesById[page.id] = page
+    })
+
+    return pagesById
+  })
+
+  getPageById(pageId: PageId): IPage | null {
+    const pagesById = this.getPageMap()
+    return pagesById[pageId] || null
   }
 
   addArtboard(
@@ -130,6 +217,21 @@ export class FileData {
 
     return artboardsByComponentId
   })
+
+  _replacePageList(
+    mapper: (prevPageList: Array<IPage>) => Array<IPage>
+  ): boolean {
+    const prevPageList = this._pageList
+    const nextPageList = mapper(prevPageList)
+    if (prevPageList === nextPageList) {
+      return false
+    }
+
+    this.getPageMap.clear()
+    this.getManifest.clear()
+
+    return true
+  }
 
   _replaceArtboardList(
     mapper: (prevArtboardList: Array<IArtboard>) => Array<IArtboard>

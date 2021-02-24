@@ -1,0 +1,178 @@
+import { FileLayerCollection } from '../collections/file-layer-collection'
+import { IArtboard } from '../types/artboard.iface'
+import { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
+import { FileLayerDescriptor } from '../types/file-layer-collection.iface'
+import { IFile } from '../types/file.iface'
+import { AggregatedFileFontDescriptor } from '../types/fonts.type'
+import { ArtboardId, ComponentId, LayerId, PageId } from '../types/ids.type'
+import { IPage } from '../types/page.iface'
+import { ArtboardSelector, LayerSelector } from '../types/selectors.type'
+import {
+  findLayer,
+  findLayerById,
+  findLayers,
+  findLayersById,
+  getBitmapAssets,
+  getFlattenedLayers,
+  getFonts,
+} from '../utils/aggregation'
+import { matchArtboard } from '../utils/artboard-lookup'
+
+export class Page implements IPage {
+  readonly id: PageId
+
+  private _file: IFile
+  private _name: string | null
+
+  constructor(id: PageId, params: { name?: string | null; file: IFile }) {
+    this.id = id
+
+    this._file = params.file
+    this._name = params.name || null
+  }
+
+  get name() {
+    return this._name
+  }
+
+  set name(nextName: string | null) {
+    this._name = nextName
+  }
+
+  addArtboard(artboardId: ArtboardId): void {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('Artboard not found')
+    }
+
+    artboard.setPage(this.id)
+  }
+
+  removeArtboard(artboardId: ArtboardId): boolean {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      return false
+    }
+
+    return this._file.removeArtboard(artboardId)
+  }
+
+  unassignArtboard(artboardId: ArtboardId): boolean {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      return false
+    }
+
+    artboard.unassignFromPage()
+    return true
+  }
+
+  getArtboards(): Array<IArtboard> {
+    return this._file.getPageArtboards(this.id)
+  }
+
+  getArtboardById(artboardId: ArtboardId): IArtboard | null {
+    const artboard = this._file.getArtboardById(artboardId)
+    if (!artboard || artboard.pageId !== this.id) {
+      return null
+    }
+
+    return artboard
+  }
+
+  getArtboardByComponentId(componentId: ComponentId): IArtboard | null {
+    const artboard = this._file.getArtboardByComponentId(componentId)
+    if (!artboard || artboard.pageId !== this.id) {
+      return null
+    }
+
+    return artboard
+  }
+
+  getComponentArtboards(): Array<IArtboard> {
+    return this.getArtboards().filter((artboard) => {
+      return artboard.isComponent()
+    })
+  }
+
+  findArtboard(selector: ArtboardSelector): IArtboard | null {
+    const selectorKeys = Object.keys(selector)
+    if (
+      selectorKeys.length === 1 &&
+      selectorKeys[0] === 'id' &&
+      typeof selector['id'] === 'string'
+    ) {
+      return this.getArtboardById(selector['id'])
+    }
+
+    for (const artboard of this.getArtboards()) {
+      if (matchArtboard(selector, artboard)) {
+        return artboard
+      }
+    }
+
+    return null
+  }
+
+  findArtboards(selector: ArtboardSelector): Array<IArtboard> {
+    const selectorKeys = Object.keys(selector)
+    if (
+      selectorKeys.length === 1 &&
+      selectorKeys[0] === 'id' &&
+      typeof selector['id'] === 'string'
+    ) {
+      const artboard = this.getArtboardById(selector['id'])
+      return artboard ? [artboard] : []
+    }
+
+    return this.getArtboards().filter((artboard) => {
+      return matchArtboard(selector, artboard)
+    })
+  }
+
+  getBitmapAssets(
+    options: Partial<{ depth: number; includePrerendered: boolean }>
+  ): Array<AggregatedFileBitmapAssetDescriptor> {
+    return getBitmapAssets(this.getArtboards(), options)
+  }
+
+  getFonts(
+    options: Partial<{ depth: number }>
+  ): Array<AggregatedFileFontDescriptor> {
+    return getFonts(this.getArtboards(), options)
+  }
+
+  getFlattenedLayers(
+    options: Partial<{ depth: number }> = {}
+  ): FileLayerCollection {
+    const layers = getFlattenedLayers(this.getArtboards(), options)
+
+    return new FileLayerCollection(layers, this._file)
+  }
+
+  findLayerById(layerId: LayerId): FileLayerDescriptor | null {
+    return findLayerById(this.getArtboards(), layerId)
+  }
+
+  findLayersById(layerId: LayerId): FileLayerCollection {
+    const layers = findLayersById(this.getArtboards(), layerId)
+
+    return new FileLayerCollection(layers, this._file)
+  }
+
+  findLayer(
+    selector: LayerSelector,
+    options: Partial<{ depth: number }> = {}
+  ): FileLayerDescriptor | null {
+    return findLayer(this.getArtboards(), selector, options)
+  }
+
+  findLayers(
+    selector: LayerSelector,
+    options: Partial<{ depth: number }> = {}
+  ): FileLayerCollection {
+    const layers = findLayers(this.getArtboards(), selector, options)
+
+    return new FileLayerCollection(layers, this._file)
+  }
+}

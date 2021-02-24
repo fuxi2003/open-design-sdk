@@ -17,9 +17,11 @@ import type {
   RgbaColor,
 } from '../types/octopus.type'
 import type { LayerSelector } from '../types/selectors.type'
+import { IPage } from '../types/page.iface'
 
 export class Artboard implements IArtboard {
   readonly octopus: ArtboardOctopusData | null
+  readonly pageId: PageId | null
 
   private _manifest: ArtboardManifestData
   private _file: IFile | null
@@ -35,13 +37,15 @@ export class Artboard implements IArtboard {
       file: IFile | null
     }> = {}
   ) {
-    const { file, manifest, ...manifestParams } = params
+    const { file, pageId, manifest, ...manifestParams } = params
 
     this._manifest = this._createManifest(params.manifest || null, octopus, {
       id,
+      pageId,
       ...manifestParams,
     })
     this.octopus = octopus || null
+    this.pageId = pageId || null
 
     this._file = file || null
   }
@@ -61,10 +65,6 @@ export class Artboard implements IArtboard {
   }
 
   get id(): ArtboardId {
-  }
-
-  get pageId(): PageId | null {
-    return this.manifest['page_original_id'] || null
     return this._manifest['artboard_original_id']
   }
 
@@ -82,6 +82,34 @@ export class Artboard implements IArtboard {
 
   getFile(): IFile | null {
     return this._file
+  }
+
+  getPage(): IPage | null {
+    const pageId = this.pageId
+    if (!pageId) {
+      return null
+    }
+
+    const file = this._file
+    if (!file) {
+      throw new Error('Cannot retrieve a detached artboard page')
+    }
+
+    return file.getPageById(pageId)
+  }
+
+  setPage(nextPageId: PageId) {
+    this._manifest = this._createManifest(this._manifest, this.octopus, {
+      id: this.id,
+      pageId: nextPageId,
+    })
+  }
+
+  unassignFromPage() {
+    this._manifest = this._createManifest(this._manifest, this.octopus, {
+      id: this.id,
+      pageId: null,
+    })
   }
 
   getRootLayers = memoize(
@@ -170,6 +198,8 @@ export class Artboard implements IArtboard {
       name = prevManifest?.['artboard_name'],
     } = params
 
+    const page = this._file && pageId ? this._file.getPageById(pageId) : null
+
     return {
       ...(prevManifest || {
         'failed': false,
@@ -190,7 +220,12 @@ export class Artboard implements IArtboard {
       ...(pageId
         ? {
             'page_original_id': pageId,
-            'page_name': prevManifest?.['page_name'] || null,
+            'page_name':
+              page?.name ||
+              (pageId === prevManifest?.['page_original_id']
+                ? prevManifest?.['page_name']
+                : null) ||
+              null,
           }
         : {}),
     }

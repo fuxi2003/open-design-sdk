@@ -1,5 +1,10 @@
-import type { ArtboardId, LayerId } from './ids.type'
+import type { ArtboardId, LayerId, PageId } from './ids.type'
 import type { LayerOctopusData } from './octopus.type'
+
+export type PageSelector = Partial<{
+  id: PageId | Array<PageId>
+  name: string | Array<string> | RegExp
+}>
 
 export type ArtboardSelector = Partial<{
   id: ArtboardId | Array<ArtboardId>

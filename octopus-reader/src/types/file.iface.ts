@@ -8,13 +8,32 @@ import type { AggregatedFileFontDescriptor } from './fonts.type'
 import type { ArtboardId, ComponentId, LayerId, PageId } from './ids.type'
 import type { ArtboardManifestData, ManifestData } from './manifest.type'
 import type { ArtboardOctopusData } from './octopus.type'
-import type { ArtboardSelector, LayerSelector } from './selectors.type'
+import type { IPage } from './page.iface'
+import type {
+  ArtboardSelector,
+  FileLayerSelector,
+  PageSelector,
+} from './selectors.type'
 
 export interface IFile {
   /** @category Octopus File Manifest */
   getManifest(): ManifestData
   /** @category Octopus File Manifest */
   setManifest(nextManifest: ManifestData): void
+
+  /** @category Page Management */
+  addPage(
+    pageId: PageId,
+    params?: Partial<{
+      name: string | null
+    }>
+  ): IPage
+
+  /** @category Page Management */
+  removePage(
+    pageId: PageId,
+    options?: Partial<{ unassignArtboards: boolean }>
+  ): boolean
 
   /**
    * @category Artboard Management
@@ -32,6 +51,15 @@ export interface IFile {
 
   /** @category Artboard Management */
   removeArtboard(artboardId: ArtboardId): boolean
+
+  /** @category Page Lookup */
+  getPages(): Array<IPage>
+  /** @category Page Lookup */
+  getPageById(pageId: PageId): IPage | null
+  /** @category Page Lookup */
+  findPage(selector: PageSelector): IPage | null
+  /** @category Page Lookup */
+  findPages(selector: PageSelector): Array<IPage>
 
   /** @category Artboard Lookup */
   getArtboards(): Array<IArtboard>
