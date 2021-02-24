@@ -2,6 +2,11 @@ import { Artboard } from './artboard'
 import { FileLayerCollection } from '../collections/file-layer-collection'
 
 import { matchArtboard } from '../utils/artboard-lookup'
+import {
+  keepUniqueFileBitmapAssetDescriptors,
+  keepUniqueFileFontDescriptors,
+} from '../utils/assets'
+import { memoize } from '../utils/memoize'
 
 import type { IFile } from '../types/file.iface'
 import type {
@@ -13,6 +18,8 @@ import type {
 import type { IArtboard } from '../types/artboard.iface'
 import type { ArtboardOctopusData } from '../types/octopus.type'
 import type { ArtboardSelector, LayerSelector } from '../types/selectors.type'
+import type { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
+import type { AggregatedFileFontDescriptor } from '../types/fonts.type'
 import type { FileLayerDescriptor } from '../types/file-layer-collection.iface'
 
 export class File implements IFile {
@@ -165,6 +172,32 @@ export class File implements IFile {
     return this._artboardList.filter((artboard) => {
       return matchArtboard(selector, artboard)
     })
+  }
+
+  getBitmapAssets(
+    options: Partial<{ depth: number; includePrerendered: boolean }>
+  ): Array<AggregatedFileBitmapAssetDescriptor> {
+    return keepUniqueFileBitmapAssetDescriptors(
+      this._artboardList.flatMap((artboard) => {
+        return artboard.getBitmapAssets(options).map((assetDesc) => {
+          const { layerIds, ...data } = assetDesc
+          return { ...data, artboardLayerIds: { [artboard.id]: layerIds } }
+        })
+      })
+    )
+  }
+
+  getFonts(
+    options: Partial<{ depth: number }>
+  ): Array<AggregatedFileFontDescriptor> {
+    return keepUniqueFileFontDescriptors(
+      this._artboardList.flatMap((artboard) => {
+        return artboard.getFonts(options).map((assetDesc) => {
+          const { layerIds, ...data } = assetDesc
+          return { ...data, artboardLayerIds: { [artboard.id]: layerIds } }
+        })
+      })
+    )
   }
 
   getFlattenedLayers = memoize(

@@ -1,3 +1,5 @@
+import type { AggregatedBitmapAssetDescriptor } from './bitmap-assets.type'
+import type { AggregatedFontDescriptor } from './fonts.type'
 import type { LayerId } from './ids.type'
 import type { ILayer } from './layer.iface'
 import type { LayerSelector } from './selectors.type'
@@ -32,4 +34,11 @@ export interface ILayerCollection {
   concat(addedLayers: ILayerCollection | Array<ILayer>): ILayerCollection
 
   flatten(options?: Partial<{ depth: number }>): ILayerCollection
+
+  getBitmapAssets(
+    options?: Partial<{ depth: number; includePrerendered: boolean }>
+  ): Array<AggregatedBitmapAssetDescriptor>
+  getFonts(
+    options?: Partial<{ depth: number }>
+  ): Array<AggregatedFontDescriptor>
 }

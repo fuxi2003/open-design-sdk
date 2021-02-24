@@ -1,4 +1,6 @@
+import type { AggregatedBitmapAssetDescriptor } from './bitmap-assets.type'
 import type { IFile } from './file.iface'
+import type { AggregatedFontDescriptor } from './fonts.type'
 import type { ArtboardId, LayerId, PageId } from './ids.type'
 import type { ILayerCollection } from './layer-collection.iface'
 import type { ILayer } from './layer.iface'
@@ -12,6 +14,13 @@ export interface IArtboard {
   readonly octopus: ArtboardOctopusData
 
   getFile(): IFile | null
+
+  getBitmapAssets(
+    options?: Partial<{ includePrerendered: boolean }>
+  ): Array<AggregatedBitmapAssetDescriptor>
+  getFonts(
+    options?: Partial<{ depth: number }>
+  ): Array<AggregatedFontDescriptor>
 
   getBackgroundColor(): RgbaColor | null
 

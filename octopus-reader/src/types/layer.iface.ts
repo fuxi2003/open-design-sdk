@@ -1,6 +1,8 @@
 import type { IArtboard } from './artboard.iface'
+import type { AggregatedBitmapAssetDescriptor } from './bitmap-assets.type'
 import type { IBitmap } from './bitmap.iface'
 import type { IEffects } from './effects.iface'
+import type { AggregatedFontDescriptor } from './fonts.type'
 import type { LayerId } from './ids.type'
 import type { ILayerCollection } from './layer-collection.iface'
 import type { LayerOctopusData } from './octopus.type'
@@ -45,6 +47,13 @@ export interface ILayer {
   isComponentInstance(): boolean
   hasComponentOverrides(): boolean
   getComponentArtboard(): IArtboard | null
+
+  getBitmapAssets(
+    options?: Partial<{ depth: number; includePrerendered: boolean }>
+  ): Array<AggregatedBitmapAssetDescriptor>
+  getFonts(
+    options?: Partial<{ depth: number }>
+  ): Array<AggregatedFontDescriptor>
 
   getBitmap(): IBitmap | null
   getPrerenderedBitmap(): IBitmap | null

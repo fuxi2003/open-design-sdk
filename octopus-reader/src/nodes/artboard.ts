@@ -4,7 +4,9 @@ import { createFlattenedLayers, createLayers } from '../utils/layer-factories'
 import { memoize } from '../utils/memoize'
 
 import type { IArtboard } from '../types/artboard.iface'
+import type { AggregatedBitmapAssetDescriptor } from '../types/bitmap-assets.type'
 import type { IFile } from '../types/file.iface'
+import type { AggregatedFontDescriptor } from '../types/fonts.type'
 import type { ArtboardId, LayerId, PageId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
 import type { ILayerCollection } from '../types/layer-collection.iface'
@@ -74,6 +76,26 @@ export class Artboard implements IArtboard {
   findLayers(selector: LayerSelector): ILayerCollection {
     return this.getFlattenedLayers().findLayers(selector, { depth: 1 })
   }
+
+  getBitmapAssets(
+    options: Partial<{ depth: number; includePrerendered: boolean }> = {}
+  ): Array<AggregatedBitmapAssetDescriptor> {
+    const depth = options.depth || Infinity
+
+    return this.getFlattenedLayers({ depth }).getBitmapAssets({
+      ...options,
+      depth: 1,
+    })
+  }
+
+  getFonts(
+    options: Partial<{ depth: number }> = {}
+  ): Array<AggregatedFontDescriptor> {
+    const depth = options.depth || Infinity
+
+    return this.getFlattenedLayers({ depth }).getFonts({ depth: 1 })
+  }
+
   getLayerDepth(layerId: LayerId): number | null {
     const layer = this.getLayerById(layerId)
     return layer ? layer.getDepth() : null

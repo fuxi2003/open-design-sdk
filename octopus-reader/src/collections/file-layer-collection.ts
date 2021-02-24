@@ -1,13 +1,19 @@
 import {
+  keepUniqueFileBitmapAssetDescriptors,
+  keepUniqueFileFontDescriptors,
+} from '../utils/assets'
+import {
   findLayerInFileLayers,
   findLayersInFileLayers,
 } from '../utils/layer-lookup'
 
+import type { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
 import type {
   FileLayerDescriptor,
   IFileLayerCollection,
 } from '../types/file-layer-collection.iface'
 import type { IFile } from '../types/file.iface'
+import type { AggregatedFileFontDescriptor } from '../types/fonts.type'
 import type { LayerSelector } from '../types/selectors.type'
 
 export class FileLayerCollection implements IFileLayerCollection {
@@ -84,5 +90,31 @@ export class FileLayerCollection implements IFileLayerCollection {
     const layers = [...this.getLayers(), ...addedLayerList]
 
     return new FileLayerCollection(layers, this._file)
+  }
+
+  getBitmapAssets(
+    options: Partial<{ depth: number; includePrerendered: boolean }> = {}
+  ): Array<AggregatedFileBitmapAssetDescriptor> {
+    return keepUniqueFileBitmapAssetDescriptors(
+      this.getLayers().flatMap(({ artboardId, layer }) => {
+        return layer.getBitmapAssets(options).map((assetDesc) => {
+          const { layerIds, ...data } = assetDesc
+          return { ...data, artboardLayerIds: { [artboardId]: layerIds } }
+        })
+      })
+    )
+  }
+
+  getFonts(
+    options: Partial<{ depth: number }> = {}
+  ): Array<AggregatedFileFontDescriptor> {
+    return keepUniqueFileFontDescriptors(
+      this.getLayers().flatMap(({ artboardId, layer }) => {
+        return layer.getFonts(options).map((assetDesc) => {
+          const { layerIds, ...data } = assetDesc
+          return { ...data, artboardLayerIds: { [artboardId]: layerIds } }
+        })
+      })
+    )
   }
 }

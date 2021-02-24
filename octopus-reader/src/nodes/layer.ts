@@ -4,12 +4,22 @@ import { LayerCollection } from '../collections/layer-collection'
 import { Shape } from '../layer-info/shape'
 import { Text } from '../layer-info/text'
 
+import {
+  keepUniqueBitmapAssetDescriptors,
+  keepUniqueFontDescriptors,
+} from '../utils/assets'
+import { getLayerBitmapAssets } from '../utils/layer-bitmaps'
 import { createLayers } from '../utils/layer-factories'
 import { memoize } from '../utils/memoize'
 
 import type { IArtboard } from '../types/artboard.iface'
 import type { IBitmap } from '../types/bitmap.iface'
+import type { AggregatedBitmapAssetDescriptor } from '../types/bitmap-assets.type'
 import type { IEffects } from '../types/effects.iface'
+import type {
+  AggregatedFontDescriptor,
+  FontDescriptor,
+} from '../types/fonts.type'
 import type { LayerId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
 import type { ILayerCollection } from '../types/layer-collection.iface'
@@ -169,6 +179,58 @@ export class Layer implements ILayer {
     }
   )
 
+  getBitmapAssets(
+    options: Partial<{ depth: number; includePrerendered: boolean }> = {}
+  ): Array<AggregatedBitmapAssetDescriptor> {
+    const layerBitmapAssetDescs = this._createBitmapAssetDescriptors({
+      includePrerendered: options.includePrerendered !== false,
+    }).map((desc) => {
+      const { layerId, ...data } = desc
+      return { ...data, layerIds: [layerId] }
+    })
+
+    const depth = options.depth || Infinity
+    const nestedLayerBitmapAssetDescs =
+      depth === 1
+        ? []
+        : this.getNestedLayers({ depth: 1 }).flatMap((nestedLayer) => {
+            return nestedLayer.getBitmapAssets({
+              ...options,
+              depth: depth - 1,
+            })
+          })
+
+    return keepUniqueBitmapAssetDescriptors([
+      ...layerBitmapAssetDescs,
+      ...nestedLayerBitmapAssetDescs,
+    ])
+  }
+
+  getFonts(
+    options: Partial<{ depth: number; includePrerendered: boolean }> = {}
+  ): Array<AggregatedFontDescriptor> {
+    const layerFontDescs = this._createFontDescriptors().map((desc) => {
+      const { layerId, ...data } = desc
+      return { ...data, layerIds: [layerId] }
+    })
+
+    const depth = options.depth || Infinity
+    const nestedLayerFontDescs =
+      depth === 1
+        ? []
+        : this.getNestedLayers({ depth: 1 }).flatMap((nestedLayer) => {
+            return nestedLayer.getFonts({
+              ...options,
+              depth: depth - 1,
+            })
+          })
+
+    return keepUniqueFontDescriptors([
+      ...layerFontDescs,
+      ...nestedLayerFontDescs,
+    ])
+  }
+
   isMasked(): boolean {
     return Boolean(this.octopus['clipped'])
   }
@@ -254,6 +316,28 @@ export class Layer implements ILayer {
   getEffects = memoize(
     (): IEffects => {
       return new Effects(this.octopus['effects'] || {})
+    }
+  )
+
+  _createBitmapAssetDescriptors = memoize(
+    (params: { includePrerendered: boolean }) => {
+      return getLayerBitmapAssets(this, params)
+    },
+    2
+  )
+
+  _createFontDescriptors = memoize(
+    (): Array<FontDescriptor> => {
+      const layerId = this.id
+      const text = this.getText()
+      const fonts = text ? text.getFonts() : []
+
+      return fonts.map((fontDesc) => {
+        return {
+          ...fontDesc,
+          layerId,
+        }
+      })
     }
   )
 }

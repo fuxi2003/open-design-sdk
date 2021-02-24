@@ -1,3 +1,7 @@
+import {
+  keepUniqueBitmapAssetDescriptors,
+  keepUniqueFontDescriptors,
+} from '../utils/assets'
 import { createLayerMap } from '../utils/layer-factories'
 import { findLayerInLayers, findLayersInLayers } from '../utils/layer-lookup'
 
@@ -6,6 +10,8 @@ import type { IArtboard } from '../types/artboard.iface'
 import type { LayerId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
 import type { LayerSelector } from '../types/selectors.type'
+import type { AggregatedBitmapAssetDescriptor } from '../types/bitmap-assets.type'
+import type { AggregatedFontDescriptor } from '../types/fonts.type'
 
 export class LayerCollection implements ILayerCollection {
   readonly length: number
@@ -88,5 +94,25 @@ export class LayerCollection implements ILayerCollection {
     })
 
     return new LayerCollection(flattenedLayers, this._artboard)
+  }
+
+  getBitmapAssets(
+    options: Partial<{ depth: number; includePrerendered: boolean }> = {}
+  ): Array<AggregatedBitmapAssetDescriptor> {
+    return keepUniqueBitmapAssetDescriptors(
+      this.getLayers().flatMap((layer) => {
+        return layer.getBitmapAssets(options)
+      })
+    )
+  }
+
+  getFonts(
+    options: Partial<{ depth: number }> = {}
+  ): Array<AggregatedFontDescriptor> {
+    return keepUniqueFontDescriptors(
+      this.getLayers().flatMap((layer) => {
+        return layer.getFonts(options)
+      })
+    )
   }
 }

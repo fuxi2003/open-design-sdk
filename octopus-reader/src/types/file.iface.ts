@@ -1,8 +1,10 @@
 import type { IArtboard } from './artboard.iface'
+import type { AggregatedFileBitmapAssetDescriptor } from './bitmap-assets.type'
 import type {
   FileLayerDescriptor,
   IFileLayerCollection,
 } from './file-layer-collection.iface'
+import type { AggregatedFileFontDescriptor } from './fonts.type'
 import type { ArtboardId, LayerId, PageId } from './ids.type'
 import type { ArtboardOctopusData } from './octopus.type'
 import type { ArtboardSelector, LayerSelector } from './selectors.type'
@@ -28,6 +30,13 @@ export interface IFile {
   ): IArtboard | null
   findArtboard(selector: ArtboardSelector): IArtboard | null
   findArtboards(selector: ArtboardSelector): Array<IArtboard>
+
+  getBitmapAssets(
+    options?: Partial<{ includePrerendered: boolean }>
+  ): Array<AggregatedFileBitmapAssetDescriptor>
+  getFonts(
+    options?: Partial<{ depth: number }>
+  ): Array<AggregatedFileFontDescriptor>
 
   getFlattenedLayers(options?: Partial<{ depth: number }>): IFileLayerCollection
 
