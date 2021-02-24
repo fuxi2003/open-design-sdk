@@ -13,19 +13,19 @@ export type ArtboardOctopusData = components['schemas']['OctopusDocument']
 // }
 
 export type Bounds = {
-  left: number
-  top: number
-  width: number
-  height: number
+  left?: number
+  top?: number
+  width?: number
+  height?: number
 }
 
 export type RgbaColor = { 'r': number; 'g': number; 'b': number; 'a': number }
 
 export type BorderRadiuses = {
-  topLeft: number
-  topRight: number
-  bottomRight: number
-  bottomLeft: number
+  topLeft?: number
+  topRight?: number
+  bottomRight?: number
+  bottomLeft?: number
 }
 
 export type Path = {

@@ -688,7 +688,7 @@ describe('Artboard', () => {
     it('should not return a background color when no color is specified in octopus', () => {
       const octopus = createOctopus({
         'hasBackgroundColor': false,
-        'backgroundColor': null,
+        'backgroundColor': undefined,
       })
       const artboard = new Artboard('a', octopus)
 
@@ -733,7 +733,7 @@ describe('Artboard', () => {
 
     it('should not claim the artboard is a component when it does not have a symbol ID in octopus', () => {
       const octopus = createOctopus({
-        'symbolID': null,
+        'symbolID': undefined,
       })
       const artboard = new Artboard('a', octopus)
 

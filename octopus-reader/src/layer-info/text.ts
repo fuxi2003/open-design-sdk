@@ -33,7 +33,7 @@ export class Text implements IText {
         if (font && postScriptName) {
           const fontTypes =
             fontTypeByPostScriptName[postScriptName] || new Set()
-          fontTypes.add(font.type)
+          fontTypes.add(font.type || '')
           fontTypeByPostScriptName[postScriptName] = fontTypes
 
           if (font.syntheticPostScriptName) {

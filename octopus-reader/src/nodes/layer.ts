@@ -52,7 +52,7 @@ export class Layer implements ILayer {
   }
 
   get name() {
-    return this.octopus['name']
+    return this.octopus['name'] == null ? null : this.octopus['name']
   }
 
   get type() {

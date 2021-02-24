@@ -2,7 +2,7 @@ import type { IBitmap } from '../types/bitmap.iface'
 import type { BitmapMetadata, Bounds } from '../types/octopus.type'
 
 type BitmapDescriptor = {
-  'filename': string
+  'filename'?: string
   'bounds'?: Bounds
   'metadata'?: BitmapMetadata
 }

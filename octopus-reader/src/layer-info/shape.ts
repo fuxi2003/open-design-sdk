@@ -11,6 +11,7 @@ export class Shape implements IShape {
   getBorderRadius(): number | null {
     const borderRadiuses = this.getBorderRadiuses()
     return borderRadiuses &&
+      borderRadiuses.topLeft != null &&
       borderRadiuses.topLeft === borderRadiuses.topRight &&
       borderRadiuses.topLeft === borderRadiuses.bottomLeft &&
       borderRadiuses.topLeft === borderRadiuses.bottomRight

@@ -228,9 +228,10 @@ export class Artboard implements IArtboard {
       'is_symbol': Boolean(componentId),
       'symbol_id': componentId || null,
 
-      'frame': octopus
-        ? octopus['frame']
-        : prevManifest?.['frame'] || { 'x': 0, 'y': 0 },
+      'frame': (octopus ? octopus['frame'] : prevManifest?.['frame']) || {
+        'x': 0,
+        'y': 0,
+      },
 
       ...(pageId
         ? {
