@@ -1,3 +1,4 @@
+import type { IOpenDesignApi } from '@opendesign/api/types'
 import type {
   AggregatedBitmapAssetDescriptor,
   AggregatedFileBitmapAssetDescriptor,
@@ -24,7 +25,11 @@ import type {
 
 // -- modules
 
-export interface ISdk {}
+export interface ISdk {
+  fetchDesignById(designId: string): Promise<IDesignFacade>
+
+  useOpenDesignApi(api: IOpenDesignApi): void
+}
 
 export interface IDesignFacade {
   getManifest(): ManifestData

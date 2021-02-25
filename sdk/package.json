@@ -2,6 +2,7 @@
   "name": "@opendesign/sdk",
   "version": "0.0.0-dev",
   "devDependencies": {
+    "@opendesign/api": "0.0.0-dev",
     "@opendesign/octopus-reader": "0.0.0-dev",
     "ts-node": "9.0.0",
     "typescript": "4.1.2"

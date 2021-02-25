@@ -5,6 +5,7 @@ import { PageFacade } from './page-facade'
 import { createEmptyFile } from '../../octopus-reader/src/index'
 import { memoize } from '../../octopus-reader/src/utils/memoize'
 
+import type { IApiDesign } from '@opendesign/api/types'
 import type {
   ArtboardId,
   ArtboardSelector,
@@ -27,6 +28,7 @@ export class DesignFacade implements IDesignFacade {
 
   _filename: string | null
   _designEntity: IFile | null = null
+  _apiDesign: IApiDesign | null = null
 
   _artboardFacades: Map<ArtboardId, ArtboardFacade> = new Map()
   _pageFacades: Map<PageId, PageFacade> = new Map()
@@ -71,6 +73,14 @@ export class DesignFacade implements IDesignFacade {
 
     return entity
   })
+
+  async setApiDesign(apiDesign: IApiDesign) {
+    this._apiDesign = apiDesign
+
+    if (!this._manifestLoaded) {
+      this.setManifest(await apiDesign.getManifest())
+    }
+  }
 
   getArtboards = memoize(() => {
     const prevArtboardFacades = this._artboardFacades
