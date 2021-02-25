@@ -1,7 +1,11 @@
 {
   "name": "@opendesign/sdk",
   "version": "0.0.0-dev",
+  "main": "dist",
   "scripts": {
+    "build": "yarn run clean-build && yarn run build:ts",
+    "build:ts": "tsc --outDir dist --sourceMap --project ./tsconfig-build.json",
+    "clean-build": "rm -rf dist",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\" }' mocha"
   },
   "devDependencies": {
