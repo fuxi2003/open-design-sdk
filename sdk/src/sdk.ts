@@ -4,10 +4,13 @@ import {
 } from './utils/design-factories'
 
 import type { IOpenDesignApi } from '@opendesign/api/types'
+import type { components } from 'open-design-api-types'
 import type { ISdk } from './types/ifaces'
 import type { DesignFacade } from './design-facade'
 import type { DesignFileManager } from './local/design-file-manager'
 import type { LocalDesignManager } from './local/local-design-manager'
+
+type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 
 export class Sdk implements ISdk {
   _openDesignApi: IOpenDesignApi | null = null
@@ -63,6 +66,32 @@ export class Sdk implements ISdk {
     return this.fetchDesignById(apiDesign.id)
   }
 
+  async convertFigmaDesign(params: {
+    figmaToken: string
+    figmaFileKey: string
+    figmaIds?: Array<string>
+    designName?: string | null
+    conversions: Array<{ format: DesignConversionTargetFormatEnum }>
+  }): Promise<DesignFacade> {
+    const openDesignApi = this._openDesignApi
+    if (!openDesignApi) {
+      throw new Error('Open Design API is not configured.')
+    }
+
+    const {
+      designId,
+      conversions,
+    } = await openDesignApi.importFigmaDesignLinkWithConversions(params)
+    const apiDesign = await openDesignApi.getDesignById(designId)
+
+    const designFacade = await this.fetchDesignById(apiDesign.id)
+    conversions.forEach((conversion) => {
+      designFacade.addConversion(conversion)
+    })
+
+    return designFacade
+  }
+
   async fetchDesignById(designId: string): Promise<DesignFacade> {
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
@@ -83,6 +112,18 @@ export class Sdk implements ISdk {
     }
 
     return designFacade
+  }
+
+  async saveDesignFileStream(
+    relPath: string,
+    designFileStream: NodeJS.ReadableStream
+  ) {
+    const designFileManager = this._designFileManager
+    if (!designFileManager) {
+      throw new Error('Design file manager is not configured.')
+    }
+
+    return designFileManager.saveDesignFileStream(relPath, designFileStream)
   }
 
   useDesignFileManager(designFileManager: DesignFileManager): void {

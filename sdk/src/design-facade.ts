@@ -5,8 +5,9 @@ import { PageFacade } from './page-facade'
 import { createEmptyFile } from '@opendesign/octopus-reader/src/index'
 import { memoize } from '@opendesign/octopus-reader/src/utils/memoize'
 import { sequence } from './utils/async'
+import { getDesignFormatByFileName } from './utils/design-format-utils'
 
-import type { IApiDesign } from '@opendesign/api/types'
+import type { IApiDesign, IApiDesignConversion } from '@opendesign/api/types'
 import type {
   ArtboardId,
   ArtboardOctopusData,
@@ -21,9 +22,13 @@ import type {
   PageId,
   PageSelector,
 } from '@opendesign/octopus-reader/types'
+import type { components } from 'open-design-api-types'
 import type { Sdk } from './sdk'
+import type { ILocalDesign } from './local/ifaces'
 import type { IDesignFacade } from './types/ifaces'
 import type { LayerFacade } from './layer-facade'
+
+type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 
 export class DesignFacade implements IDesignFacade {
   _sdk: Sdk
@@ -37,6 +42,11 @@ export class DesignFacade implements IDesignFacade {
 
   _manifestLoaded: boolean = false
   _pendingManifestUpdate: ManifestData | null = null
+
+  _conversions: Map<
+    DesignConversionTargetFormatEnum,
+    IApiDesignConversion
+  > = new Map()
 
   constructor(params: { sdk: Sdk }) {
     this._sdk = params.sdk
@@ -478,6 +488,22 @@ export class DesignFacade implements IDesignFacade {
     await this.setLocalDesign(localDesign)
   }
 
+  async saveDesignFile(relPath: string) {
+    const format = getDesignFormatByFileName(relPath)
+    if (!format) {
+      throw new Error('Unknown target design file format')
+    }
+    if (format !== 'sketch') {
+      throw new Error('Unsupported target design file format')
+    }
+
+    const conversion = await this._getConversionToFormat(format)
+    return this._sdk.saveDesignFileStream(
+      relPath,
+      await conversion.getResultStream()
+    )
+  }
+
   async _getLocalDesign(relPath: string | null): Promise<ILocalDesign> {
     if (!relPath) {
       const localDesign = this._localDesign
@@ -495,5 +521,27 @@ export class DesignFacade implements IDesignFacade {
     }
 
     return targetLocalDesign
+  }
+
+  addConversion(conversion: IApiDesignConversion) {
+    const format = conversion.resultFormat
+    this._conversions.set(format, conversion)
+  }
+
+  async _getConversionToFormat(format: DesignConversionTargetFormatEnum) {
+    const prevConversion = this._conversions.get(format)
+    if (prevConversion) {
+      return prevConversion
+    }
+
+    const apiDesign = this._apiDesign
+    if (!apiDesign) {
+      throw new Error('The API is not configured, cannot convert the design')
+    }
+
+    const conversion = await apiDesign.convertDesign({ format })
+    this._conversions.set(format, conversion)
+
+    return conversion
   }
 }

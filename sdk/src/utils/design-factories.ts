@@ -1,6 +1,6 @@
 import { DesignFacade } from '../design-facade'
 
-import type { IApiDesign } from '@opendesign/api/types'
+import type { IApiDesign, IApiDesignConversion } from '@opendesign/api/types'
 import type { ILocalDesign } from '../local/ifaces'
 import type { Sdk } from '../sdk'
 
@@ -21,11 +21,18 @@ export async function createDesignFromOpenDesignApiDesign(
   apiDesign: IApiDesign,
   params: {
     sdk: Sdk
+    conversions?: Array<IApiDesignConversion> | null
   }
 ): Promise<DesignFacade> {
   const design = new DesignFacade({ sdk: params.sdk })
 
   await design.setApiDesign(apiDesign)
+
+  if (params.conversions) {
+    params.conversions.forEach((conversion) => {
+      design.addConversion(conversion)
+    })
+  }
 
   return design
 }
