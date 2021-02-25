@@ -1,5 +1,5 @@
 import { populatePathPattern, PathParams } from './paths'
-import fetch, { Headers, RequestInit } from 'node-fetch'
+import fetchInternal, { Headers, RequestInit } from 'node-fetch'
 import FormData from 'form-data'
 
 import type { OptionalKeys, RequiredKeys } from 'utility-types'
@@ -17,6 +17,13 @@ type MethodPathPatterns<M> = {
   [P in keyof paths]: M extends keyof paths[P] ? P : never
 }[keyof paths]
 
+type AuthInfo = { token: string }
+
+const fetch = (...args: Parameters<typeof fetchInternal>) => {
+  console.log('fetch()', ...args)
+  return fetchInternal(...args)
+}
+
 // JSON
 
 export async function get<
@@ -25,9 +32,10 @@ export async function get<
 >(
   apiRoot: string,
   pathPattern: PathPattern,
-  pathParams: PathParams<PathPattern>
+  pathParams: PathParams<PathPattern>,
+  authInfo: AuthInfo
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {
-  return request('get', apiRoot, pathPattern, pathParams)
+  return request('get', apiRoot, pathPattern, pathParams, {}, authInfo)
 }
 
 export async function post<
@@ -37,7 +45,8 @@ export async function post<
   apiRoot: string,
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
-  data: OperationBodyParams<Operation, 'application/json'>
+  data: OperationBodyParams<Operation, 'application/json'>,
+  authInfo: AuthInfo | null = null
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {
   return request(
     'post',
@@ -50,6 +59,7 @@ export async function post<
         'Content-Type': 'application/json',
       },
     },
+    authInfo
   )
 }
 
@@ -61,13 +71,14 @@ export async function getStream<
 >(
   apiRoot: string,
   pathPattern: PathPattern,
-  pathParams: PathParams<PathPattern>
+  pathParams: PathParams<PathPattern>,
+  authInfo: AuthInfo
 ): Promise<{
   statusCode: Exclude<OperationStatusCodes<Operation>, 500>
   headers: Headers
   stream: NodeJS.ReadableStream
 }> {
-  return requestStream('get', apiRoot, pathPattern, pathParams)
+  return requestStream('get', apiRoot, pathPattern, pathParams, authInfo)
 }
 
 // MultipartFilePart
@@ -89,7 +100,8 @@ export async function postMultipart<
       [K in Extract<OptionalKeys<MultipartBody>, string>]?:
         | MultipartBody[K]
         | NodeJS.ReadableStream
-    }
+    },
+  authInfo: AuthInfo
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {
   const path = populatePathPattern(pathPattern, pathParams)
 
@@ -101,6 +113,9 @@ export async function postMultipart<
   const res = await fetch(`${apiRoot}${path}`, {
     method: 'post',
     body: requestBody,
+    headers: {
+      'Authorization': `Bearer ${authInfo.token}`,
+    },
   })
   const body = await res.json()
 
@@ -126,11 +141,19 @@ async function request<
   apiRoot: string,
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
-  requestParams: Omit<RequestInit, 'method'> = {}
+  requestParams: Omit<RequestInit, 'method'> = {},
+  authInfo: AuthInfo | null
 ) {
   const path = populatePathPattern(pathPattern, pathParams)
 
-  const res = await fetch(`${apiRoot}${path}`, { method, ...requestParams })
+  const res = await fetch(`${apiRoot}${path}`, {
+    method,
+    ...requestParams,
+    headers: {
+      ...(authInfo ? { 'Authorization': `Bearer ${authInfo.token}` } : {}),
+      ...(requestParams.headers || {}),
+    },
+  })
   const body = await res.json()
 
   if (res.status === 500) {
@@ -152,11 +175,17 @@ async function requestStream<
   method: string,
   apiRoot: string,
   pathPattern: PathPattern,
-  pathParams: PathParams<PathPattern>
+  pathParams: PathParams<PathPattern>,
+  authInfo: AuthInfo
 ) {
   const path = populatePathPattern(pathPattern, pathParams)
 
-  const res = await fetch(`${apiRoot}${path}`, { method })
+  const res = await fetch(`${apiRoot}${path}`, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${authInfo.token}`,
+    },
+  })
 
   if (res.status === 500) {
     console.log('Server Error', { statusCode: res.status })

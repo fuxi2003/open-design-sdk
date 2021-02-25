@@ -19,19 +19,30 @@ type OctopusDocument = components['schemas']['OctopusDocument']
 
 export class OpenDesignApi implements IOpenDesignApi {
   _apiRoot: string
+  _token: string
 
-  constructor(params: { apiRoot: string }) {
+  constructor(params: { apiRoot: string; token: string }) {
     this._apiRoot = params.apiRoot
+    this._token = params.token
   }
 
   getApiRoot() {
     return this._apiRoot
   }
 
+  _getAuthInfo() {
+    return { token: this._token }
+  }
+
   async getDesignById(designId: DesignId): Promise<ApiDesign> {
-    const res = await get(this._apiRoot, '/designs/{design_id}', {
-      'design_id': designId,
-    })
+    const res = await get(
+      this._apiRoot,
+      '/designs/{design_id}',
+      {
+        'design_id': designId,
+      },
+      this._getAuthInfo()
+    )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
       console.error('OpenDesignApi#getDesignById()', { designId }, res)
@@ -51,9 +62,14 @@ export class OpenDesignApi implements IOpenDesignApi {
   }
 
   async getDesignSummary(designId: DesignId): Promise<DesignSummary> {
-    const res = await get(this._apiRoot, '/designs/{design_id}/summary', {
-      'design_id': designId,
-    })
+    const res = await get(
+      this._apiRoot,
+      '/designs/{design_id}/summary',
+      {
+        'design_id': designId,
+      },
+      this._getAuthInfo()
+    )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
       console.error('OpenDesignApi#getDesignSummary()', { designId }, res)
@@ -79,7 +95,8 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         'file': designFileStream,
         ...(options.format ? { 'format': options.format } : {}),
-      }
+      },
+      this._getAuthInfo()
     )
 
     if (res.statusCode !== 201) {
@@ -102,7 +119,8 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         'url': url,
         ...(options.format ? { 'format': options.format } : {}),
-      }
+      },
+      this._getAuthInfo()
     )
 
     if (res.statusCode !== 201) {
@@ -129,7 +147,8 @@ export class OpenDesignApi implements IOpenDesignApi {
         'figma_filekey': params.figmaFileKey,
         ...(params.figmaIds ? { 'figma_ids': params.figmaIds } : {}),
         ...(params.name ? { 'design_name': params.name } : {}),
-      }
+      },
+      this._getAuthInfo()
     )
 
     if (res.statusCode !== 201) {
@@ -158,7 +177,8 @@ export class OpenDesignApi implements IOpenDesignApi {
         'conversions': params.conversions,
         ...(params.figmaIds ? { 'figma_ids': params.figmaIds } : {}),
         ...(params.name ? { 'design_name': params.name } : {}),
-      }
+      },
+      this._getAuthInfo()
     )
 
     if (res.statusCode !== 201) {
@@ -186,7 +206,8 @@ export class OpenDesignApi implements IOpenDesignApi {
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}/artboards/{artboard_id}/content',
-      { 'design_id': designId, 'artboard_id': artboardId }
+      { 'design_id': designId, 'artboard_id': artboardId },
+      this._getAuthInfo()
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
@@ -209,7 +230,8 @@ export class OpenDesignApi implements IOpenDesignApi {
     const res = await getStream(
       this._apiRoot,
       '/designs/{design_id}/artboards/{artboard_id}/content',
-      { 'design_id': designId, 'artboard_id': artboardId }
+      { 'design_id': designId, 'artboard_id': artboardId },
+      this._getAuthInfo()
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
@@ -239,7 +261,8 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._apiRoot,
       '/designs/{design_id}/conversions',
       { 'design_id': designId },
-      { 'format': params.format }
+      { 'format': params.format },
+      this._getAuthInfo()
     )
 
     if (res.statusCode !== 201) {
@@ -267,7 +290,8 @@ export class OpenDesignApi implements IOpenDesignApi {
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}/conversions/{conversion_id}',
-      { 'design_id': designId, 'conversion_id': conversionId }
+      { 'design_id': designId, 'conversion_id': conversionId },
+      this._getAuthInfo()
     )
 
     if (res.statusCode !== 200) {
