@@ -21,6 +21,9 @@
     "test": "yarn run test:octopus-reader",
     "test:octopus-reader": "yarn workspace @opendesign/octopus-reader run test"
   },
+  "dependencies": {
+    "dotenv": "8.2.0"
+  },
   "devDependencies": {
     "@types/node": "*",
     "prettier": "2.2.1",

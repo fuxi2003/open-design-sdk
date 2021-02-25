@@ -1,18 +1,26 @@
 {
   "name": "@opendesign/sdk",
   "version": "0.0.0-dev",
+  "scripts": {
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\" }' mocha"
+  },
   "devDependencies": {
     "@opendesign/api": "0.0.0-dev",
     "@opendesign/octopus-reader": "0.0.0-dev",
     "@types/fs-extra": "^9.0.7",
     "@types/mkdirp": "1.0.1",
+    "@types/mocha": "8.2.0",
+    "@types/node-fetch": "2.5.8",
     "@types/uuid": "8.3.0",
+    "mocha": "8.2.1",
+    "source-map-support": "0.5.19",
     "ts-node": "9.0.0",
     "typescript": "4.1.2"
   },
   "dependencies": {
     "fs-extra": "^9.1.0",
     "mkdirp": "1.0.4",
+    "node-fetch": "2.6.1",
     "open-design-api-types": "0.2.0",
     "uuid": "8.3.2"
   }
