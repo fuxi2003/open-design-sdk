@@ -2,8 +2,6 @@ import { LayerFacade } from './layer-facade'
 import { LayerCollectionFacade } from './layer-collection-facade'
 
 import type {
-  AggregatedBitmapAssetDescriptor,
-  AggregatedFontDescriptor,
   ArtboardManifestData,
   IArtboard,
   LayerId,
@@ -32,8 +30,18 @@ export class ArtboardFacade implements IArtboardFacade {
     return this._artboardEntity.id
   }
 
-  get octopus() {
-    return this._artboardEntity.getOctopus()
+  async getContent() {
+    const artboardEntity = this._artboardEntity
+    if (!artboardEntity.isLoaded()) {
+      await this._designFacade.loadArtboard(this.id)
+    }
+
+    const octopus = artboardEntity.getOctopus()
+    if (!octopus) {
+      throw new Error('The artboard octopus is not available')
+    }
+
+    return octopus
   }
 
   get pageId() {
@@ -72,6 +80,14 @@ export class ArtboardFacade implements IArtboardFacade {
     return this._artboardEntity.isLoaded()
   }
 
+  async load(): Promise<void> {
+    if (this.isLoaded()) {
+      return
+    }
+
+    await this._designFacade.loadArtboard(this.id)
+  }
+
   getPage() {
     const pageId = this.pageId
     return pageId ? this._designFacade.getPageById(pageId) : null
@@ -85,32 +101,46 @@ export class ArtboardFacade implements IArtboardFacade {
     this._artboardEntity.unassignFromPage()
   }
 
-  getBitmapAssets(
+  async getBitmapAssets(
     options: Partial<{ includePrerendered: boolean }> = {}
-  ): Array<AggregatedBitmapAssetDescriptor> {
+  ) {
+    await this.load()
+
     return this._artboardEntity.getBitmapAssets(options)
   }
-  getFonts(
-    options: Partial<{ depth: number }> = {}
-  ): Array<AggregatedFontDescriptor> {
+
+  async getFonts(options: Partial<{ depth: number }> = {}) {
+    await this.load()
+
     return this._artboardEntity.getFonts(options)
   }
 
-  getBackgroundColor(): RgbaColor | null {
+  async getBackgroundColor(): Promise<RgbaColor | null> {
+    await this.load()
+
     return this._artboardEntity.getBackgroundColor()
   }
 
-  getRootLayers() {
+  async getRootLayers() {
+    await this.load()
+
     const layerCollection = this._artboardEntity.getRootLayers()
     return new LayerCollectionFacade(layerCollection, { artboardFacade: this })
   }
 
-  getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+  async getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+    await this.load()
+
     const layerCollection = this._artboardEntity.getFlattenedLayers(options)
     return new LayerCollectionFacade(layerCollection, { artboardFacade: this })
   }
 
-  getLayerById(layerId: LayerId): LayerFacade | null {
+  async getLayerById(layerId: LayerId) {
+    await this.load()
+    return this.getLayerFacadeById(layerId)
+  }
+
+  getLayerFacadeById(layerId: LayerId) {
     const prevLayerFacade = this._layerFacades.get(layerId)
     if (prevLayerFacade) {
       return prevLayerFacade
@@ -124,20 +154,29 @@ export class ArtboardFacade implements IArtboardFacade {
     return nextLayerFacade
   }
 
-  findLayer(selector: LayerSelector, options: Partial<{ depth: number }> = {}) {
+  async findLayer(
+    selector: LayerSelector,
+    options: Partial<{ depth: number }> = {}
+  ) {
+    await this.load()
+
     const layerEntity = this._artboardEntity.findLayer(selector, options)
     return layerEntity ? this.getLayerById(layerEntity.id) : null
   }
 
-  findLayers(
+  async findLayers(
     selector: LayerSelector,
     options: Partial<{ depth: number }> = {}
   ) {
+    await this.load()
+
     const layerCollection = this._artboardEntity.findLayers(selector, options)
     return new LayerCollectionFacade(layerCollection, { artboardFacade: this })
   }
 
-  getLayerDepth(layerId: LayerId): number | null {
+  async getLayerDepth(layerId: LayerId) {
+    await this.load()
+
     return this._artboardEntity.getLayerDepth(layerId)
   }
 

@@ -8,6 +8,7 @@ import { memoize } from '../../octopus-reader/src/utils/memoize'
 import type { IApiDesign } from '@opendesign/api/types'
 import type {
   ArtboardId,
+  ArtboardOctopusData,
   ArtboardSelector,
   ComponentId,
   FileLayerSelector,
@@ -249,7 +250,9 @@ export class DesignFacade implements IDesignFacade {
       .filter(Boolean) as Array<PageFacade>
   }
 
-  getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+  async getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+    await this.load()
+
     const entity = this.getDesignEntity()
     const layerCollection = entity.getFlattenedLayers(options)
 
@@ -258,14 +261,16 @@ export class DesignFacade implements IDesignFacade {
     })
   }
 
-  findLayerById(layerId: LayerId) {
+  async findLayerById(layerId: LayerId) {
+    await this.load()
+
     const entity = this.getDesignEntity()
     const layerEntityDesc = entity.findLayerById(layerId)
     if (!layerEntityDesc) {
       return null
     }
 
-    const layerFacade = this.getArtboardLayer(
+    const layerFacade = this.getArtboardLayerFacade(
       layerEntityDesc.artboardId,
       layerEntityDesc.layer.id
     )
@@ -278,7 +283,9 @@ export class DesignFacade implements IDesignFacade {
       : null
   }
 
-  findLayersById(layerId: LayerId) {
+  async findLayersById(layerId: LayerId) {
+    await this.load()
+
     const entity = this.getDesignEntity()
     const layerCollection = entity.findLayersById(layerId)
 
@@ -287,17 +294,19 @@ export class DesignFacade implements IDesignFacade {
     })
   }
 
-  findLayer(
+  async findLayer(
     selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
   ) {
+    await this.load()
+
     const entity = this.getDesignEntity()
     const layerEntityDesc = entity.findLayer(selector, options)
     if (!layerEntityDesc) {
       return null
     }
 
-    const layerFacade = this.getArtboardLayer(
+    const layerFacade = this.getArtboardLayerFacade(
       layerEntityDesc.artboardId,
       layerEntityDesc.layer.id
     )
@@ -310,10 +319,12 @@ export class DesignFacade implements IDesignFacade {
       : null
   }
 
-  findLayers(
+  async findLayers(
     selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
   ) {
+    await this.load()
+
     const entity = this.getDesignEntity()
     const layerCollection = entity.findLayers(selector, options)
 
@@ -322,25 +333,63 @@ export class DesignFacade implements IDesignFacade {
     })
   }
 
-  getBitmapAssets(
+  async getBitmapAssets(
     options: Partial<{ depth: number; includePrerendered: boolean }> = {}
-  ): Array<AggregatedFileBitmapAssetDescriptor> {
+  ) {
+    await this.load()
+
     const entity = this.getDesignEntity()
     return entity.getBitmapAssets(options)
   }
 
-  getFonts(
-    options: Partial<{ depth: number }> = {}
-  ): Array<AggregatedFileFontDescriptor> {
+  async getFonts(options: Partial<{ depth: number }> = {}) {
+    await this.load()
+
     const entity = this.getDesignEntity()
     return entity.getFonts(options)
   }
 
-  getArtboardLayer(
+  getArtboardLayerFacade(
     artboardId: ArtboardId,
     layerId: LayerId
   ): LayerFacade | null {
     const artboardFacade = this.getArtboardById(artboardId)
-    return artboardFacade ? artboardFacade.getLayerById(layerId) : null
+    return artboardFacade ? artboardFacade.getLayerFacadeById(layerId) : null
+  }
+
+  async load() {
+    const artboards = this.getArtboards()
+    return Promise.all(
+      artboards.map((artboard) => {
+        return artboard.load()
+      })
+    )
+  }
+
+  async loadArtboard(artboardId: ArtboardId): Promise<ArtboardFacade> {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    if (!artboard.isLoaded()) {
+      // NOTE: Maybe use the Octopus Reader file entity instead for clearer source of truth.
+      const artboardEntity = artboard.getArtboardEntity()
+      const content = await this._loadArtboardContent(artboardId)
+      artboardEntity.setOctopus(content)
+    }
+
+    return artboard
+  }
+
+  async _loadArtboardContent(
+    artboardId: ArtboardId
+  ): Promise<ArtboardOctopusData> {
+    const apiDesign = this._apiDesign
+    if (!apiDesign) {
+      throw new Error('The artboard cannot be loaded')
+    }
+
+    return apiDesign.getArtboardContent(artboardId)
   }
 }

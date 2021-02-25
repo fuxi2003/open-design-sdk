@@ -25,9 +25,15 @@ import type {
 
 // -- modules
 
+export interface IDesignFileManager {
+  readDesignFileStream(relPath: string): Promise<NodeJS.ReadableStream>
+}
+
 export interface ISdk {
+  openDesignFile(relPath: string): Promise<IDesignFacade>
   fetchDesignById(designId: string): Promise<IDesignFacade>
 
+  useDesignFileManager(designFileManager: IDesignFileManager): void
   useOpenDesignApi(api: IOpenDesignApi): void
 }
 
@@ -64,37 +70,36 @@ export interface IDesignFacade {
   /** @category Layer Lookup */
   getFlattenedLayers(
     options?: Partial<{ depth: number }>
-  ): IFileLayerCollectionFacade
+  ): Promise<IFileLayerCollectionFacade>
 
   /** @category Layer Lookup */
-  findLayerById(layerId: LayerId): DesignLayerDescriptor | null
+  findLayerById(layerId: LayerId): Promise<DesignLayerDescriptor | null>
   /** @category Layer Lookup */
-  findLayersById(layerId: LayerId): IFileLayerCollectionFacade
+  findLayersById(layerId: LayerId): Promise<IFileLayerCollectionFacade>
   /** @category Layer Lookup */
   findLayer(
     selector: FileLayerSelector,
     options?: Partial<{ depth: number }>
-  ): DesignLayerDescriptor | null
+  ): Promise<DesignLayerDescriptor | null>
   /** @category Layer Lookup */
   findLayers(
     selector: FileLayerSelector,
     options?: Partial<{ depth: number }>
-  ): IFileLayerCollectionFacade
+  ): Promise<IFileLayerCollectionFacade>
 
   /** @category Asset Aggregation */
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
-  ): Array<AggregatedFileBitmapAssetDescriptor>
+  ): Promise<Array<AggregatedFileBitmapAssetDescriptor>>
   /** @category Asset Aggregation */
   getFonts(
     options?: Partial<{ depth: number }>
-  ): Array<AggregatedFileFontDescriptor>
+  ): Promise<Array<AggregatedFileFontDescriptor>>
 }
 
 export interface IArtboardFacade {
   readonly id: ArtboardId
 
-  readonly octopus: ArtboardOctopusData | null
   readonly pageId: PageId | null
   readonly componentId: ComponentId | null
   readonly name: string | null
@@ -103,6 +108,7 @@ export interface IArtboardFacade {
   setManifest(nextManifest: ArtboardManifestData): void
 
   isLoaded(): boolean
+  getContent(): Promise<ArtboardOctopusData>
 
   getDesign(): IDesignFacade | null
 
@@ -112,30 +118,30 @@ export interface IArtboardFacade {
 
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
-  ): Array<AggregatedBitmapAssetDescriptor>
+  ): Promise<Array<AggregatedBitmapAssetDescriptor>>
   getFonts(
     options?: Partial<{ depth: number }>
-  ): Array<AggregatedFontDescriptor>
+  ): Promise<Array<AggregatedFontDescriptor>>
 
-  getBackgroundColor(): RgbaColor | null
+  getBackgroundColor(): Promise<RgbaColor | null>
 
-  getRootLayers(): ILayerCollectionFacade
+  getRootLayers(): Promise<ILayerCollectionFacade>
   getFlattenedLayers(
     options?: Partial<{ depth: number }>
-  ): ILayerCollectionFacade
+  ): Promise<ILayerCollectionFacade>
 
-  getLayerById(layerId: LayerId): ILayerFacade | null
+  getLayerById(layerId: LayerId): Promise<ILayerFacade | null>
   findLayer(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
-  ): ILayerFacade | null
+  ): Promise<ILayerFacade | null>
 
   findLayers(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
-  ): ILayerCollectionFacade
+  ): Promise<ILayerCollectionFacade>
 
-  getLayerDepth(layerId: LayerId): number | null
+  getLayerDepth(layerId: LayerId): Promise<number | null>
 
   isComponent(): boolean
 }
@@ -154,29 +160,29 @@ export interface IPageFacade {
 
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
-  ): Array<AggregatedFileBitmapAssetDescriptor>
+  ): Promise<Array<AggregatedFileBitmapAssetDescriptor>>
   getFonts(
     options?: Partial<{ depth: number }>
-  ): Array<AggregatedFileFontDescriptor>
+  ): Promise<Array<AggregatedFileFontDescriptor>>
 
-  getFlattenedLayers(): IFileLayerCollectionFacade
+  getFlattenedLayers(): Promise<IFileLayerCollectionFacade>
 
   findLayerById(
     layerId: LayerId,
     options?: Partial<{ depth: number }>
-  ): DesignLayerDescriptor | null
+  ): Promise<DesignLayerDescriptor | null>
   findLayersById(
     layerId: LayerId,
     options?: Partial<{ depth: number }>
-  ): IFileLayerCollectionFacade
+  ): Promise<IFileLayerCollectionFacade>
   findLayer(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
-  ): DesignLayerDescriptor | null
+  ): Promise<DesignLayerDescriptor | null>
   findLayers(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
-  ): IFileLayerCollectionFacade
+  ): Promise<IFileLayerCollectionFacade>
 }
 
 export interface ILayerFacade {

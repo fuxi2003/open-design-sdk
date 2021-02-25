@@ -39,7 +39,7 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
     (): Array<LayerFacade> => {
       return this._layerCollection
         .map((layerEntity) => {
-          return this._artboardFacade.getLayerById(layerEntity.id)
+          return this._artboardFacade.getLayerFacadeById(layerEntity.id)
         })
         .filter(Boolean) as Array<LayerFacade>
     }
@@ -64,7 +64,7 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
   ): LayerFacade | null {
     const layerEntity = this._layerCollection.findLayer(selector, options)
     return layerEntity
-      ? this._artboardFacade.getLayerById(layerEntity.id)
+      ? this._artboardFacade.getLayerFacadeById(layerEntity.id)
       : null
   }
 
@@ -80,7 +80,7 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
 
   filter(filter: (layer: LayerFacade) => boolean): LayerCollectionFacade {
     const layerCollection = this._layerCollection.filter((layer) => {
-      const layerFacade = this._artboardFacade.getLayerById(layer.id)
+      const layerFacade = this._artboardFacade.getLayerFacadeById(layer.id)
       return Boolean(layerFacade && filter(layerFacade))
     })
 

@@ -10,9 +10,9 @@ import type {
   LayerId,
   LayerSelector,
 } from '@opendesign/octopus-reader/types'
+import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
 import type { IPageFacade } from './types/ifaces'
-import type { ArtboardFacade } from './artboard-facade'
 
 export class PageFacade implements IPageFacade {
   _pageEntity: IPage
@@ -37,6 +37,22 @@ export class PageFacade implements IPageFacade {
 
   getDesign() {
     return this._designFacade
+  }
+
+  isLoaded() {
+    const artboards = this.getArtboards()
+    return artboards.every((artboard) => {
+      return artboard.isLoaded()
+    })
+  }
+
+  async load(): Promise<void> {
+    const artboards = this.getArtboards()
+    await Promise.all(
+      artboards.map((artboard) => {
+        return artboard.load()
+      })
+    )
   }
 
   getArtboards() {
@@ -102,25 +118,38 @@ export class PageFacade implements IPageFacade {
     })
   }
 
-  getBitmapAssets(options: Partial<{ includePrerendered: boolean }> = {}) {
+  async getBitmapAssets(
+    options: Partial<{ includePrerendered: boolean }> = {}
+  ) {
+    await this.load()
+
     return this._pageEntity.getBitmapAssets(options)
   }
 
-  getFonts(options: Partial<{ depth: number }> = {}) {
+  async getFonts(options: Partial<{ depth: number }> = {}) {
+    await this.load()
+
     return this._pageEntity.getFonts(options)
   }
 
-  getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+  async getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+    await this.load()
+
     const layerCollection = this._pageEntity.getFlattenedLayers(options)
     return new FileLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
   }
 
-  findLayerById(layerId: LayerId, options: Partial<{ depth: number }> = {}) {
+  async findLayerById(
+    layerId: LayerId,
+    options: Partial<{ depth: number }> = {}
+  ) {
+    await this.load()
+
     const layerEntityDesc = this._pageEntity.findLayerById(layerId, options)
     const layerFacade = layerEntityDesc
-      ? this._designFacade.getArtboardLayer(
+      ? this._designFacade.getArtboardLayerFacade(
           layerEntityDesc.artboardId,
           layerEntityDesc.layer.id
         )
@@ -134,17 +163,27 @@ export class PageFacade implements IPageFacade {
       : null
   }
 
-  findLayersById(layerId: LayerId, options: Partial<{ depth: number }> = {}) {
+  async findLayersById(
+    layerId: LayerId,
+    options: Partial<{ depth: number }> = {}
+  ) {
+    await this.load()
+
     const layerCollection = this._pageEntity.findLayersById(layerId, options)
     return new FileLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
   }
 
-  findLayer(selector: LayerSelector, options: Partial<{ depth: number }> = {}) {
+  async findLayer(
+    selector: LayerSelector,
+    options: Partial<{ depth: number }> = {}
+  ) {
+    await this.load()
+
     const layerEntityDesc = this._pageEntity.findLayer(selector, options)
     const layerFacade = layerEntityDesc
-      ? this._designFacade.getArtboardLayer(
+      ? this._designFacade.getArtboardLayerFacade(
           layerEntityDesc.artboardId,
           layerEntityDesc.layer.id
         )
@@ -158,10 +197,12 @@ export class PageFacade implements IPageFacade {
       : null
   }
 
-  findLayers(
+  async findLayers(
     selector: LayerSelector,
     options: Partial<{ depth: number }> = {}
   ) {
+    await this.load()
+
     const layerCollection = this._pageEntity.findLayers(selector, options)
     return new FileLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,

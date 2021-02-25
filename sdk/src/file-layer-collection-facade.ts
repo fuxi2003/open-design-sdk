@@ -112,7 +112,7 @@ export class FileLayerCollectionFacade implements IFileLayerCollectionFacade {
   _resolveArtboardLayerDescriptor(
     layerEntityDesc: FileLayerDescriptor
   ): DesignLayerDescriptor | null {
-    const layerFacade = this._designFacade.getArtboardLayer(
+    const layerFacade = this._designFacade.getArtboardLayerFacade(
       layerEntityDesc.artboardId,
       layerEntityDesc.layer.id
     )
