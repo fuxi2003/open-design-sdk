@@ -4,7 +4,15 @@
   "devDependencies": {
     "@opendesign/api": "0.0.0-dev",
     "@opendesign/octopus-reader": "0.0.0-dev",
+    "@types/fs-extra": "^9.0.7",
+    "@types/mkdirp": "1.0.1",
+    "@types/uuid": "8.3.0",
     "ts-node": "9.0.0",
     "typescript": "4.1.2"
+  },
+  "dependencies": {
+    "fs-extra": "^9.1.0",
+    "mkdirp": "1.0.4",
+    "uuid": "8.3.2"
   }
 }

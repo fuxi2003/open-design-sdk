@@ -2,8 +2,9 @@ import { ArtboardFacade } from './artboard-facade'
 import { FileLayerCollectionFacade } from './file-layer-collection-facade'
 import { PageFacade } from './page-facade'
 
-import { createEmptyFile } from '../../octopus-reader/src/index'
-import { memoize } from '../../octopus-reader/src/utils/memoize'
+import { createEmptyFile } from '@opendesign/octopus-reader/src/index'
+import { memoize } from '@opendesign/octopus-reader/src/utils/memoize'
+import { sequence } from './utils/async'
 
 import type { IApiDesign } from '@opendesign/api/types'
 import type {
@@ -27,8 +28,8 @@ import type { LayerFacade } from './layer-facade'
 export class DesignFacade implements IDesignFacade {
   _sdk: Sdk
 
-  _filename: string | null
   _designEntity: IFile | null = null
+  _localDesign: ILocalDesign | null = null
   _apiDesign: IApiDesign | null = null
 
   _artboardFacades: Map<ArtboardId, ArtboardFacade> = new Map()
@@ -37,9 +38,18 @@ export class DesignFacade implements IDesignFacade {
   _manifestLoaded: boolean = false
   _pendingManifestUpdate: ManifestData | null = null
 
-  constructor(params: { sdk: Sdk; filename?: string | null }) {
+  constructor(params: { sdk: Sdk }) {
     this._sdk = params.sdk
-    this._filename = params.filename || null
+  }
+
+  get id() {
+    const apiDesign = this._apiDesign
+    return apiDesign?.id || null
+  }
+
+  get filename() {
+    const localDesign = this._localDesign
+    return localDesign?.filename || null
   }
 
   getManifest(): ManifestData {
@@ -74,6 +84,18 @@ export class DesignFacade implements IDesignFacade {
 
     return entity
   })
+
+  getLocalDesign() {
+    return this._localDesign
+  }
+
+  async setLocalDesign(localDesign: ILocalDesign) {
+    this._localDesign = localDesign
+
+    if (!this._manifestLoaded) {
+      this.setManifest(await localDesign.getManifest())
+    }
+  }
 
   async setApiDesign(apiDesign: IApiDesign) {
     this._apiDesign = apiDesign
@@ -385,11 +407,93 @@ export class DesignFacade implements IDesignFacade {
   async _loadArtboardContent(
     artboardId: ArtboardId
   ): Promise<ArtboardOctopusData> {
+    const localDesign = this._localDesign
     const apiDesign = this._apiDesign
+
+    if (localDesign) {
+      if (!(await localDesign.hasArtboardContent(artboardId))) {
+        if (!apiDesign) {
+          throw new Error(
+            'The artboard is not locally available and the API is not configured'
+          )
+        }
+
+        const contentStream = await apiDesign.getArtboardContentJsonStream(
+          artboardId
+        )
+        await localDesign.saveArtboardContentJsonStream(
+          artboardId,
+          contentStream
+        )
+      }
+
+      return localDesign.getArtboardContent(artboardId)
+    }
+
     if (!apiDesign) {
       throw new Error('The artboard cannot be loaded')
     }
 
     return apiDesign.getArtboardContent(artboardId)
+  }
+
+  async saveOctopusFile(relPath: string | null = null) {
+    const localDesign = await this._getLocalDesign(relPath)
+
+    const manifest = this.getManifest()
+    await localDesign.saveManifest(manifest)
+
+    await Promise.all(
+      this.getArtboards().map(async (artboard) => {
+        const artboardOctopus = await artboard.getContent()
+        if (!artboardOctopus) {
+          throw new Error('Artboard octopus not available')
+        }
+
+        await localDesign.saveArtboardContent(artboard.id, artboardOctopus)
+      })
+    )
+
+    const bitmapAssetDescs = await this.getBitmapAssets()
+    const apiDesign = this._apiDesign
+
+    await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
+      if (await localDesign.hasBitmapAsset(bitmapAssetDesc)) {
+        return
+      }
+
+      if (!apiDesign) {
+        throw new Error('The API is not configured, cannot save bitmap assets')
+      }
+
+      const bitmapAssetStream = await apiDesign.getBitmapAssetStream(
+        bitmapAssetDesc.name
+      )
+      await localDesign.saveBitmapAssetStream(
+        bitmapAssetDesc,
+        bitmapAssetStream
+      )
+    })
+
+    await this.setLocalDesign(localDesign)
+  }
+
+  async _getLocalDesign(relPath: string | null): Promise<ILocalDesign> {
+    if (!relPath) {
+      const localDesign = this._localDesign
+      if (!localDesign) {
+        throw new Error('The design is not configured to be a local file')
+      }
+
+      return localDesign
+    }
+
+    const targetDesignFacade = await this._sdk.openOctopusFile(relPath)
+    const targetLocalDesign = targetDesignFacade.getLocalDesign()
+    if (!targetLocalDesign) {
+      throw new Error('Target location is not available')
+    }
+
+    return targetLocalDesign
   }
 }

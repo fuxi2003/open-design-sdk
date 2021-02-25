@@ -1,18 +1,19 @@
 import { DesignFacade } from '../design-facade'
 
 import type { IApiDesign } from '@opendesign/api/types'
-import type { ManifestData } from '@opendesign/octopus-reader/types'
+import type { ILocalDesign } from '../local/ifaces'
 import type { Sdk } from '../sdk'
 
-export function createDesignFromManifest(
-  manifest: ManifestData,
+export async function createDesignFromLocalDesign(
+  localDesign: ILocalDesign,
   params: {
     sdk: Sdk
-    filename?: string | null
   }
-): DesignFacade {
+): Promise<DesignFacade> {
   const design = new DesignFacade(params)
-  design.setManifest(manifest)
+
+  await design.setLocalDesign(localDesign)
+
   return design
 }
 

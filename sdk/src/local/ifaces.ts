@@ -1,0 +1,70 @@
+import type {
+  ArtboardId,
+  ArtboardOctopusData,
+  ManifestData,
+  PageId,
+} from '@opendesign/octopus-reader/types'
+
+export type LocalBitmapAssetDescriptor = { name: string; prerendered: boolean }
+
+// Top-level API
+
+export interface ILocalDesignManager {
+  openOctopusFile(filename: string): Promise<ILocalDesign>
+  createOctopusFileFromManifest(manifest: ManifestData): Promise<ILocalDesign>
+}
+
+// Design-level API
+
+export interface ILocalDesign {
+  readonly filename: string | null
+
+  saveAs(nextFilename: string): Promise<void>
+  move(nextFilename: string): Promise<void>
+
+  getManifest(): Promise<ManifestData>
+  saveManifest(manifest: ManifestData): Promise<void>
+
+  // Design Structure
+
+  getArtboardContent(artboardId: ArtboardId): Promise<ArtboardOctopusData>
+  getArtboardContentJsonStream(
+    artboardId: ArtboardId
+  ): Promise<NodeJS.ReadableStream>
+  hasArtboardContent(artboardId: ArtboardId): Promise<boolean>
+  saveArtboardContent(
+    artboardId: ArtboardId,
+    artboardOctopus: ArtboardOctopusData
+  ): Promise<void>
+  saveArtboardContentJsonStream(
+    artboardId: ArtboardId,
+    artboardOctopusJsonStream: NodeJS.ReadableStream
+  ): Promise<void>
+
+  getPageContent(pageId: PageId): Promise<ArtboardOctopusData>
+  hasPageContent(pageId: PageId): Promise<boolean>
+  savePageContent(
+    pageId: PageId,
+    pageOctopus: ArtboardOctopusData
+  ): Promise<void>
+  savePageContentJsonStream(
+    pageId: PageId,
+    pageOctopusJsonStream: NodeJS.ReadableStream
+  ): Promise<void>
+
+  hasBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor): Promise<boolean>
+  getBitmapAssetStream(
+    bitmapAssetDesc: LocalBitmapAssetDescriptor
+  ): Promise<NodeJS.ReadableStream>
+  getBitmapAssetBlob(
+    bitmapAssetDesc: LocalBitmapAssetDescriptor
+  ): Promise<Buffer>
+  saveBitmapAssetStream(
+    bitmapAssetDesc: LocalBitmapAssetDescriptor,
+    bitmapAssetStream: NodeJS.ReadableStream
+  ): Promise<void>
+  saveBitmapAssetBlob(
+    bitmapAssetDesc: LocalBitmapAssetDescriptor,
+    bitmapAssetBlob: Buffer
+  ): Promise<void>
+}

@@ -22,6 +22,7 @@ import type {
   PageSelector,
   RgbaColor,
 } from '@opendesign/octopus-reader/types'
+import type { ILocalDesignManager } from '../local/ifaces'
 
 // -- modules
 
@@ -31,13 +32,20 @@ export interface IDesignFileManager {
 
 export interface ISdk {
   openDesignFile(relPath: string): Promise<IDesignFacade>
+  openOctopusFile(relPath: string): Promise<IDesignFacade>
   fetchDesignById(designId: string): Promise<IDesignFacade>
 
+  useLocalDesignManager(localDesignManager: ILocalDesignManager): void
   useDesignFileManager(designFileManager: IDesignFileManager): void
   useOpenDesignApi(api: IOpenDesignApi): void
 }
 
 export interface IDesignFacade {
+  readonly id: string | null
+  readonly filename: string | null
+
+  saveOctopusFile(relPath?: string | null): Promise<void>
+
   getManifest(): ManifestData
   // setManifest(nextManifest: ManifestData): void
 
