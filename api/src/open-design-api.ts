@@ -44,6 +44,11 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._getAuthInfo()
     )
 
+    // @ts-ignore
+    if (res.statusCode === 401 || res.statusCode === 403) {
+      console.error('OpenDesignApi#getDesignById()', { designId }, res)
+      throw new Error('Cannot fetch design due to missing permissions')
+    }
     if (res.statusCode !== 200 && res.statusCode !== 202) {
       console.error('OpenDesignApi#getDesignById()', { designId }, res)
       throw new Error('Cannot fetch design')
