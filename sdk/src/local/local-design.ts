@@ -1,4 +1,4 @@
-import { join as joinPaths } from 'path'
+import { basename, extname, join as joinPaths } from 'path'
 import {
   checkFile,
   readJsonFile,
@@ -10,11 +10,13 @@ import {
   copyDirectory,
   moveDirectory,
 } from '../utils/fs'
+import { v4 as uuid } from 'uuid'
 
 import {
   ARTBOARD_CONTENT_BASENAME,
   ARTBOARD_DIRECTORY_BASENAME,
   BITMAP_ASSET_DIRECTORY_BASENAME,
+  BITMAP_ASSET_MAPPING_BASENAME,
   MANIFEST_BASENAME,
   PAGE_CONTENT_BASENAME,
   PAGE_DIRECTORY_BASENAME,
@@ -27,11 +29,16 @@ import type {
   ManifestData,
   PageId,
 } from '@opendesign/octopus-reader/types'
-import type { ILocalDesign, LocalBitmapAssetDescriptor } from './ifaces'
+import type {
+  BitmapMapping,
+  ILocalDesign,
+  LocalBitmapAssetDescriptor,
+} from './ifaces'
 import type { LocalDesignManager } from './local-design-manager'
 
 export class LocalDesign implements ILocalDesign {
   _filename: string
+  _bitmapMapping: BitmapMapping | null = null
 
   constructor(init: {
     filename: string
@@ -138,17 +145,23 @@ export class LocalDesign implements ILocalDesign {
   }
 
   async hasBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
-    const bitmapAssetFilename = this._getBitmapAssetFilename(bitmapAssetDesc)
+    const { filename: bitmapAssetFilename } = await this._resolveBitmapAsset(
+      bitmapAssetDesc
+    )
     return checkFile(bitmapAssetFilename)
   }
 
   async getBitmapAssetStream(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
-    const bitmapAssetFilename = this._getBitmapAssetFilename(bitmapAssetDesc)
+    const { filename: bitmapAssetFilename } = await this._resolveBitmapAsset(
+      bitmapAssetDesc
+    )
     return readFileStream(bitmapAssetFilename)
   }
 
   async getBitmapAssetBlob(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
-    const bitmapAssetFilename = this._getBitmapAssetFilename(bitmapAssetDesc)
+    const { filename: bitmapAssetFilename } = await this._resolveBitmapAsset(
+      bitmapAssetDesc
+    )
     return readFileBlob(bitmapAssetFilename)
   }
 
@@ -156,28 +169,104 @@ export class LocalDesign implements ILocalDesign {
     bitmapAssetDesc: LocalBitmapAssetDescriptor,
     content: ArtboardOctopusData
   ): Promise<void> {
-    const bitmapAssetFilename = this._getBitmapAssetFilename(bitmapAssetDesc)
+    await this._loadBitmapMapping()
+
+    const {
+      filename: bitmapAssetFilename,
+      basename,
+      mapped,
+    } = await this._resolveBitmapAsset(bitmapAssetDesc)
     await writeJsonFile(bitmapAssetFilename, content)
+
+    if (mapped) {
+      await this.saveBitmapMapping({
+        ...(this._bitmapMapping || {}),
+        [bitmapAssetDesc.name]: basename,
+      })
+    }
   }
 
   async saveBitmapAssetStream(
     bitmapAssetDesc: LocalBitmapAssetDescriptor,
     contentStream: NodeJS.ReadableStream
   ): Promise<void> {
-    const bitmapAssetFilename = this._getBitmapAssetFilename(bitmapAssetDesc)
+    await this._loadBitmapMapping()
+
+    const {
+      filename: bitmapAssetFilename,
+      basename,
+      mapped,
+    } = await this._resolveBitmapAsset(bitmapAssetDesc)
     await writeJsonFileStream(bitmapAssetFilename, contentStream)
+
+    if (mapped) {
+      await this.saveBitmapMapping({
+        ...(this._bitmapMapping || {}),
+        [bitmapAssetDesc.name]: basename,
+      })
+    }
   }
 
   async saveBitmapAssetBlob(
     bitmapAssetDesc: LocalBitmapAssetDescriptor,
     bitmapAssetBlob: Buffer
   ): Promise<void> {
-    const bitmapAssetFilename = this._getBitmapAssetFilename(bitmapAssetDesc)
+    await this._loadBitmapMapping()
+
+    const {
+      filename: bitmapAssetFilename,
+      basename,
+      mapped,
+    } = await this._resolveBitmapAsset(bitmapAssetDesc)
     await writeFileBlob(bitmapAssetFilename, bitmapAssetBlob)
+
+    if (mapped) {
+      await this.saveBitmapMapping({
+        ...(this._bitmapMapping || {}),
+        [bitmapAssetDesc.name]: basename,
+      })
+    }
+  }
+
+  async getBitmapMapping(): Promise<BitmapMapping> {
+    await this._loadBitmapMapping()
+
+    if (!this._bitmapMapping) {
+      throw new Error('Bitmap mapping is not available')
+    }
+
+    return this._bitmapMapping
+  }
+
+  async _loadBitmapMapping() {
+    if (this._bitmapMapping) {
+      return
+    }
+
+    const bitmapMappingFilename = this._getBitmapMappingFilename()
+    if (!(await checkFile(bitmapMappingFilename))) {
+      this._bitmapMapping = {}
+      return
+    }
+
+    this._bitmapMapping = (await readJsonFile(
+      bitmapMappingFilename
+    )) as BitmapMapping
+  }
+
+  async saveBitmapMapping(bitmapMapping: BitmapMapping): Promise<void> {
+    this._bitmapMapping = bitmapMapping
+
+    const bitmapMappingFilename = this._getBitmapMappingFilename()
+    await writeJsonFile(bitmapMappingFilename, bitmapMapping)
   }
 
   _getManifestFilename(): string {
     return joinPaths(this._filename, MANIFEST_BASENAME)
+  }
+
+  _getBitmapMappingFilename(): string {
+    return joinPaths(this._filename, BITMAP_ASSET_MAPPING_BASENAME)
   }
 
   _getArtboardContentFilename(artboardId: ArtboardId): string {
@@ -198,18 +287,55 @@ export class LocalDesign implements ILocalDesign {
     )
   }
 
-  _getBitmapAssetFilename(bitmapAssetDesc: LocalBitmapAssetDescriptor): string {
-    return bitmapAssetDesc.prerendered
-      ? joinPaths(
-          this._filename,
-          BITMAP_ASSET_DIRECTORY_BASENAME,
-          PRERENDERED_BITMAP_ASSET_SUBDIRECTORY_BASENAME,
-          bitmapAssetDesc.name
-        )
-      : joinPaths(
-          this._filename,
-          BITMAP_ASSET_DIRECTORY_BASENAME,
-          bitmapAssetDesc.name
-        )
+  async _resolveBitmapAsset(
+    bitmapAssetDesc: LocalBitmapAssetDescriptor
+  ): Promise<{ basename: string; mapped: boolean; filename: string }> {
+    const { basename, mapped } = await this._getBitmapAssetBasename(
+      bitmapAssetDesc
+    )
+
+    return {
+      basename,
+      mapped,
+      filename: bitmapAssetDesc.prerendered
+        ? joinPaths(
+            this._filename,
+            BITMAP_ASSET_DIRECTORY_BASENAME,
+            PRERENDERED_BITMAP_ASSET_SUBDIRECTORY_BASENAME,
+            basename
+          )
+        : joinPaths(this._filename, BITMAP_ASSET_DIRECTORY_BASENAME, basename),
+    }
+  }
+
+  async _getBitmapAssetBasename(
+    bitmapAssetDesc: LocalBitmapAssetDescriptor
+  ): Promise<{ basename: string; mapped: boolean }> {
+    await this._loadBitmapMapping()
+
+    const bitmapMapping = this._bitmapMapping || {}
+    const mappedBasename = bitmapMapping[bitmapAssetDesc.name]
+
+    return mappedBasename
+      ? { basename: mappedBasename, mapped: true }
+      : this._createBitmapAssetBasename(bitmapAssetDesc)
+  }
+
+  _createBitmapAssetBasename(
+    bitmapAssetDesc: LocalBitmapAssetDescriptor
+  ): { basename: string; mapped: boolean } {
+    const bitmapKey = bitmapAssetDesc.name.toLowerCase()
+    if (this._checkBitmapBasenameValid(bitmapKey)) {
+      return { basename: bitmapKey, mapped: false }
+    }
+
+    const ext = extname(bitmapKey)
+    const name = basename(bitmapKey, ext).replace(/#:\?\/\*(.*?)$/, '$1')
+
+    return { basename: `${name}-${uuid()}${ext || '.png'}`, mapped: true }
+  }
+
+  _checkBitmapBasenameValid(basename: string): boolean {
+    return !/[#:?/*]/.test(basename)
   }
 }

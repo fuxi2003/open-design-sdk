@@ -7,6 +7,8 @@ import type {
 
 export type LocalBitmapAssetDescriptor = { name: string; prerendered: boolean }
 
+export type BitmapMapping = { [bitmapKey: string]: string }
+
 // Top-level API
 
 export interface ILocalDesignManager {
@@ -24,6 +26,9 @@ export interface ILocalDesign {
 
   getManifest(): Promise<ManifestData>
   saveManifest(manifest: ManifestData): Promise<void>
+
+  getBitmapMapping(): Promise<BitmapMapping>
+  saveBitmapMapping(bitmapMapping: BitmapMapping): Promise<void>
 
   // Design Structure
 
