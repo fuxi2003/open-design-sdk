@@ -24,7 +24,7 @@ import type {
 } from '@opendesign/octopus-reader/types'
 import type { components } from 'open-design-api-types'
 import type { Sdk } from './sdk'
-import type { ILocalDesign } from './local/ifaces'
+import type { ILocalDesign, LocalBitmapAssetDescriptor } from './local/ifaces'
 import type { IDesignFacade } from './types/ifaces'
 import type { LayerFacade } from './layer-facade'
 
@@ -445,6 +445,32 @@ export class DesignFacade implements IDesignFacade {
     }
 
     return apiDesign.getArtboardContent(artboardId)
+  }
+
+  async downloadBitmapAssets(
+    bitmapAssetDescs: Array<LocalBitmapAssetDescriptor>
+  ) {
+    const apiDesign = this._apiDesign
+    if (!apiDesign) {
+      throw new Error(
+        'The API is not configured, cannot download bitmap assets'
+      )
+    }
+
+    const localDesign = this._localDesign
+    if (!localDesign) {
+      throw new Error('The design is not configured to be a local file')
+    }
+
+    await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
+      const bitmapAssetStream = await apiDesign.getBitmapAssetStream(
+        bitmapAssetDesc.name
+      )
+      return localDesign.saveBitmapAssetStream(
+        bitmapAssetDesc,
+        bitmapAssetStream
+      )
+    })
   }
 
   async saveOctopusFile(relPath: string | null = null) {

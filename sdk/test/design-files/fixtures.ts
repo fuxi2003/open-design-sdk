@@ -45,3 +45,16 @@ export const multiArtboardSketchFileFixture = {
     },
   ],
 }
+
+export const singleInlineArtboardPhotoshopFileFixture = {
+  filename: join(__dirname, 'prerendered-with-doggo.psd'),
+  bitmapCount: 3,
+  prerenderedBitmapCount: 2,
+  artboards: [
+    {
+      name: 'Artboard 1',
+      width: 500,
+      height: 400,
+    },
+  ],
+}

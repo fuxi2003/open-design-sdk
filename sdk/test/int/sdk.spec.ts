@@ -1,5 +1,5 @@
 import { deepStrictEqual, doesNotThrow, ok, strictEqual } from 'assert'
-import { readFileSync, statSync, unlinkSync } from 'fs'
+import { readdirSync, readFileSync, statSync, unlinkSync } from 'fs'
 
 import { createOctopusFile } from '../utils/octopus-file'
 import { createSdk } from '../utils/sdk'
@@ -8,6 +8,7 @@ import { createTempFileTarget } from '../utils/temp-location'
 import {
   multiArtboardSketchFileFixture,
   singleArtboardSketchFileFixture,
+  singleInlineArtboardPhotoshopFileFixture,
 } from '../design-files/fixtures'
 
 import type {
@@ -39,14 +40,12 @@ describe('DesignFacade', () => {
       deepStrictEqual(await artboardFacade.getContent(), artboardOctopuses['a'])
     })
 
-    it('should save all its data to a new location', async () => {
+    it('should save its manifest to a new location', async () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
-      const {
-        filename: originalFilename,
-        manifest,
-        artboardOctopuses,
-      } = await createOctopusFile('original.octopus')
+      const { filename: originalFilename, manifest } = await createOctopusFile(
+        'original.octopus'
+      )
       const designFacade = await sdk.openOctopusFile(originalFilename)
 
       const copyFilename = await createTempFileTarget('copy.octopus')
@@ -56,12 +55,50 @@ describe('DesignFacade', () => {
         JSON.parse(readFileSync(`${copyFilename}/manifest.json`, 'utf8')),
         manifest
       )
+    })
+
+    it('should save its artboard octopus data to a new location', async () => {
+      const { sdk } = await createSdk({ localDesigns: true })
+
+      const {
+        filename: originalFilename,
+        artboardOctopuses,
+      } = await createOctopusFile('original.octopus')
+      const designFacade = await sdk.openOctopusFile(originalFilename)
+
+      const copyFilename = await createTempFileTarget('copy.octopus')
+      await designFacade.saveOctopusFile(copyFilename)
+
       deepStrictEqual(
         JSON.parse(
           readFileSync(`${copyFilename}/artboards/a/data.json`, 'utf8')
         ),
         artboardOctopuses['a']
       )
+    })
+
+    it('should save its bitmaps referenced via relative paths in octopus data to a new location', async () => {
+      const { sdk } = await createSdk({ localDesigns: true })
+
+      const {
+        filename: originalFilename,
+        bitmapFilenames,
+        bitmapMapping,
+      } = await createOctopusFile('original.octopus')
+
+      const designFacade = await sdk.openOctopusFile(originalFilename)
+
+      const copyFilename = await createTempFileTarget('copy.octopus')
+      await designFacade.saveOctopusFile(copyFilename)
+
+      deepStrictEqual(
+        JSON.parse(readFileSync(`${copyFilename}/bitmaps.json`, 'utf8')),
+        bitmapMapping
+      )
+
+      bitmapFilenames.forEach(([_bitmapKey, bitmapFilename]) => {
+        statSync(bitmapFilename)
+      })
     })
 
     it('should open a non-existent octopus file', async () => {
@@ -243,6 +280,60 @@ describe('DesignFacade', () => {
         )
       )
       deepStrictEqual(localOctopus, artboardOctopus)
+    })
+  })
+
+  describe('asset downloading', () => {
+    it('should download all bitmaps from an uploaded design', async function () {
+      const { sdk } = await createSdk({
+        designFiles: true,
+        localDesigns: true,
+        api: true,
+      })
+
+      const designFacade = await sdk.openDesignFile(
+        multiArtboardSketchFileFixture.filename
+      )
+
+      const filename = designFacade.filename
+      ok(filename)
+
+      const bitmapAssetDescs = await designFacade.getBitmapAssets()
+      await designFacade.downloadBitmapAssets(bitmapAssetDescs)
+
+      doesNotThrow(() => {
+        const bitmapBasenames = readdirSync(`${filename}/bitmaps`)
+        strictEqual(
+          bitmapBasenames.length,
+          multiArtboardSketchFileFixture.bitmapCount
+        )
+      })
+    })
+
+    it('should download prerendered bitmaps from an uploaded design to a subdirectory', async function () {
+      const { sdk } = await createSdk({
+        designFiles: true,
+        localDesigns: true,
+        api: true,
+      })
+
+      const designFacade = await sdk.openDesignFile(
+        singleInlineArtboardPhotoshopFileFixture.filename
+      )
+
+      const filename = designFacade.filename
+      ok(filename)
+
+      const bitmapAssetDescs = await designFacade.getBitmapAssets()
+      await designFacade.downloadBitmapAssets(bitmapAssetDescs)
+
+      doesNotThrow(() => {
+        const bitmapBasenames = readdirSync(`${filename}/bitmaps/prerendered`)
+        strictEqual(
+          bitmapBasenames.length,
+          singleInlineArtboardPhotoshopFileFixture.prerenderedBitmapCount
+        )
+      })
     })
   })
 
