@@ -10,10 +10,11 @@ import {
 import type { DesignFacade } from './design-facade'
 import type {
   DesignLayerDescriptor,
-  IFileLayerCollectionFacade,
+  IDesignLayerCollectionFacade,
 } from './types/ifaces'
 
-export class FileLayerCollectionFacade implements IFileLayerCollectionFacade {
+export class DesignLayerCollectionFacade
+  implements IDesignLayerCollectionFacade {
   _layerCollection: IFileLayerCollection
   _designFacade: DesignFacade
 
@@ -60,16 +61,16 @@ export class FileLayerCollectionFacade implements IFileLayerCollectionFacade {
   findLayers(
     selector: LayerSelector,
     options: Partial<{ depth: number }> = {}
-  ): FileLayerCollectionFacade {
+  ): DesignLayerCollectionFacade {
     const layerCollection = this._layerCollection.findLayers(selector, options)
-    return new FileLayerCollectionFacade(layerCollection, {
+    return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
   }
 
   filter(
     filter: (layerDesc: DesignLayerDescriptor) => boolean
-  ): FileLayerCollectionFacade {
+  ): DesignLayerCollectionFacade {
     const layerCollection = this._layerCollection.filter((layerEntityDesc) => {
       const layerFacadeDesc = this._resolveArtboardLayerDescriptor(
         layerEntityDesc
@@ -77,7 +78,7 @@ export class FileLayerCollectionFacade implements IFileLayerCollectionFacade {
       return Boolean(layerFacadeDesc && filter(layerFacadeDesc))
     })
 
-    return new FileLayerCollectionFacade(layerCollection, {
+    return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
   }

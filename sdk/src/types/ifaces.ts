@@ -83,12 +83,12 @@ export interface IDesignFacade {
   /** @category Layer Lookup */
   getFlattenedLayers(
     options?: Partial<{ depth: number }>
-  ): Promise<IFileLayerCollectionFacade>
+  ): Promise<IDesignLayerCollectionFacade>
 
   /** @category Layer Lookup */
   findLayerById(layerId: LayerId): Promise<DesignLayerDescriptor | null>
   /** @category Layer Lookup */
-  findLayersById(layerId: LayerId): Promise<IFileLayerCollectionFacade>
+  findLayersById(layerId: LayerId): Promise<IDesignLayerCollectionFacade>
   /** @category Layer Lookup */
   findLayer(
     selector: FileLayerSelector,
@@ -98,7 +98,7 @@ export interface IDesignFacade {
   findLayers(
     selector: FileLayerSelector,
     options?: Partial<{ depth: number }>
-  ): Promise<IFileLayerCollectionFacade>
+  ): Promise<IDesignLayerCollectionFacade>
 
   /** @category Asset Aggregation */
   getBitmapAssets(
@@ -178,7 +178,7 @@ export interface IPageFacade {
     options?: Partial<{ depth: number }>
   ): Promise<Array<AggregatedFileFontDescriptor>>
 
-  getFlattenedLayers(): Promise<IFileLayerCollectionFacade>
+  getFlattenedLayers(): Promise<IDesignLayerCollectionFacade>
 
   findLayerById(
     layerId: LayerId,
@@ -187,7 +187,7 @@ export interface IPageFacade {
   findLayersById(
     layerId: LayerId,
     options?: Partial<{ depth: number }>
-  ): Promise<IFileLayerCollectionFacade>
+  ): Promise<IDesignLayerCollectionFacade>
   findLayer(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
@@ -195,7 +195,7 @@ export interface IPageFacade {
   findLayers(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
-  ): Promise<IFileLayerCollectionFacade>
+  ): Promise<IDesignLayerCollectionFacade>
 }
 
 export interface ILayerFacade {
@@ -292,7 +292,7 @@ export interface ILayerCollectionFacade {
   ): Array<AggregatedFontDescriptor>
 }
 
-export interface IFileLayerCollectionFacade {
+export interface IDesignLayerCollectionFacade {
   readonly length: number
 
   [Symbol.iterator](): Iterator<DesignLayerDescriptor>
@@ -306,11 +306,11 @@ export interface IFileLayerCollectionFacade {
   findLayers(
     selector: FileLayerSelector,
     options?: Partial<{ depth: number }>
-  ): IFileLayerCollectionFacade
+  ): IDesignLayerCollectionFacade
 
   filter(
     filter: (layerDesc: DesignLayerDescriptor) => boolean
-  ): IFileLayerCollectionFacade
+  ): IDesignLayerCollectionFacade
 
   map<T>(mapper: (layerDesc: DesignLayerDescriptor) => T): Array<T>
   flatMap<T>(mapper: (layerDesc: DesignLayerDescriptor) => Array<T>): Array<T>

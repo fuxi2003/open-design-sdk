@@ -1,4 +1,4 @@
-import { FileLayerCollectionFacade } from './file-layer-collection-facade'
+import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
 import { matchArtboard } from '@opendesign/octopus-reader/src/utils/artboard-lookup'
 
@@ -136,7 +136,7 @@ export class PageFacade implements IPageFacade {
     await this.load()
 
     const layerCollection = this._pageEntity.getFlattenedLayers(options)
-    return new FileLayerCollectionFacade(layerCollection, {
+    return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
   }
@@ -170,7 +170,7 @@ export class PageFacade implements IPageFacade {
     await this.load()
 
     const layerCollection = this._pageEntity.findLayersById(layerId, options)
-    return new FileLayerCollectionFacade(layerCollection, {
+    return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
   }
@@ -204,7 +204,7 @@ export class PageFacade implements IPageFacade {
     await this.load()
 
     const layerCollection = this._pageEntity.findLayers(selector, options)
-    return new FileLayerCollectionFacade(layerCollection, {
+    return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
   }
