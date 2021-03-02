@@ -475,9 +475,17 @@ export class DesignFacade implements IDesignFacade {
 
   async saveOctopusFile(relPath: string | null = null) {
     const localDesign = await this._getLocalDesign(relPath)
+    const apiDesign = this._apiDesign
 
     const manifest = this.getManifest()
     await localDesign.saveManifest(manifest)
+
+    if (apiDesign) {
+      await localDesign.saveApiDesignInfo({
+        apiRoot: apiDesign.getApiRoot(),
+        designId: apiDesign.id,
+      })
+    }
 
     await Promise.all(
       this.getArtboards().map(async (artboard) => {
@@ -491,7 +499,6 @@ export class DesignFacade implements IDesignFacade {
     )
 
     const bitmapAssetDescs = await this.getBitmapAssets()
-    const apiDesign = this._apiDesign
 
     await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
       if (await localDesign.hasBitmapAsset(bitmapAssetDesc)) {

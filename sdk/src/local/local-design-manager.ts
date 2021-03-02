@@ -11,13 +11,18 @@ import { LocalDesign } from './local-design'
 import { MANIFEST_BASENAME } from './consts'
 
 import type { ManifestData } from '@opendesign/octopus-reader/types'
-import type { ILocalDesignManager } from './ifaces'
+import type { ApiDesignInfo, ILocalDesignManager } from './ifaces'
 
 const statPromised = promisify(stat)
 const mkdirPromised = promisify(mkdir)
 
 export class LocalDesignManager implements ILocalDesignManager {
-  async openOctopusFile(relPath: string): Promise<LocalDesign> {
+  async openOctopusFile(
+    relPath: string,
+    options: Partial<{
+      apiDesignInfo: ApiDesignInfo | null
+    }> = {}
+  ): Promise<LocalDesign> {
     const filename = resolvePath(relPath)
     this._checkOctopusFileName(filename)
 
@@ -28,7 +33,15 @@ export class LocalDesignManager implements ILocalDesignManager {
     const manifestFilename = joinPaths(filename, MANIFEST_BASENAME)
     await this._checkFilePresence(manifestFilename)
 
-    return new LocalDesign({ filename, localDesignManager: this })
+    const localDesign = new LocalDesign({ filename, localDesignManager: this })
+    if (
+      options.apiDesignInfo &&
+      !(await this._checkApiDesignInfo(localDesign, options.apiDesignInfo))
+    ) {
+      throw new Error('Incompatible API design entity info')
+    }
+
+    return localDesign
   }
 
   async createOctopusFile(relPath: string): Promise<LocalDesign> {
@@ -44,13 +57,20 @@ export class LocalDesignManager implements ILocalDesignManager {
   }
 
   async createOctopusFileFromManifest(
-    manifest: ManifestData
+    manifest: ManifestData,
+    options: Partial<{
+      apiDesignInfo: ApiDesignInfo | null
+    }> = {}
   ): Promise<LocalDesign> {
     const filename = await this._createTempLocation()
     const localDesign = await this.createOctopusFile(filename)
     console.log('temp octopus file from manifest', filename)
 
     await localDesign.saveManifest(manifest)
+
+    if (options.apiDesignInfo) {
+      await localDesign.saveApiDesignInfo(options.apiDesignInfo)
+    }
 
     return localDesign
   }
@@ -88,5 +108,23 @@ export class LocalDesignManager implements ILocalDesignManager {
     await mkdirPromised(dirname)
 
     return dirname
+  }
+
+  async _checkApiDesignInfo(
+    localDesign: LocalDesign,
+    nextApiDesignInfo: ApiDesignInfo
+  ): Promise<boolean> {
+    const prevApiDesignInfo = await localDesign.getApiDesignInfo()
+    if (!prevApiDesignInfo) {
+      return true
+    }
+
+    return (
+      (!prevApiDesignInfo.apiRoot ||
+        prevApiDesignInfo.apiRoot === nextApiDesignInfo.apiRoot) &&
+      (!prevApiDesignInfo.designId ||
+        !nextApiDesignInfo.designId ||
+        prevApiDesignInfo.designId === nextApiDesignInfo.designId)
+    )
   }
 }

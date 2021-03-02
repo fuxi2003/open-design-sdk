@@ -43,6 +43,10 @@ export class ApiDesign implements IApiDesign {
     return this._info['status']
   }
 
+  getApiRoot() {
+    return this._openDesignApi.getApiRoot()
+  }
+
   async getManifest() {
     const summary = await this.getSummary()
     const {

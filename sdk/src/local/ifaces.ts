@@ -5,6 +5,11 @@ import type {
   PageId,
 } from '@opendesign/octopus-reader/types'
 
+export type ApiDesignInfo = {
+  apiRoot?: string
+  designId?: string
+}
+
 export type LocalBitmapAssetDescriptor = { name: string; prerendered: boolean }
 
 export type BitmapMapping = { [bitmapKey: string]: string }
@@ -29,6 +34,9 @@ export interface ILocalDesign {
 
   getBitmapMapping(): Promise<BitmapMapping>
   saveBitmapMapping(bitmapMapping: BitmapMapping): Promise<void>
+
+  getApiDesignInfo(): Promise<ApiDesignInfo | null>
+  saveApiDesignInfo(apiDesignInfo: ApiDesignInfo | null): Promise<void>
 
   // Design Structure
 

@@ -9,6 +9,7 @@ import type { ISdk } from './types/ifaces'
 import type { DesignFacade } from './design-facade'
 import type { DesignFileManager } from './local/design-file-manager'
 import type { LocalDesignManager } from './local/local-design-manager'
+import type { ILocalDesign } from './local/ifaces'
 
 type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 
@@ -23,10 +24,17 @@ export class Sdk implements ISdk {
       throw new Error('Local design manager is not configured.')
     }
 
-    const localDesign = await localDesignManager.openOctopusFile(relPath)
+    const localDesign = await localDesignManager.openOctopusFile(relPath, {
+      apiDesignInfo: this._getCommonApiDesignInfo(),
+    })
     const designFacade = await createDesignFromLocalDesign(localDesign, {
       sdk: this,
     })
+
+    const apiDesign = await this._getApiDesignByLocalDesign(localDesign)
+    if (apiDesign) {
+      await designFacade.setApiDesign(apiDesign)
+    }
 
     return designFacade
   }
@@ -106,7 +114,15 @@ export class Sdk implements ISdk {
     const localDesignManager = this._localDesignManager
     if (localDesignManager) {
       const localDesign = await localDesignManager.createOctopusFileFromManifest(
-        designFacade.getManifest()
+        designFacade.getManifest(),
+        apiDesign
+          ? {
+              apiDesignInfo: {
+                apiRoot: apiDesign.getApiRoot(),
+                designId: apiDesign.id,
+              },
+            }
+          : {}
       )
       await designFacade.setLocalDesign(localDesign)
     }
@@ -136,5 +152,35 @@ export class Sdk implements ISdk {
 
   useOpenDesignApi(api: IOpenDesignApi): void {
     this._openDesignApi = api
+  }
+
+  _getCommonApiDesignInfo() {
+    const openDesignApi = this._openDesignApi
+    return openDesignApi ? { apiRoot: openDesignApi.getApiRoot() } : null
+  }
+
+  async _getApiDesignByLocalDesign(localDesign: ILocalDesign) {
+    const apiDesignInfo = await localDesign.getApiDesignInfo()
+    const designId = apiDesignInfo ? apiDesignInfo.designId : null
+    if (!designId) {
+      return null
+    }
+
+    const openDesignApi = this._openDesignApi
+    if (!openDesignApi) {
+      console.warn(
+        'The local design references an API design but the API is not configured.'
+      )
+      return null
+    }
+
+    try {
+      return await openDesignApi.getDesignById(designId)
+    } catch (err) {
+      console.warn(
+        'API design referenced by the opened local design is not available'
+      )
+      return null
+    }
   }
 }

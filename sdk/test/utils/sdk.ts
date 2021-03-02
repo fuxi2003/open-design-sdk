@@ -19,13 +19,13 @@ export async function createSdk(params: {
     sdk.useDesignFileManager(new DesignFileManager())
   }
 
-  const { openDesignApi, token } = params.api
+  const { openDesignApi, apiRoot, token } = params.api
     ? await createOpenDesignApi({ token: params.token })
-    : { openDesignApi: null, token: null }
+    : { openDesignApi: null, apiRoot: null, token: null }
 
   if (openDesignApi) {
     sdk.useOpenDesignApi(openDesignApi)
   }
 
-  return { sdk, token }
+  return { sdk, apiRoot, token }
 }

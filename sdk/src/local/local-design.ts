@@ -1,4 +1,9 @@
-import { basename, extname, join as joinPaths } from 'path'
+import {
+  basename,
+  extname,
+  join as joinPaths,
+  resolve as resolvePath,
+} from 'path'
 import {
   checkFile,
   readJsonFile,
@@ -9,12 +14,14 @@ import {
   writeFileBlob,
   copyDirectory,
   moveDirectory,
+  deleteFile,
 } from '../utils/fs'
 import { v4 as uuid } from 'uuid'
 
 import {
   ARTBOARD_CONTENT_BASENAME,
   ARTBOARD_DIRECTORY_BASENAME,
+  API_DESIGN_INFO_BASENAME,
   BITMAP_ASSET_DIRECTORY_BASENAME,
   BITMAP_ASSET_MAPPING_BASENAME,
   MANIFEST_BASENAME,
@@ -30,6 +37,7 @@ import type {
   PageId,
 } from '@opendesign/octopus-reader/types'
 import type {
+  ApiDesignInfo,
   BitmapMapping,
   ILocalDesign,
   LocalBitmapAssetDescriptor,
@@ -38,11 +46,14 @@ import type { LocalDesignManager } from './local-design-manager'
 
 export class LocalDesign implements ILocalDesign {
   _filename: string
+
+  _apiDesignInfo: ApiDesignInfo | null
   _bitmapMapping: BitmapMapping | null = null
 
   constructor(init: {
     filename: string
     localDesignManager: LocalDesignManager
+    apiDesignInfo?: ApiDesignInfo | null
   }) {
     const filename = init.filename
     if (!filename) {
@@ -50,19 +61,22 @@ export class LocalDesign implements ILocalDesign {
     }
 
     this._filename = init.filename
+    this._apiDesignInfo = init.apiDesignInfo || null
   }
 
   get filename() {
     return this._filename
   }
 
-  async saveAs(nextFilename: string) {
+  async saveAs(nextRelPath: string) {
+    const nextFilename = resolvePath(nextRelPath)
     const prevFilename = this._filename
     await copyDirectory(prevFilename, nextFilename)
     this._filename = nextFilename
   }
 
-  async move(nextFilename: string) {
+  async move(nextRelPath: string) {
+    const nextFilename = resolvePath(nextRelPath)
     const prevFilename = this._filename
     await moveDirectory(prevFilename, nextFilename)
     this._filename = nextFilename
@@ -261,12 +275,49 @@ export class LocalDesign implements ILocalDesign {
     await writeJsonFile(bitmapMappingFilename, bitmapMapping)
   }
 
+  async getApiDesignInfo(): Promise<ApiDesignInfo | null> {
+    await this._loadApiDesignInfo()
+
+    return this._apiDesignInfo
+  }
+
+  async _loadApiDesignInfo() {
+    if (this._apiDesignInfo) {
+      return
+    }
+
+    const apiDesignInfoFilename = this._getApiDesignInfoFilename()
+    if (!(await checkFile(apiDesignInfoFilename))) {
+      this._apiDesignInfo = null
+      return
+    }
+
+    this._apiDesignInfo = (await readJsonFile(
+      apiDesignInfoFilename
+    )) as ApiDesignInfo
+  }
+
+  async saveApiDesignInfo(apiDesignInfo: ApiDesignInfo | null): Promise<void> {
+    this._apiDesignInfo = apiDesignInfo
+
+    const apiDesignInfoFilename = this._getApiDesignInfoFilename()
+    if (apiDesignInfo) {
+      await writeJsonFile(apiDesignInfoFilename, apiDesignInfo)
+    } else {
+      await deleteFile(apiDesignInfoFilename)
+    }
+  }
+
   _getManifestFilename(): string {
     return joinPaths(this._filename, MANIFEST_BASENAME)
   }
 
   _getBitmapMappingFilename(): string {
     return joinPaths(this._filename, BITMAP_ASSET_MAPPING_BASENAME)
+  }
+
+  _getApiDesignInfoFilename(): string {
+    return joinPaths(this._filename, API_DESIGN_INFO_BASENAME)
   }
 
   _getArtboardContentFilename(artboardId: ArtboardId): string {

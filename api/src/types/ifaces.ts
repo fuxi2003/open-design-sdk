@@ -18,6 +18,8 @@ export interface IOpenDesignApiModule {
 }
 
 export interface IOpenDesignApi {
+  getApiRoot(): string
+
   // Import
 
   importDesignFile(
@@ -93,6 +95,8 @@ export interface IApiDesign {
   readonly createdAt: DesignData['created_at']
   readonly completedAt: DesignData['completed_at']
   readonly status: DesignData['status']
+
+  getApiRoot(): string
 
   getSummary(): Promise<DesignSummary>
   getManifest(): Promise<ManifestData>

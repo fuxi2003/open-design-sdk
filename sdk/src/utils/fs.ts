@@ -62,6 +62,11 @@ export function writeFileBlob(filename: string, blob: Buffer): Promise<void> {
   return writeFile(filename, blob)
 }
 
+export function deleteFile(filename: string): Promise<void> {
+  const unlink = promisify(fs.unlink)
+  return unlink(filename)
+}
+
 export function copyDirectory(
   prevDirname: string,
   nextDirname: string

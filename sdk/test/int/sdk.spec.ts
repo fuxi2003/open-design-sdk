@@ -15,6 +15,7 @@ import type {
   ArtboardOctopusData,
   ManifestData,
 } from '@opendesign/octopus-reader/types'
+import { ApiDesignInfo } from '../../src/local/ifaces'
 
 describe('DesignFacade', () => {
   describe('local files', () => {
@@ -231,6 +232,24 @@ describe('DesignFacade', () => {
       strictEqual(octopus['bounds']?.['height'], fixtureArtboardDesc.height)
     })
 
+    it('should save info about the API design', async function () {
+      const { sdk, apiRoot } = await createSdk({
+        token: tokenFromBefore,
+        localDesigns: true,
+        api: true,
+      })
+
+      const designFacade = await sdk.fetchDesignById(designId)
+
+      const filename = await createTempFileTarget('file.octopus')
+      await designFacade.saveOctopusFile(filename)
+
+      const apiDesignInfo: ApiDesignInfo = JSON.parse(
+        readFileSync(`${filename}/api-design.json`, 'utf8')
+      )
+      deepStrictEqual(apiDesignInfo, { apiRoot, designId })
+    })
+
     it('should cache the manifest of a fetched design in a local file', async function () {
       const { sdk } = await createSdk({
         token: tokenFromBefore,
@@ -280,6 +299,29 @@ describe('DesignFacade', () => {
         )
       )
       deepStrictEqual(localOctopus, artboardOctopus)
+    })
+
+    it('should continue using the API design reference after reopening the cache', async function () {
+      const { sdk } = await createSdk({
+        token: tokenFromBefore,
+        localDesigns: true,
+        api: true,
+      })
+
+      const designFacade = await sdk.fetchDesignById(designId)
+      const filename = designFacade.filename
+      ok(filename)
+
+      const reopenedDesignFacade = await sdk.openOctopusFile(filename)
+
+      const [fixtureArtboardDesc] = singleArtboardSketchFileFixture.artboards
+      ok(fixtureArtboardDesc)
+
+      const artboardFacade = reopenedDesignFacade.getArtboardById(
+        fixtureArtboardDesc.id
+      )
+      const artboardOctopus = await artboardFacade?.getContent()
+      ok(artboardOctopus)
     })
   })
 
