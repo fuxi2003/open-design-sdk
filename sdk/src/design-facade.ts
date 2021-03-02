@@ -531,12 +531,18 @@ export class DesignFacade implements IDesignFacade {
   }
 
   async _getLocalDesign(relPath: string | null): Promise<ILocalDesign> {
+    const localDesign = this._localDesign
+
     if (!relPath) {
-      const localDesign = this._localDesign
       if (!localDesign) {
         throw new Error('The design is not configured to be a local file')
       }
 
+      return localDesign
+    }
+
+    if (localDesign) {
+      await localDesign.saveAs(relPath)
       return localDesign
     }
 
