@@ -1,0 +1,10 @@
+{
+  "entryPoints": ["./src/docs.ts"],
+  "readme": "none",
+  "listInvalidSymbolLinks": true,
+  "hideGenerator": true,
+  "disableSources": true,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true
+}
