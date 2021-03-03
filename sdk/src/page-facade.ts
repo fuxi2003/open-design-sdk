@@ -119,20 +119,20 @@ export class PageFacade implements IPageFacade {
   }
 
   async getBitmapAssets(
-    options: Partial<{ includePrerendered: boolean }> = {}
+    options: { depth?: number; includePrerendered?: boolean } = {}
   ) {
     await this.load()
 
     return this._pageEntity.getBitmapAssets(options)
   }
 
-  async getFonts(options: Partial<{ depth: number }> = {}) {
+  async getFonts(options: { depth?: number } = {}) {
     await this.load()
 
     return this._pageEntity.getFonts(options)
   }
 
-  async getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+  async getFlattenedLayers(options: { depth?: number } = {}) {
     await this.load()
 
     const layerCollection = this._pageEntity.getFlattenedLayers(options)
@@ -141,10 +141,7 @@ export class PageFacade implements IPageFacade {
     })
   }
 
-  async findLayerById(
-    layerId: LayerId,
-    options: Partial<{ depth: number }> = {}
-  ) {
+  async findLayerById(layerId: LayerId, options: { depth?: number } = {}) {
     await this.load()
 
     const layerEntityDesc = this._pageEntity.findLayerById(layerId, options)
@@ -163,10 +160,7 @@ export class PageFacade implements IPageFacade {
       : null
   }
 
-  async findLayersById(
-    layerId: LayerId,
-    options: Partial<{ depth: number }> = {}
-  ) {
+  async findLayersById(layerId: LayerId, options: { depth?: number } = {}) {
     await this.load()
 
     const layerCollection = this._pageEntity.findLayersById(layerId, options)
@@ -175,10 +169,7 @@ export class PageFacade implements IPageFacade {
     })
   }
 
-  async findLayer(
-    selector: LayerSelector,
-    options: Partial<{ depth: number }> = {}
-  ) {
+  async findLayer(selector: LayerSelector, options: { depth?: number } = {}) {
     await this.load()
 
     const layerEntityDesc = this._pageEntity.findLayer(selector, options)
@@ -197,10 +188,7 @@ export class PageFacade implements IPageFacade {
       : null
   }
 
-  async findLayers(
-    selector: LayerSelector,
-    options: Partial<{ depth: number }> = {}
-  ) {
+  async findLayers(selector: LayerSelector, options: { depth?: number } = {}) {
     await this.load()
 
     const layerCollection = this._pageEntity.findLayers(selector, options)

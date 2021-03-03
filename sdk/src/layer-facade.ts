@@ -81,27 +81,21 @@ export class LayerFacade implements ILayerFacade {
     return this._layerEntity.hasNestedLayers()
   }
 
-  getNestedLayers(options?: Partial<{ depth: number }>) {
+  getNestedLayers(options: { depth?: number } = {}) {
     const layerEntities = this._layerEntity.getNestedLayers(options)
     return new LayerCollectionFacade(layerEntities, {
       artboardFacade: this._artboardFacade,
     })
   }
 
-  findNestedLayer(
-    selector: LayerSelector,
-    options?: Partial<{ depth: number }>
-  ) {
+  findNestedLayer(selector: LayerSelector, options: { depth?: number } = {}) {
     const layerEntity = this._layerEntity.findNestedLayer(selector, options)
     return layerEntity
       ? new LayerFacade(layerEntity, { artboardFacade: this._artboardFacade })
       : null
   }
 
-  findNestedLayers(
-    selector: LayerSelector,
-    options?: Partial<{ depth: number }>
-  ) {
+  findNestedLayers(selector: LayerSelector, options: { depth?: number } = {}) {
     const layerEntities = this._layerEntity.findNestedLayers(selector, options)
     return new LayerCollectionFacade(layerEntities, {
       artboardFacade: this._artboardFacade,
@@ -145,12 +139,12 @@ export class LayerFacade implements ILayerFacade {
   }
 
   getBitmapAssets(
-    options?: Partial<{ depth: number; includePrerendered: boolean }>
+    options: { depth?: number; includePrerendered?: boolean } = {}
   ) {
     return this._layerEntity.getBitmapAssets(options)
   }
 
-  getFonts(options?: Partial<{ depth: number }>) {
+  getFonts(options: { depth?: number } = {}) {
     return this._layerEntity.getFonts(options)
   }
 

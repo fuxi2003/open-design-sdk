@@ -285,7 +285,7 @@ export class DesignFacade implements IDesignFacade {
       .filter(Boolean) as Array<PageFacade>
   }
 
-  async getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+  async getFlattenedLayers(options: { depth?: number } = {}) {
     await this.load()
 
     const entity = this.getDesignEntity()
@@ -331,7 +331,7 @@ export class DesignFacade implements IDesignFacade {
 
   async findLayer(
     selector: FileLayerSelector,
-    options: Partial<{ depth: number }> = {}
+    options: { depth?: number } = {}
   ) {
     await this.load()
 
@@ -356,7 +356,7 @@ export class DesignFacade implements IDesignFacade {
 
   async findLayers(
     selector: FileLayerSelector,
-    options: Partial<{ depth: number }> = {}
+    options: { depth?: number } = {}
   ) {
     await this.load()
 
@@ -369,7 +369,7 @@ export class DesignFacade implements IDesignFacade {
   }
 
   async getBitmapAssets(
-    options: Partial<{ depth: number; includePrerendered: boolean }> = {}
+    options: { depth?: number; includePrerendered?: boolean } = {}
   ) {
     await this.load()
 
@@ -377,7 +377,7 @@ export class DesignFacade implements IDesignFacade {
     return entity.getBitmapAssets(options)
   }
 
-  async getFonts(options: Partial<{ depth: number }> = {}) {
+  async getFonts(options: { depth?: number } = {}) {
     await this.load()
 
     const entity = this.getDesignEntity()

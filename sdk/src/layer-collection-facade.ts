@@ -60,7 +60,7 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
 
   findLayer(
     selector: LayerSelector,
-    options: Partial<{ depth: number }> = {}
+    options: { depth?: number } = {}
   ): LayerFacade | null {
     const layerEntity = this._layerCollection.findLayer(selector, options)
     return layerEntity
@@ -70,7 +70,7 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
 
   findLayers(
     selector: LayerSelector,
-    options: Partial<{ depth: number }> = {}
+    options: { depth?: number } = {}
   ): LayerCollectionFacade {
     const layerCollection = this._layerCollection.findLayers(selector, options)
     return new LayerCollectionFacade(layerCollection, {
@@ -118,7 +118,7 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
     })
   }
 
-  flatten(options: Partial<{ depth: number }> = {}): LayerCollectionFacade {
+  flatten(options: { depth?: number } = {}): LayerCollectionFacade {
     const flattenedLayerCollection = this._layerCollection.flatten(options)
 
     return new LayerCollectionFacade(flattenedLayerCollection, {
@@ -127,14 +127,12 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
   }
 
   getBitmapAssets(
-    options: Partial<{ depth: number; includePrerendered: boolean }> = {}
+    options: { depth?: number; includePrerendered?: boolean } = {}
   ): Array<AggregatedBitmapAssetDescriptor> {
     return this._layerCollection.getBitmapAssets(options)
   }
 
-  getFonts(
-    options: Partial<{ depth: number }> = {}
-  ): Array<AggregatedFontDescriptor> {
+  getFonts(options: { depth?: number } = {}): Array<AggregatedFontDescriptor> {
     return this._layerCollection.getFonts(options)
   }
 }

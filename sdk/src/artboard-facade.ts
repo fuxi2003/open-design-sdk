@@ -102,14 +102,14 @@ export class ArtboardFacade implements IArtboardFacade {
   }
 
   async getBitmapAssets(
-    options: Partial<{ includePrerendered: boolean }> = {}
+    options: { depth?: number; includePrerendered?: boolean } = {}
   ) {
     await this.load()
 
     return this._artboardEntity.getBitmapAssets(options)
   }
 
-  async getFonts(options: Partial<{ depth: number }> = {}) {
+  async getFonts(options: { depth?: number } = {}) {
     await this.load()
 
     return this._artboardEntity.getFonts(options)
@@ -128,7 +128,7 @@ export class ArtboardFacade implements IArtboardFacade {
     return new LayerCollectionFacade(layerCollection, { artboardFacade: this })
   }
 
-  async getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+  async getFlattenedLayers(options: { depth?: number } = {}) {
     await this.load()
 
     const layerCollection = this._artboardEntity.getFlattenedLayers(options)
@@ -154,20 +154,14 @@ export class ArtboardFacade implements IArtboardFacade {
     return nextLayerFacade
   }
 
-  async findLayer(
-    selector: LayerSelector,
-    options: Partial<{ depth: number }> = {}
-  ) {
+  async findLayer(selector: LayerSelector, options: { depth?: number } = {}) {
     await this.load()
 
     const layerEntity = this._artboardEntity.findLayer(selector, options)
     return layerEntity ? this.getLayerById(layerEntity.id) : null
   }
 
-  async findLayers(
-    selector: LayerSelector,
-    options: Partial<{ depth: number }> = {}
-  ) {
+  async findLayers(selector: LayerSelector, options: { depth?: number } = {}) {
     await this.load()
 
     const layerCollection = this._artboardEntity.findLayers(selector, options)
