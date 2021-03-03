@@ -97,6 +97,7 @@ export class ArtboardFacade implements IArtboardFacade {
     this._artboardEntity.setPage(nextPageId)
   }
 
+  /** @internal */
   unassignFromPage() {
     this._artboardEntity.unassignFromPage()
   }
@@ -140,6 +141,7 @@ export class ArtboardFacade implements IArtboardFacade {
     return this.getLayerFacadeById(layerId)
   }
 
+  /** @internal */
   getLayerFacadeById(layerId: LayerId) {
     const prevLayerFacade = this._layerFacades.get(layerId)
     if (prevLayerFacade) {

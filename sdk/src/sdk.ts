@@ -18,6 +18,9 @@ export class Sdk implements ISdk {
   private _designFileManager: DesignFileManager | null = null
   private _localDesignManager: LocalDesignManager | null = null
 
+  /** @internal */
+  constructor() {}
+
   async openOctopusFile(relPath: string): Promise<DesignFacade> {
     const localDesignManager = this._localDesignManager
     if (!localDesignManager) {
@@ -130,6 +133,7 @@ export class Sdk implements ISdk {
     return designFacade
   }
 
+  /** @internal */
   async saveDesignFileStream(
     relPath: string,
     designFileStream: NodeJS.ReadableStream
@@ -142,14 +146,17 @@ export class Sdk implements ISdk {
     return designFileManager.saveDesignFileStream(relPath, designFileStream)
   }
 
+  /** @internal */
   useDesignFileManager(designFileManager: DesignFileManager): void {
     this._designFileManager = designFileManager
   }
 
+  /** @internal */
   useLocalDesignManager(localDesignManager: LocalDesignManager): void {
     this._localDesignManager = localDesignManager
   }
 
+  /** @internal */
   useOpenDesignApi(api: IOpenDesignApi): void {
     this._openDesignApi = api
   }

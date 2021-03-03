@@ -8,6 +8,7 @@ export class LayerFacade implements ILayerFacade {
   private _layerEntity: ILayer
   private _artboardFacade: ArtboardFacade
 
+  /** @internal */
   constructor(layerEntity: ILayer, params: { artboardFacade: ArtboardFacade }) {
     this._layerEntity = layerEntity
     this._artboardFacade = params.artboardFacade
@@ -33,6 +34,7 @@ export class LayerFacade implements ILayerFacade {
     return this._artboardFacade
   }
 
+  /** @internal */
   getLayerEntity() {
     return this._layerEntity
   }

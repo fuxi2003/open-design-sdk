@@ -18,6 +18,7 @@ export class PageFacade implements IPageFacade {
   private _pageEntity: IPage
   private _designFacade: DesignFacade
 
+  /** @internal */
   constructor(pageEntity: IPage, params: { designFacade: DesignFacade }) {
     this._pageEntity = pageEntity
     this._designFacade = params.designFacade
@@ -31,6 +32,7 @@ export class PageFacade implements IPageFacade {
     return this._pageEntity.name
   }
 
+  /** @internal */
   setPageEntity(pageEntity: IPage) {
     this._pageEntity = pageEntity
   }
@@ -46,6 +48,7 @@ export class PageFacade implements IPageFacade {
     })
   }
 
+  /** @internal */
   async load(): Promise<void> {
     const artboards = this.getArtboards()
     await Promise.all(

@@ -15,6 +15,7 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
   private _layerCollection: ILayerCollection
   private _artboardFacade: ArtboardFacade
 
+  /** @internal */
   constructor(
     layerCollection: ILayerCollection,
     params: { artboardFacade: ArtboardFacade }
@@ -31,6 +32,7 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
     return this._layerCollection.length
   }
 
+  /** @internal */
   getLayerCollectionEntity() {
     return this._layerCollection
   }

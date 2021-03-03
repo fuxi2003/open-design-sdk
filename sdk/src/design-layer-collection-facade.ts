@@ -20,6 +20,7 @@ export class DesignLayerCollectionFacade
   private _layerCollection: IFileLayerCollection
   private _designFacade: DesignFacade
 
+  /** @internal */
   constructor(
     layerCollection: IFileLayerCollection,
     params: { designFacade: DesignFacade }
@@ -36,6 +37,7 @@ export class DesignLayerCollectionFacade
     return this._layerCollection.length
   }
 
+  /** @internal */
   getFileLayerCollectionEntity() {
     return this._layerCollection
   }

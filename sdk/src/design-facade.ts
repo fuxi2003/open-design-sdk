@@ -51,6 +51,7 @@ export class DesignFacade implements IDesignFacade {
     IApiDesignConversion
   > = new Map()
 
+  /** @internal */
   constructor(params: { sdk: Sdk }) {
     this._sdk = params.sdk
   }
@@ -65,6 +66,7 @@ export class DesignFacade implements IDesignFacade {
     return localDesign?.filename || null
   }
 
+  /** @internal */
   getManifest(): ManifestData {
     if (this._pendingManifestUpdate) {
       return this._pendingManifestUpdate
@@ -74,6 +76,7 @@ export class DesignFacade implements IDesignFacade {
     return entity.getManifest()
   }
 
+  /** @internal */
   setManifest(nextManifest: ManifestData) {
     this._pendingManifestUpdate = nextManifest
     this._manifestLoaded = true
@@ -98,10 +101,12 @@ export class DesignFacade implements IDesignFacade {
     return entity
   })
 
+  /** @internal */
   getLocalDesign() {
     return this._localDesign
   }
 
+  /** @internal */
   async setLocalDesign(localDesign: ILocalDesign) {
     this._localDesign = localDesign
 
@@ -110,6 +115,7 @@ export class DesignFacade implements IDesignFacade {
     }
   }
 
+  /** @internal */
   async setApiDesign(apiDesign: IApiDesign) {
     this._apiDesign = apiDesign
 
@@ -388,6 +394,7 @@ export class DesignFacade implements IDesignFacade {
     return entity.getFonts(options)
   }
 
+  /** @internal */
   getArtboardLayerFacade(
     artboardId: ArtboardId,
     layerId: LayerId
@@ -396,6 +403,7 @@ export class DesignFacade implements IDesignFacade {
     return artboardFacade ? artboardFacade.getLayerFacadeById(layerId) : null
   }
 
+  /** @internal */
   async load() {
     const artboards = this.getArtboards()
     return Promise.all(
@@ -405,6 +413,7 @@ export class DesignFacade implements IDesignFacade {
     )
   }
 
+  /** @internal */
   async loadArtboard(artboardId: ArtboardId): Promise<ArtboardFacade> {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {
@@ -569,6 +578,7 @@ export class DesignFacade implements IDesignFacade {
     return targetLocalDesign
   }
 
+  /** @internal */
   addConversion(conversion: IApiDesignConversion) {
     const format = conversion.resultFormat
     this._conversions.set(format, conversion)
