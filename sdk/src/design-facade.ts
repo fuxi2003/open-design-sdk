@@ -70,7 +70,7 @@ export class DesignFacade implements IDesignFacade {
       return this._pendingManifestUpdate
     }
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     return entity.getManifest()
   }
 
@@ -78,12 +78,12 @@ export class DesignFacade implements IDesignFacade {
     this._pendingManifestUpdate = nextManifest
     this._manifestLoaded = true
 
-    this.getDesignEntity.clear()
-    this.getArtboards.clear()
-    this.getPages.clear()
+    this._getDesignEntity.clear()
+    this._getArtboardsMemoized.clear()
+    this._getPagesMemoized.clear()
   }
 
-  getDesignEntity = memoize(() => {
+  private _getDesignEntity = memoize(() => {
     const entity = this._designEntity || createEmptyFile()
 
     const pendingManifestUpdate = this._pendingManifestUpdate
@@ -91,8 +91,8 @@ export class DesignFacade implements IDesignFacade {
       this._pendingManifestUpdate = null
       entity.setManifest(pendingManifestUpdate)
 
-      this.getArtboards.clear()
-      this.getPages.clear()
+      this._getArtboardsMemoized.clear()
+      this._getPagesMemoized.clear()
     }
 
     return entity
@@ -118,11 +118,15 @@ export class DesignFacade implements IDesignFacade {
     }
   }
 
-  getArtboards = memoize(() => {
+  getArtboards() {
+    return this._getArtboardsMemoized()
+  }
+
+  private _getArtboardsMemoized = memoize(() => {
     const prevArtboardFacades = this._artboardFacades
     const nextArtboardFacades: Map<ArtboardId, ArtboardFacade> = new Map()
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const artboardEntities = entity.getArtboards()
 
     artboardEntities.forEach((artboardEntity) => {
@@ -147,7 +151,7 @@ export class DesignFacade implements IDesignFacade {
       return prevArtboardFacade
     }
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const artboardEntity = entity.getArtboardById(artboardId)
     if (!artboardEntity) {
       return null
@@ -163,7 +167,7 @@ export class DesignFacade implements IDesignFacade {
   }
 
   getPageArtboards(pageId: PageId): Array<ArtboardFacade> {
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const artboardEntities = entity.getPageArtboards(pageId)
 
     return artboardEntities
@@ -174,7 +178,7 @@ export class DesignFacade implements IDesignFacade {
   }
 
   getComponentArtboards(): Array<ArtboardFacade> {
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const artboardEntities = entity.getComponentArtboards()
 
     return artboardEntities
@@ -185,22 +189,22 @@ export class DesignFacade implements IDesignFacade {
   }
 
   getArtboardByComponentId(componentId: ComponentId): ArtboardFacade | null {
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const artboardEntity = entity.getArtboardByComponentId(componentId)
 
     return artboardEntity ? this.getArtboardById(artboardEntity.id) : null
   }
 
   isPaged() {
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     return entity.isPaged()
   }
 
-  getPages = memoize(() => {
+  private _getPagesMemoized = memoize(() => {
     const prevPageFacades = this._pageFacades
     const nextPageFacades: Map<PageId, PageFacade> = new Map()
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const pageEntities = entity.getPages()
 
     pageEntities.forEach((pageEntity) => {
@@ -224,7 +228,7 @@ export class DesignFacade implements IDesignFacade {
       return prevPageFacade
     }
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const pageEntity = entity.getPageById(pageId)
     if (!pageEntity) {
       return null
@@ -250,14 +254,14 @@ export class DesignFacade implements IDesignFacade {
   }
 
   findArtboard(selector: ArtboardSelector): ArtboardFacade | null {
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const artboardEntity = entity.findArtboard(selector)
 
     return artboardEntity ? this.getArtboardById(artboardEntity.id) : null
   }
 
   findArtboards(selector: ArtboardSelector): Array<ArtboardFacade> {
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const artboardEntities = entity.findArtboards(selector)
 
     return artboardEntities
@@ -268,14 +272,14 @@ export class DesignFacade implements IDesignFacade {
   }
 
   findPage(selector: PageSelector): PageFacade | null {
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const pageEntity = entity.findPage(selector)
 
     return pageEntity ? this.getPageById(pageEntity.id) : null
   }
 
   findPages(selector: PageSelector): Array<PageFacade> {
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const pageEntities = entity.findPages(selector)
 
     return pageEntities
@@ -288,7 +292,7 @@ export class DesignFacade implements IDesignFacade {
   async getFlattenedLayers(options: { depth?: number } = {}) {
     await this.load()
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const layerCollection = entity.getFlattenedLayers(options)
 
     return new DesignLayerCollectionFacade(layerCollection, {
@@ -299,7 +303,7 @@ export class DesignFacade implements IDesignFacade {
   async findLayerById(layerId: LayerId) {
     await this.load()
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const layerEntityDesc = entity.findLayerById(layerId)
     if (!layerEntityDesc) {
       return null
@@ -321,7 +325,7 @@ export class DesignFacade implements IDesignFacade {
   async findLayersById(layerId: LayerId) {
     await this.load()
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const layerCollection = entity.findLayersById(layerId)
 
     return new DesignLayerCollectionFacade(layerCollection, {
@@ -335,7 +339,7 @@ export class DesignFacade implements IDesignFacade {
   ) {
     await this.load()
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const layerEntityDesc = entity.findLayer(selector, options)
     if (!layerEntityDesc) {
       return null
@@ -360,7 +364,7 @@ export class DesignFacade implements IDesignFacade {
   ) {
     await this.load()
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     const layerCollection = entity.findLayers(selector, options)
 
     return new DesignLayerCollectionFacade(layerCollection, {
@@ -373,14 +377,14 @@ export class DesignFacade implements IDesignFacade {
   ) {
     await this.load()
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     return entity.getBitmapAssets(options)
   }
 
   async getFonts(options: { depth?: number } = {}) {
     await this.load()
 
-    const entity = this.getDesignEntity()
+    const entity = this._getDesignEntity()
     return entity.getFonts(options)
   }
 

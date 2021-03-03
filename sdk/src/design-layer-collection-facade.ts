@@ -40,7 +40,11 @@ export class DesignLayerCollectionFacade
     return this._layerCollection
   }
 
-  getLayers = memoize(
+  getLayers() {
+    return this._getLayersMemoized()
+  }
+
+  private _getLayersMemoized = memoize(
     (): Array<DesignLayerDescriptor> => {
       return this._layerCollection
         .map((layerEntityDesc) => {

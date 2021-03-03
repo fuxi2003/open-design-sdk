@@ -35,7 +35,11 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
     return this._layerCollection
   }
 
-  getLayers = memoize(
+  getLayers() {
+    return this._getLayersMemoized()
+  }
+
+  private _getLayersMemoized = memoize(
     (): Array<LayerFacade> => {
       return this._layerCollection
         .map((layerEntity) => {
