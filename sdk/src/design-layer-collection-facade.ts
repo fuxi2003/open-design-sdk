@@ -12,6 +12,7 @@ import type { DesignFacade } from './design-facade'
 import type { LayerFacade } from './layer-facade'
 import type { IDesignLayerCollectionFacade } from './types/design-layer-collection-facade.iface'
 
+/** @category Layer Lookup */
 export type DesignLayerDescriptor = {
   artboardId: ArtboardId
   layer: LayerFacade

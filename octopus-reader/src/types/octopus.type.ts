@@ -1,7 +1,21 @@
 import type { components } from 'open-design-api-types'
 
+/**
+ * An artboard ID.
+ * @category Identification
+ */
 export type ArtboardId = string
+
+/**
+ * A component ID.
+ * @category Identification
+ */
 export type ComponentId = string
+
+/**
+ * Artboard content (an octopus document)
+ * @category Data
+ */
 export type ArtboardOctopusData = components['schemas']['OctopusDocument']
 // type ArtboardOctopusData = {
 //   'bounds': Bounds
@@ -34,6 +48,10 @@ export type Path = {
 
 export type BitmapMetadata = Record<string, unknown>
 
+/**
+ * A layer ID.
+ * @category Identification
+ */
 export type LayerId = string
 
 export type FontData = {
@@ -63,6 +81,10 @@ export type BorderEffectOctopusData =
   | GradientBorderEffectOctopusData
   | PatternBorderEffectOctopusData
 
+/**
+ * Layer data (layer octopus)
+ * @category Data
+ */
 export type LayerOctopusData = NonNullable<
   components['schemas']['OctopusDocument']['layers']
 >[0]
