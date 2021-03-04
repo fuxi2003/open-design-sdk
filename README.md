@@ -1,33 +1,57 @@
-# Open Design SDK
+# Open Design SDK Testing Session Instructions
 
-## Component Responsibilities
+Forgive the alpha state of the repository. We currently do not have a release process in place and the testing session build is not available via NPM.
 
-### Facade
+You will have to clone the repo, build the code and then run it.
 
-- Orchestrates the high-level logic of loading and persisting of design files and working with their contents.
-- Hides most platform/technology differences
-- Makes working with design files very straight-forward
-- Has the concept of design, page and artboard entities
-- Manages in-memory state but does not keep the design data themselves
+- Clone the repo
 
-### Octopus Reader
+  ```bash
+  git clone git@gitlab-ssh.avcd.cz:opendesign/open-design-sdk.git && cd open-design-sdk
+  ```
 
-- Keeps the state (loaded designs)
-- Does not work with design file locations or any design IDs
+- Checkout the testing session code snapshot
 
-### API Client
+  ```bash
+  git checkout testingsession1
+  ```
 
-- Fetches design data from a remote service (Open Design API)
-- Does not keep any state
-- Uploads design files to the remote service
-- Has the concept of an ID-based design storage
-- Does not work with file locations
+- Install dependencies
 
-### Local Data Manager
+  ```bash
+  yarn
+  ```
 
-- Loads octopus design data from the local storage (the file system)
-- Saves octopus design data to the local storage
-- Manages temporary working state of design files
-- Has the concept of an filename-based design storage
-- Has the concept of "octopus files"
-- Does not work with any design IDs
+- Build the documentation
+
+  ```
+  yarn workspace @opendesign/sdk run build:docs
+  ```
+
+  The documentation is generated inside `sdk/docs`. You can browse it by opening `sdk/docs/index.html` in a web browser.
+
+- The build process is not currently finished so you will have to use `ts-node` (or raw `tsc`) and work with the original TypeScript code directly by importing `sdk/src`.
+
+  ```bash
+  $ yarn add ts-node # or install globally: yarn global add ts-node
+  $ ./node_modules/.bin/ts-node # or globally: ts-node
+  ```
+
+  ```typescript
+  import { createSdk } from './sdk/src'
+
+  const sdk = createSdk({
+    token: 'abc',
+    apiRoot: 'https://opendesign.avcd.cz/api',
+  })
+  // Obtain an access token from the ODAPI docs:
+  //   - Staging: https://opendesign.avcd.cz/docs/authentication
+  //   - Produciton: https://opendesign.avocode.com/docs/authentication
+  // The apiRoot defaults to the production ODAPI root.
+  ```
+
+- Read the documentation and test the SDK works and behaves in ways you would expect and seem natural to you.
+
+- Please report any issues you uncover or anything unusual or unexpected you encounter. I would also love some feedback on the documentation content.
+
+  - Here is a **testing session issue** in GitLab: https://gitlab.avcd.cz/opendesign/open-design-sdk/-/issues/1
