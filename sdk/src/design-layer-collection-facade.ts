@@ -5,7 +5,7 @@ import {
   FileLayerDescriptor,
   IFileLayerCollection,
   AggregatedFileFontDescriptor,
-  LayerSelector,
+  FileLayerSelector,
 } from '@opendesign/octopus-reader/types'
 import type { DesignFacade } from './design-facade'
 import type { IDesignLayerCollectionFacade } from './types/design-layer-collection-facade.iface'
@@ -51,7 +51,7 @@ export class DesignLayerCollectionFacade
   )
 
   findLayer(
-    selector: LayerSelector,
+    selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
   ): DesignLayerDescriptor | null {
     const layerEntityDesc = this._layerCollection.findLayer(selector, options)
@@ -61,7 +61,7 @@ export class DesignLayerCollectionFacade
   }
 
   findLayers(
-    selector: LayerSelector,
+    selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
   ): DesignLayerCollectionFacade {
     const layerCollection = this._layerCollection.findLayers(selector, options)

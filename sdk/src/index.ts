@@ -15,6 +15,16 @@ export function createSdk(params: {
   return sdk
 }
 
+export function createUncachedSdk(params: {
+  token: string
+  apiRoot?: string | null
+}): ISdk {
+  const sdk = new Sdk()
+  configureOfflineUncachedServices(sdk)
+  configureOnlineServices(sdk, params)
+  return sdk
+}
+
 export function createOfflineSdk(): ISdk {
   const sdk = new Sdk()
   configureOfflineServices(sdk)
@@ -31,8 +41,18 @@ export function createOnlineSdk(params: {
 }
 
 function configureOfflineServices(sdk: ISdk): ISdk {
-  sdk.useLocalDesignManager(new LocalDesignManager())
+  configureOfflineUncachedServices(sdk)
+  configureOfflineCacheServices(sdk)
+  return sdk
+}
+
+function configureOfflineUncachedServices(sdk: ISdk): ISdk {
   sdk.useDesignFileManager(new DesignFileManager())
+  return sdk
+}
+
+function configureOfflineCacheServices(sdk: ISdk): ISdk {
+  sdk.useLocalDesignManager(new LocalDesignManager())
   return sdk
 }
 
