@@ -32,6 +32,11 @@ export interface IFileLayerCollection {
     initialValue?: T
   ): T
 
+  concat(
+    addedLayers: Array<FileLayerDescriptor> | IFileLayerCollection
+  ): IFileLayerCollection
+  flatten(options?: Partial<{ depth: number }>): IFileLayerCollection
+
   getBitmapAssets(
     options?: Partial<{ depth: number; includePrerendered: boolean }>
   ): Array<AggregatedFileBitmapAssetDescriptor>

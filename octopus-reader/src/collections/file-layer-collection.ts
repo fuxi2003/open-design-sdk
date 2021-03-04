@@ -92,6 +92,23 @@ export class FileLayerCollection implements IFileLayerCollection {
     return new FileLayerCollection(layers, this._file)
   }
 
+  flatten(options: Partial<{ depth: number }> = {}): IFileLayerCollection {
+    const depth = options.depth || Infinity
+
+    const flattenedLayers = this.getLayers().flatMap(
+      ({ artboardId, layer }) => {
+        return [
+          { artboardId, layer },
+          ...layer.getNestedLayers({ depth }).map((nestedLayer) => {
+            return { artboardId, layer: nestedLayer }
+          }),
+        ]
+      }
+    )
+
+    return new FileLayerCollection(flattenedLayers, this._file)
+  }
+
   getBitmapAssets(
     options: Partial<{ depth: number; includePrerendered: boolean }> = {}
   ): Array<AggregatedFileBitmapAssetDescriptor> {

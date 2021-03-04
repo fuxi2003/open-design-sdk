@@ -8,10 +8,12 @@ import {
   LayerSelector,
 } from '@opendesign/octopus-reader/types'
 import type { DesignFacade } from './design-facade'
-import type {
-  DesignLayerDescriptor,
-  IDesignLayerCollectionFacade,
-} from './types/ifaces'
+import type { IDesignLayerCollectionFacade } from './types/ifaces'
+
+export type DesignLayerDescriptor = {
+  artboardId: ArtboardId
+  layer: LayerFacade
+}
 
 export class DesignLayerCollectionFacade
   implements IDesignLayerCollectionFacade {
@@ -96,6 +98,35 @@ export class DesignLayerCollectionFacade
     initialValue: T
   ): T {
     return this.getLayers().reduce(reducer, initialValue)
+  }
+
+  concat(
+    addedLayers:
+      | DesignLayerCollectionFacade
+      | Array<{
+          artboardId: ArtboardId
+          layer: LayerFacade
+        }>
+  ): DesignLayerCollectionFacade {
+    const addedLayerList = Array.isArray(addedLayers)
+      ? addedLayers.map(({ artboardId, layer: layerFacade }) => {
+          return { artboardId, layer: layerFacade.getLayerEntity() }
+        })
+      : addedLayers.getFileLayerCollectionEntity()
+
+    const nextLayerCollection = this._layerCollection.concat(addedLayerList)
+
+    return new DesignLayerCollectionFacade(nextLayerCollection, {
+      designFacade: this._designFacade,
+    })
+  }
+
+  flatten(options: { depth?: number } = {}): DesignLayerCollectionFacade {
+    const flattenedLayerCollection = this._layerCollection.flatten(options)
+
+    return new DesignLayerCollectionFacade(flattenedLayerCollection, {
+      designFacade: this._designFacade,
+    })
   }
 
   getBitmapAssets(

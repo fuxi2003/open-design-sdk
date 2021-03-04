@@ -320,6 +320,12 @@ export interface IDesignLayerCollectionFacade {
     initialValue?: T
   ): T
 
+  concat(
+    addedLayers: IDesignLayerCollectionFacade | Array<DesignLayerDescriptor>
+  ): IDesignLayerCollectionFacade
+
+  flatten(options?: Partial<{ depth: number }>): IDesignLayerCollectionFacade
+
   getBitmapAssets(
     options?: Partial<{ depth: number; includePrerendered: boolean }>
   ): Array<AggregatedFileBitmapAssetDescriptor>
