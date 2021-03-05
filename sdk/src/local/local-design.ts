@@ -41,7 +41,7 @@ import type {
   BitmapMapping,
   ILocalDesign,
   LocalBitmapAssetDescriptor,
-} from './ifaces'
+} from '../types/local-design.iface'
 import type { LocalDesignManager } from './local-design-manager'
 
 export class LocalDesign implements ILocalDesign {

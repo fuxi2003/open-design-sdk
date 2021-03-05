@@ -11,7 +11,8 @@ import { LocalDesign } from './local-design'
 import { MANIFEST_BASENAME } from './consts'
 
 import type { ManifestData } from '@opendesign/octopus-reader/types'
-import type { ApiDesignInfo, ILocalDesignManager } from './ifaces'
+import type { ApiDesignInfo } from '../types/local-design.iface'
+import type { ILocalDesignManager } from '../types/local-design-manager.iface'
 
 const statPromised = promisify(stat)
 const mkdirPromised = promisify(mkdir)

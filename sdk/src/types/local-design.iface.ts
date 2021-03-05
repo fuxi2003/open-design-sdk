@@ -14,13 +14,6 @@ export type LocalBitmapAssetDescriptor = { name: string; prerendered: boolean }
 
 export type BitmapMapping = { [bitmapKey: string]: string }
 
-// Top-level API
-
-export interface ILocalDesignManager {
-  openOctopusFile(filename: string): Promise<ILocalDesign>
-  createOctopusFileFromManifest(manifest: ManifestData): Promise<ILocalDesign>
-}
-
 // Design-level API
 
 export interface ILocalDesign {

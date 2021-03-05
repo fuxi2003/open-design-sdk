@@ -24,8 +24,11 @@ import type {
 } from '@opendesign/octopus-reader/types'
 import type { components } from 'open-design-api-types'
 import type { Sdk } from './sdk'
-import type { ILocalDesign, LocalBitmapAssetDescriptor } from './local/ifaces'
-import type { IDesignFacade } from './types/ifaces'
+import type {
+  ILocalDesign,
+  LocalBitmapAssetDescriptor,
+} from './types/local-design.iface'
+import type { IDesignFacade } from './types/design-facade.iface'
 import type { LayerFacade } from './layer-facade'
 
 type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']

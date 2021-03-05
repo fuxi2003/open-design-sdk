@@ -10,7 +10,7 @@ import type {
   RgbaColor,
 } from '@opendesign/octopus-reader/types'
 import type { DesignFacade } from './design-facade'
-import type { IArtboardFacade } from './types/ifaces'
+import type { IArtboardFacade } from './types/artboard-facade.iface'
 
 export class ArtboardFacade implements IArtboardFacade {
   _artboardEntity: IArtboard

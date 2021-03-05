@@ -8,7 +8,7 @@ import {
   LayerSelector,
 } from '@opendesign/octopus-reader/types'
 import type { DesignFacade } from './design-facade'
-import type { IDesignLayerCollectionFacade } from './types/ifaces'
+import type { IDesignLayerCollectionFacade } from './types/design-layer-collection-facade.iface'
 
 export type DesignLayerDescriptor = {
   artboardId: ArtboardId

@@ -2,7 +2,8 @@ import { OpenDesignApi } from '@opendesign/api/src/open-design-api'
 import { DesignFileManager } from './local/design-file-manager'
 import { LocalDesignManager } from './local/local-design-manager'
 import { Sdk } from './sdk'
-import { ISdk } from './types/ifaces'
+
+import type { ISdk } from './types/sdk.iface'
 
 export function createSdk(params: {
   token: string

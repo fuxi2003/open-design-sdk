@@ -5,11 +5,11 @@ import {
 
 import type { IOpenDesignApi } from '@opendesign/api/types'
 import type { components } from 'open-design-api-types'
-import type { ISdk } from './types/ifaces'
+import type { ISdk } from './types/sdk.iface'
 import type { DesignFacade } from './design-facade'
 import type { DesignFileManager } from './local/design-file-manager'
 import type { LocalDesignManager } from './local/local-design-manager'
-import type { ILocalDesign } from './local/ifaces'
+import type { ILocalDesign } from './types/local-design.iface'
 
 type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 

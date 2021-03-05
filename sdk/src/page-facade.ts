@@ -12,7 +12,7 @@ import type {
 } from '@opendesign/octopus-reader/types'
 import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
-import type { IPageFacade } from './types/ifaces'
+import type { IPageFacade } from './types/page-facade.iface'
 
 export class PageFacade implements IPageFacade {
   _pageEntity: IPage
