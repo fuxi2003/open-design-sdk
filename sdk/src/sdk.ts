@@ -21,6 +21,17 @@ export class Sdk implements ISdk {
   /** @internal */
   constructor() {}
 
+  /**
+   * Opens a local `.octopus` file.
+   *
+   * Offline services have to be configured when using this method.
+   *
+   * In case the file references a server-side design and online services is configured, the API can be used for fetching missing data of partially downloaded files.
+   *
+   * @category Local Design File Usage
+   * @param relPath An absolute `.octopus` file path or a path relative to the current working directory.
+   * @returns A design object which can be used for retrieving data from the local `.octopus` file or a referenced server-side design (see above).
+   */
   async openOctopusFile(relPath: string): Promise<DesignFacade> {
     const localDesignManager = this._localDesignManager
     if (!localDesignManager) {
@@ -42,6 +53,17 @@ export class Sdk implements ISdk {
     return designFacade
   }
 
+  /**
+   * Opens a local design file.
+   *
+   * Both online and offline services have to be configured when using this method.
+   *
+   * The design is automatically uploaded to the API and local caching is established.
+   *
+   * @category Local Design File Usage
+   * @param relPath An absolute design file path or a path relative to the current working directory.
+   * @returns A design object which can be used for retrieving data from the local design file using the API.
+   */
   async openDesignFile(relPath: string): Promise<DesignFacade> {
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
@@ -61,6 +83,21 @@ export class Sdk implements ISdk {
     return this.fetchDesignById(apiDesign.id)
   }
 
+  /**
+   * Opens a Figma design.
+   *
+   * Online services have to be configured when using this method.
+   *
+   * The design is automatically imported by the API and local caching is established.
+   *
+   * @category Figma Design Usage
+   * @param params Info about the Figma design
+   * @param params.figmaToken A Figma access token generated in the "Personal access tokens" section of [Figma account settings](https://www.figma.com/settings).
+   * @param params.figmaFileKey A Figma design "file key" from the design URL (i.e. `abc` from `https://www.figma.com/file/abc/Sample-File`).
+   * @param params.figmaIds A listing of Figma design frames to use.
+   * @param params.designName A name override for the design. The original Figma design name is used by default.
+   * @returns A design object which can be used for retrieving data from the Figma design using the API.
+   */
   async openFigmaDesign(params: {
     figmaToken: string
     figmaFileKey: string
@@ -77,6 +114,22 @@ export class Sdk implements ISdk {
     return this.fetchDesignById(apiDesign.id)
   }
 
+  /**
+   * Opens a Figma design while initiating a conversion to another design file format (currently only Sketch is available).
+   *
+   * Online services have to be configured when using this method. Offline services have to be configured for downloading the converted design file from the API but downloading the result is not a required step as it can be done later from another client.
+   *
+   * The design is automatically imported by the API and local caching is established in case offline services are configured.
+   *
+   * @category Figma Design Usage
+   * @param params Info about the Figma design
+   * @param params.figmaToken A Figma access token generated in the "Personal access tokens" section of [Figma account settings](https://www.figma.com/settings).
+   * @param params.figmaFileKey A Figma design "file key" from the design URL (i.e. `abc` from `https://www.figma.com/file/abc/Sample-File`).
+   * @param params.figmaIds A listing of Figma design frames to use.
+   * @param params.designName A name override for the design. The original Figma design name is used by default.
+   * @param params.conversions Design file conversion configurations. Only a single conversion to the `"sketch"` (Sketch) file format is available currently.
+   * @returns A design object which can be used for retrieving data from the Figma design or downloading the converted design file using the API.
+   */
   async convertFigmaDesign(params: {
     figmaToken: string
     figmaFileKey: string
@@ -103,6 +156,17 @@ export class Sdk implements ISdk {
     return designFacade
   }
 
+  /**
+   * Opens a server-side design file.
+   *
+   * Online services have to be configured when using this method.
+   *
+   * The design is automatically uploaded to the API and when offline services are also configured, local caching is established and the designs can be saved as `.octopus` files.
+   *
+   * @category Server Side Design File Usage
+   * @param designId An ID of a server-side design assigned during import (via `openDesignFile()`, `openFigmaDesign()` or `convertFigmaDesign()`).
+   * @returns A design object which can be used for retrieving data from the design using the API.
+   */
   async fetchDesignById(designId: string): Promise<DesignFacade> {
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {

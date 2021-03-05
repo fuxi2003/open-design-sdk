@@ -1,4 +1,19 @@
 {
+  "categoryOrder": [
+    "Primary Entry Point",
+    "Experimental Entry Point",
+    "Identification",
+    "Data",
+    "Reference",
+    "Local Design File Usage",
+    "Server Side Design File Usage",
+    "Figma Design Usage",
+    "Layer Context",
+    "Layer Lookup",
+    "Asset Aggregation",
+    "Iteration",
+    "Collection Manipulation"
+  ],
   "entryPoints": ["./src/docs.ts"],
   "readme": "none",
   "listInvalidSymbolLinks": true,

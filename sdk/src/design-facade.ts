@@ -56,11 +56,19 @@ export class DesignFacade implements IDesignFacade {
     this._sdk = params.sdk
   }
 
+  /**
+   * The ID of the referenced server-side design. This is not available when online services are not configured for the SDK.
+   * @category Identification
+   */
   get id() {
     const apiDesign = this._apiDesign
     return apiDesign?.id || null
   }
 
+  /**
+   * The absolute path of the open local `.octopus` design or the local cache. This is not available when online services are not configured for the SDK.
+   * @category Identification
+   */
   get filename() {
     const localDesign = this._localDesign
     return localDesign?.filename || null
@@ -124,6 +132,11 @@ export class DesignFacade implements IDesignFacade {
     }
   }
 
+  /**
+   * Returns a complete list of artboard object in the design. These can be used to work with artboard contents.
+   *
+   * @category Artboard Lookup
+   */
   getArtboards() {
     return this._getArtboardsMemoized()
   }
@@ -151,6 +164,12 @@ export class DesignFacade implements IDesignFacade {
     return [...nextArtboardFacades.values()]
   })
 
+  /**
+   * Returns a single artboard object. These can be used to work with the artboard contents.
+   *
+   * @category Artboard Lookup
+   * @param artboardId An artboard ID.
+   */
   getArtboardById(artboardId: ArtboardId): ArtboardFacade | null {
     const prevArtboardFacade = this._artboardFacades.get(artboardId)
     if (prevArtboardFacade) {
@@ -172,6 +191,12 @@ export class DesignFacade implements IDesignFacade {
     return artboardFacade
   }
 
+  /**
+   * Returns artboard objects for a specific page (in case the design is paged). These can be used to work with artboard contents.
+   *
+   * @category Artboard Lookup
+   * @param pageId A page ID.
+   */
   getPageArtboards(pageId: PageId): Array<ArtboardFacade> {
     const entity = this._getDesignEntity()
     const artboardEntities = entity.getPageArtboards(pageId)
@@ -183,6 +208,11 @@ export class DesignFacade implements IDesignFacade {
       .filter(Boolean) as Array<ArtboardFacade>
   }
 
+  /**
+   * Returns (main/master) component artboard objects. These can be used to work with artboard contents.
+   *
+   * @category Artboard Lookup
+   */
   getComponentArtboards(): Array<ArtboardFacade> {
     const entity = this._getDesignEntity()
     const artboardEntities = entity.getComponentArtboards()
@@ -194,6 +224,12 @@ export class DesignFacade implements IDesignFacade {
       .filter(Boolean) as Array<ArtboardFacade>
   }
 
+  /**
+   * Returns an artboard object of a specific (main/master) component. These can be used to work with the artboard contents.
+   *
+   * @category Artboard Lookup
+   * @param componentId A component ID.
+   */
   getArtboardByComponentId(componentId: ComponentId): ArtboardFacade | null {
     const entity = this._getDesignEntity()
     const artboardEntity = entity.getArtboardByComponentId(componentId)
@@ -201,9 +237,25 @@ export class DesignFacade implements IDesignFacade {
     return artboardEntity ? this.getArtboardById(artboardEntity.id) : null
   }
 
+  /**
+   * Returns info about whether the design is paged (i.e. has artboards organized on different pages).
+   *
+   * @category Page Lookup
+   */
   isPaged() {
     const entity = this._getDesignEntity()
     return entity.isPaged()
+  }
+
+  /**
+   * Returns a complete list of page object in the design. These can be used to work with artboard contents.
+   *
+   * An empty list is returned for unpaged designs.
+   *
+   * @category Page Lookup
+   */
+  getPages() {
+    return this._getPagesMemoized()
   }
 
   private _getPagesMemoized = memoize(() => {
@@ -228,6 +280,12 @@ export class DesignFacade implements IDesignFacade {
     return [...nextPageFacades.values()]
   })
 
+  /**
+   * Returns a single page object. These can be used to work with the page contents and contents of artboards inside the page.
+   *
+   * @category Page Lookup
+   * @param pageId A page ID.
+   */
   getPageById(pageId: PageId): PageFacade | null {
     const prevPageFacade = this._pageFacades.get(pageId)
     if (prevPageFacade) {
@@ -259,6 +317,12 @@ export class DesignFacade implements IDesignFacade {
     return page
   }
 
+  /**
+   * Looks up the first artboard object matching the provided criteria.
+   *
+   * @category Artboard Lookup
+   * @param selector An artboard selector. All specified fields must be matched by the result.
+   */
   findArtboard(selector: ArtboardSelector): ArtboardFacade | null {
     const entity = this._getDesignEntity()
     const artboardEntity = entity.findArtboard(selector)
@@ -266,6 +330,12 @@ export class DesignFacade implements IDesignFacade {
     return artboardEntity ? this.getArtboardById(artboardEntity.id) : null
   }
 
+  /**
+   * Looks up all artboard objects matching the provided criteria.
+   *
+   * @category Artboard Lookup
+   * @param selector An artboard selector. All specified fields must be matched by the results.
+   */
   findArtboards(selector: ArtboardSelector): Array<ArtboardFacade> {
     const entity = this._getDesignEntity()
     const artboardEntities = entity.findArtboards(selector)
@@ -277,6 +347,12 @@ export class DesignFacade implements IDesignFacade {
       .filter(Boolean) as Array<ArtboardFacade>
   }
 
+  /**
+   * Looks up the first artboard object matching the provided criteria.
+   *
+   * @category Page Lookup
+   * @param selector A page selector. All specified fields must be matched by the result.
+   */
   findPage(selector: PageSelector): PageFacade | null {
     const entity = this._getDesignEntity()
     const pageEntity = entity.findPage(selector)
@@ -284,6 +360,12 @@ export class DesignFacade implements IDesignFacade {
     return pageEntity ? this.getPageById(pageEntity.id) : null
   }
 
+  /**
+   * Looks up all artboard objects matching the provided criteria.
+   *
+   * @category Page Lookup
+   * @param selector A page selector. All specified fields must be matched by the results.
+   */
   findPages(selector: PageSelector): Array<PageFacade> {
     const entity = this._getDesignEntity()
     const pageEntities = entity.findPages(selector)
@@ -295,7 +377,17 @@ export class DesignFacade implements IDesignFacade {
       .filter(Boolean) as Array<PageFacade>
   }
 
-  async getFlattenedLayers(options: { depth?: number } = {}) {
+  /**
+   * Returns a collection of all layers from all pages and artboards (optionally down to a specific nesting level).
+   *
+   * The produced collection can be queried further for narrowing down the search.
+   *
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param options.depth The maximum nesting level of layers within pages and artboards to include in the collection. By default, all levels are included.
+   */
+  async getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
     await this.load()
 
     const entity = this._getDesignEntity()
@@ -306,6 +398,16 @@ export class DesignFacade implements IDesignFacade {
     })
   }
 
+  /**
+   * Returns the first layer object which has the specified ID.
+   *
+   * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes. This is the reason the method is not prefixed with "get".
+   *
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param layerId A layer ID.
+   */
   async findLayerById(layerId: LayerId) {
     await this.load()
 
@@ -328,6 +430,16 @@ export class DesignFacade implements IDesignFacade {
       : null
   }
 
+  /**
+   * Returns a collection of all layer objects which have the specified ID.
+   *
+   * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes.
+   *
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param layerId A layer ID.
+   */
   async findLayersById(layerId: LayerId) {
     await this.load()
 
@@ -339,6 +451,15 @@ export class DesignFacade implements IDesignFacade {
     })
   }
 
+  /**
+   * Returns the first layer object from any page or artboard (optionally down to a specific nesting level) matching the specified criteria.
+   *
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param selector A design-wide layer selector. All specified fields must be matched by the result.
+   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched.
+   */
   async findLayer(
     selector: FileLayerSelector,
     options: { depth?: number } = {}
@@ -364,6 +485,15 @@ export class DesignFacade implements IDesignFacade {
       : null
   }
 
+  /**
+   * Returns a collection of all layer objects from all pages and artboards (optionally down to a specific nesting level) matching the specified criteria.
+   *
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param selector A design-wide layer selector. All specified fields must be matched by the result.
+   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched.
+   */
   async findLayers(
     selector: FileLayerSelector,
     options: { depth?: number } = {}
@@ -378,6 +508,15 @@ export class DesignFacade implements IDesignFacade {
     })
   }
 
+  /**
+   * Returns a list of bitmap assets used by layers in all pages and artboards (optionally down to a specific nesting level).
+   *
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Asset Aggregation
+   * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched.
+   * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
+   */
   async getBitmapAssets(
     options: { depth?: number; includePrerendered?: boolean } = {}
   ) {
@@ -387,6 +526,14 @@ export class DesignFacade implements IDesignFacade {
     return entity.getBitmapAssets(options)
   }
 
+  /**
+   * Returns a list of fonts used by layers in all pages and artboards (optionally down to a specific nesting level).
+   *
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Asset Aggregation
+   * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched.
+   */
   async getFonts(options: { depth?: number } = {}) {
     await this.load()
 
@@ -463,6 +610,14 @@ export class DesignFacade implements IDesignFacade {
     return apiDesign.getArtboardContent(artboardId)
   }
 
+  /**
+   * Downloads the specified bitmap assets to the local `.octopus` file or the local cache.
+   *
+   * Both online and offline services have to be configured when using this method.
+   *
+   * @category Asset Aggregation
+   * @param bitmapAssetDescs A list of bitmap assets to download.
+   */
   async downloadBitmapAssets(
     bitmapAssetDescs: Array<LocalBitmapAssetDescriptor>
   ) {
@@ -489,6 +644,18 @@ export class DesignFacade implements IDesignFacade {
     })
   }
 
+  /**
+   * Downloads all uncached pages, artboards and bitmap assets to the local `.octopus` file or the local cache.
+   *
+   * In case a new file path is provided for a design loaded from an existing `.octopus` file, all of its contents are copied to the new location and this method essentially serves the purpose of a "save as" action.
+   *
+   * The produced `.octopus` file preserves a reference to a server-side design.
+   *
+   * The design object switches to using the new location as the local `.octopus` file and considers the file a local cache.
+   *
+   * @category Serialization
+   * @param relPath An absolute path of the target `.octopus` file or a path relative to the current working directory. When omitted, the open `.octopus` file location is used instead. Online services have to be configured in case there are uncached items.
+   */
   async saveOctopusFile(relPath: string | null = null) {
     const localDesign = await this._getLocalDesign(relPath)
     const apiDesign = this._apiDesign
@@ -537,6 +704,14 @@ export class DesignFacade implements IDesignFacade {
     await this.setLocalDesign(localDesign)
   }
 
+  /**
+   * Downloads the design file of the specified format produced by a server-side design file format conversion.
+   *
+   * In case no such conversion has been done for the design yet, a new conversion is initiated and the resulting design file is downloaded.
+   *
+   * @category Serialization
+   * @param relPath An absolute path to which to save the design file or a path relative to the current working directory.
+   */
   async saveDesignFile(relPath: string) {
     const format = getDesignFormatByFileName(relPath)
     if (!format) {
