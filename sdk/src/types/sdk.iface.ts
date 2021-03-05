@@ -8,6 +8,8 @@ export interface ISdk {
   openOctopusFile(relPath: string): Promise<IDesignFacade>
   fetchDesignById(designId: string): Promise<IDesignFacade>
 
+  setWorkingDirectory(workingDirectory: string | null): void
+
   useLocalDesignManager(localDesignManager: ILocalDesignManager): void
   useDesignFileManager(designFileManager: IDesignFileManager): void
   useOpenDesignApi(api: IOpenDesignApi): void

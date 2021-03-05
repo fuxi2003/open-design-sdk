@@ -13,14 +13,21 @@ import type { ISdk } from './types/sdk.iface'
  * @category Primary Entry Point
  * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication).
  * @param params.apiRoot The URL base for Open Design API calls. By default, production Avocode Open Design API servers are used.
+ * @param params.workingDirectory An absolute path to the directory where the SDK should look for its cache directory.
  */
 export function createSdk(params: {
   token: string
   apiRoot?: string | null
+  workingDirectory?: string | null
 }): ISdk {
   const sdk = new Sdk()
-  configureOfflineServices(sdk)
-  configureOnlineServices(sdk, params)
+  configureOfflineServices(sdk, {
+    workingDirectory: params.workingDirectory || null,
+  })
+  configureOnlineServices(sdk, {
+    token: params.token,
+    apiRoot: params.apiRoot || null,
+  })
   return sdk
 }
 
@@ -49,10 +56,15 @@ export function createUncachedSdk(params: {
  * Such an SDK instance is not connected to the Open Design API and can only work with local `.octopus` files. It can query the designs for various content (layers, bitmap assets, font usage, …).
  *
  * @category Experimental Entry Point
+ * @param params.workingDirectory An absolute path to the directory where the SDK should look for its cache directory.
  */
-export function createOfflineSdk(): ISdk {
+export function createOfflineSdk(
+  params: {
+    workingDirectory?: string | null
+  } = {}
+): ISdk {
   const sdk = new Sdk()
-  configureOfflineServices(sdk)
+  configureOfflineServices(sdk, params)
   return sdk
 }
 
@@ -74,9 +86,12 @@ export function createOnlineSdk(params: {
   return sdk
 }
 
-function configureOfflineServices(sdk: ISdk): ISdk {
+function configureOfflineServices(
+  sdk: ISdk,
+  params: { workingDirectory?: string | null }
+): ISdk {
   configureOfflineUncachedServices(sdk)
-  configureOfflineCacheServices(sdk)
+  configureOfflineCacheServices(sdk, params)
   return sdk
 }
 
@@ -85,8 +100,12 @@ function configureOfflineUncachedServices(sdk: ISdk): ISdk {
   return sdk
 }
 
-function configureOfflineCacheServices(sdk: ISdk): ISdk {
+function configureOfflineCacheServices(
+  sdk: ISdk,
+  params: { workingDirectory?: string | null }
+): ISdk {
   sdk.useLocalDesignManager(new LocalDesignManager())
+  sdk.setWorkingDirectory(params.workingDirectory || null)
   return sdk
 }
 

@@ -18,6 +18,10 @@ const statPromised = promisify(stat)
 export class LocalDesignManager implements ILocalDesignManager {
   private _workingDirectory: string = resolvePath('.')
 
+  setWorkingDirectory(workingDirectory: string | null) {
+    this._workingDirectory = resolvePath(workingDirectory || '.')
+  }
+
   resolvePath(relPath: string) {
     return resolvePath(this._workingDirectory, `${relPath}`)
   }

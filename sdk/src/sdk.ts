@@ -22,6 +22,27 @@ export class Sdk implements ISdk {
   constructor() {}
 
   /**
+   * Sets the "working directory" which is used for storing the local cache and temporary files.
+   *
+   * The SDK creates and reads from a `.opendesign` subdirectory within the working directory.
+   *
+   * Note that the `.opendesign` subdirectory should likely not be included in version control systems.
+   *
+   * @category Configuration
+   * @param workingDirectory An absolute path to the directory or a path relative to the process working directory (`process.cwd()` in node.js). When `null` is provided, the working directory is reset to the process working directory.
+   */
+  setWorkingDirectory(workingDirectory: string | null) {
+    const localDesignManager = this._localDesignManager
+    if (!localDesignManager) {
+      throw new Error(
+        'Offline services are not configured. Cannot set the working directory.'
+      )
+    }
+
+    localDesignManager.setWorkingDirectory(workingDirectory)
+  }
+
+  /**
    * Opens a local `.octopus` file.
    *
    * Offline services have to be configured when using this method.
