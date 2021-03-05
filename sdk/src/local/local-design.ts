@@ -1,9 +1,4 @@
-import {
-  basename,
-  extname,
-  join as joinPaths,
-  resolve as resolvePath,
-} from 'path'
+import { basename, extname, join as joinPaths } from 'path'
 import {
   checkFile,
   readJsonFile,
@@ -45,6 +40,8 @@ import type {
 import type { LocalDesignManager } from './local-design-manager'
 
 export class LocalDesign implements ILocalDesign {
+  _localDesignManager: LocalDesignManager
+
   _filename: string
 
   _apiDesignInfo: ApiDesignInfo | null
@@ -61,6 +58,7 @@ export class LocalDesign implements ILocalDesign {
     }
 
     this._filename = init.filename
+    this._localDesignManager = init.localDesignManager
     this._apiDesignInfo = init.apiDesignInfo || null
   }
 
@@ -69,14 +67,14 @@ export class LocalDesign implements ILocalDesign {
   }
 
   async saveAs(nextRelPath: string) {
-    const nextFilename = resolvePath(nextRelPath)
+    const nextFilename = this._localDesignManager.resolvePath(nextRelPath)
     const prevFilename = this._filename
     await copyDirectory(prevFilename, nextFilename)
     this._filename = nextFilename
   }
 
   async move(nextRelPath: string) {
-    const nextFilename = resolvePath(nextRelPath)
+    const nextFilename = this._localDesignManager.resolvePath(nextRelPath)
     const prevFilename = this._filename
     await moveDirectory(prevFilename, nextFilename)
     this._filename = nextFilename

@@ -18,13 +18,19 @@ const statPromised = promisify(stat)
 const mkdirPromised = promisify(mkdir)
 
 export class LocalDesignManager implements ILocalDesignManager {
+  private _workingDirectory: string = tmpdir()
+
+  resolvePath(relPath: string) {
+    return resolvePath(this._workingDirectory, `${relPath}`)
+  }
+
   async openOctopusFile(
     relPath: string,
     options: Partial<{
       apiDesignInfo: ApiDesignInfo | null
     }> = {}
   ): Promise<LocalDesign> {
-    const filename = resolvePath(relPath)
+    const filename = this.resolvePath(relPath)
     this._checkOctopusFileName(filename)
 
     const fileStatus = await this._checkOctopusFileStatus(filename)
@@ -50,7 +56,7 @@ export class LocalDesignManager implements ILocalDesignManager {
   }
 
   async createOctopusFile(relPath: string): Promise<LocalDesign> {
-    const filename = resolvePath(relPath)
+    const filename = this.resolvePath(relPath)
     this._checkOctopusFileName(filename)
 
     await this._createDirectory(filename)
