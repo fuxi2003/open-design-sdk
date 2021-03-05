@@ -27,8 +27,12 @@ export class LocalDesignManager implements ILocalDesignManager {
     const filename = resolvePath(relPath)
     this._checkOctopusFileName(filename)
 
-    if (!(await this._checkDirectoryPresence(filename))) {
+    const fileStatus = await this._checkOctopusFileStatus(filename)
+    if (fileStatus === 'missing') {
       throw new Error('No such .octopus file')
+    }
+    if (fileStatus === 'invalid') {
+      throw new Error('The file is not a valid Octopus file')
     }
 
     const manifestFilename = joinPaths(filename, MANIFEST_BASENAME)
@@ -87,12 +91,14 @@ export class LocalDesignManager implements ILocalDesignManager {
     await mkdirp(dirname)
   }
 
-  async _checkDirectoryPresence(dirname: string): Promise<boolean> {
+  async _checkOctopusFileStatus(
+    filename: string
+  ): Promise<'valid' | 'invalid' | 'missing'> {
     try {
-      const stats = await statPromised(dirname)
-      return stats.isDirectory()
+      const stats = await statPromised(filename)
+      return stats.isDirectory() ? 'valid' : 'invalid'
     } catch (err) {
-      return false
+      return 'missing'
     }
   }
 

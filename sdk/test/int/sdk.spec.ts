@@ -105,8 +105,9 @@ describe('DesignFacade', () => {
     it('should fail opening a non-existent octopus file', async () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
+      const randomFilename = await createTempFileTarget('random-file.octopus')
       const [result] = await Promise.allSettled([
-        await sdk.openOctopusFile('/tmp/random-file.octopus'),
+        sdk.openOctopusFile(randomFilename),
       ])
       strictEqual(result.status, 'rejected')
     })
