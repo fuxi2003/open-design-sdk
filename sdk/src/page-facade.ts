@@ -15,8 +15,8 @@ import type { DesignFacade } from './design-facade'
 import type { IPageFacade } from './types/page-facade.iface'
 
 export class PageFacade implements IPageFacade {
-  _pageEntity: IPage
-  _designFacade: DesignFacade
+  private _pageEntity: IPage
+  private _designFacade: DesignFacade
 
   constructor(pageEntity: IPage, params: { designFacade: DesignFacade }) {
     this._pageEntity = pageEntity

@@ -12,8 +12,8 @@ import type { LayerFacade } from './layer-facade'
 import type { ILayerCollectionFacade } from './types/layer-collection-facade.iface'
 
 export class LayerCollectionFacade implements ILayerCollectionFacade {
-  _layerCollection: ILayerCollection
-  _artboardFacade: ArtboardFacade
+  private _layerCollection: ILayerCollection
+  private _artboardFacade: ArtboardFacade
 
   constructor(
     layerCollection: ILayerCollection,
@@ -46,11 +46,11 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
   )
 
   getLayerById(layerId: LayerId): LayerFacade | null {
-    const layerFacadesById = this._getLayerFacadeMap()
+    const layerFacadesById = this._getLayerFacadeMapMemoized()
     return layerFacadesById.get(layerId) || null
   }
 
-  _getLayerFacadeMap = memoize(() => {
+  private _getLayerFacadeMapMemoized = memoize(() => {
     const map: Map<LayerId, LayerFacade> = new Map()
     this.getLayers().forEach((layerFacade) => {
       map.set(layerFacade.id, layerFacade)

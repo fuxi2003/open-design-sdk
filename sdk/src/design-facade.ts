@@ -34,19 +34,19 @@ import type { LayerFacade } from './layer-facade'
 type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 
 export class DesignFacade implements IDesignFacade {
-  _sdk: Sdk
+  private _sdk: Sdk
 
-  _designEntity: IFile | null = null
-  _localDesign: ILocalDesign | null = null
-  _apiDesign: IApiDesign | null = null
+  private _designEntity: IFile | null = null
+  private _localDesign: ILocalDesign | null = null
+  private _apiDesign: IApiDesign | null = null
 
-  _artboardFacades: Map<ArtboardId, ArtboardFacade> = new Map()
-  _pageFacades: Map<PageId, PageFacade> = new Map()
+  private _artboardFacades: Map<ArtboardId, ArtboardFacade> = new Map()
+  private _pageFacades: Map<PageId, PageFacade> = new Map()
 
-  _manifestLoaded: boolean = false
-  _pendingManifestUpdate: ManifestData | null = null
+  private _manifestLoaded: boolean = false
+  private _pendingManifestUpdate: ManifestData | null = null
 
-  _conversions: Map<
+  private _conversions: Map<
     DesignConversionTargetFormatEnum,
     IApiDesignConversion
   > = new Map()
@@ -239,12 +239,12 @@ export class DesignFacade implements IDesignFacade {
     return pageFacade
   }
 
-  _createArtboardFacade(artboardEntity: IArtboard): ArtboardFacade {
+  private _createArtboardFacade(artboardEntity: IArtboard): ArtboardFacade {
     const artboard = new ArtboardFacade(artboardEntity, { designFacade: this })
     return artboard
   }
 
-  _createPageFacade(pageEntity: IPage): PageFacade {
+  private _createPageFacade(pageEntity: IPage): PageFacade {
     const page = new PageFacade(pageEntity, { designFacade: this })
     return page
   }
@@ -417,7 +417,7 @@ export class DesignFacade implements IDesignFacade {
     return artboard
   }
 
-  async _loadArtboardContent(
+  private async _loadArtboardContent(
     artboardId: ArtboardId
   ): Promise<ArtboardOctopusData> {
     const localDesign = this._localDesign
@@ -540,7 +540,7 @@ export class DesignFacade implements IDesignFacade {
     )
   }
 
-  async _getLocalDesign(relPath: string | null): Promise<ILocalDesign> {
+  private async _getLocalDesign(relPath: string | null): Promise<ILocalDesign> {
     const localDesign = this._localDesign
 
     if (!relPath) {
@@ -570,7 +570,9 @@ export class DesignFacade implements IDesignFacade {
     this._conversions.set(format, conversion)
   }
 
-  async _getConversionToFormat(format: DesignConversionTargetFormatEnum) {
+  private async _getConversionToFormat(
+    format: DesignConversionTargetFormatEnum
+  ) {
     const prevConversion = this._conversions.get(format)
     if (prevConversion) {
       return prevConversion

@@ -17,8 +17,8 @@ export type DesignLayerDescriptor = {
 
 export class DesignLayerCollectionFacade
   implements IDesignLayerCollectionFacade {
-  _layerCollection: IFileLayerCollection
-  _designFacade: DesignFacade
+  private _layerCollection: IFileLayerCollection
+  private _designFacade: DesignFacade
 
   constructor(
     layerCollection: IFileLayerCollection,
@@ -141,7 +141,7 @@ export class DesignLayerCollectionFacade
     return this._layerCollection.getFonts(options)
   }
 
-  _resolveArtboardLayerDescriptor(
+  private _resolveArtboardLayerDescriptor(
     layerEntityDesc: FileLayerDescriptor
   ): DesignLayerDescriptor | null {
     const layerFacade = this._designFacade.getArtboardLayerFacade(

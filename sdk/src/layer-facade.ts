@@ -5,8 +5,8 @@ import type { ArtboardFacade } from './artboard-facade'
 import type { ILayerFacade } from './types/layer-facade.iface'
 
 export class LayerFacade implements ILayerFacade {
-  _layerEntity: ILayer
-  _artboardFacade: ArtboardFacade
+  private _layerEntity: ILayer
+  private _artboardFacade: ArtboardFacade
 
   constructor(layerEntity: ILayer, params: { artboardFacade: ArtboardFacade }) {
     this._layerEntity = layerEntity

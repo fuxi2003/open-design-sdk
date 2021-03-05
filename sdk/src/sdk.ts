@@ -14,9 +14,9 @@ import type { ILocalDesign } from './types/local-design.iface'
 type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 
 export class Sdk implements ISdk {
-  _openDesignApi: IOpenDesignApi | null = null
-  _designFileManager: DesignFileManager | null = null
-  _localDesignManager: LocalDesignManager | null = null
+  private _openDesignApi: IOpenDesignApi | null = null
+  private _designFileManager: DesignFileManager | null = null
+  private _localDesignManager: LocalDesignManager | null = null
 
   async openOctopusFile(relPath: string): Promise<DesignFacade> {
     const localDesignManager = this._localDesignManager
@@ -154,12 +154,12 @@ export class Sdk implements ISdk {
     this._openDesignApi = api
   }
 
-  _getCommonApiDesignInfo() {
+  private _getCommonApiDesignInfo() {
     const openDesignApi = this._openDesignApi
     return openDesignApi ? { apiRoot: openDesignApi.getApiRoot() } : null
   }
 
-  async _getApiDesignByLocalDesign(localDesign: ILocalDesign) {
+  private async _getApiDesignByLocalDesign(localDesign: ILocalDesign) {
     const apiDesignInfo = await localDesign.getApiDesignInfo()
     const designId = apiDesignInfo ? apiDesignInfo.designId : null
     if (!designId) {

@@ -13,10 +13,10 @@ import type { DesignFacade } from './design-facade'
 import type { IArtboardFacade } from './types/artboard-facade.iface'
 
 export class ArtboardFacade implements IArtboardFacade {
-  _artboardEntity: IArtboard
-  _designFacade: DesignFacade
+  private _artboardEntity: IArtboard
+  private _designFacade: DesignFacade
 
-  _layerFacades: Map<LayerId, LayerFacade> = new Map()
+  private _layerFacades: Map<LayerId, LayerFacade> = new Map()
 
   constructor(
     artboardEntity: IArtboard,
@@ -178,7 +178,7 @@ export class ArtboardFacade implements IArtboardFacade {
     return this._artboardEntity.isComponent()
   }
 
-  _createLayerFacade(layerId: LayerId): LayerFacade | null {
+  private _createLayerFacade(layerId: LayerId): LayerFacade | null {
     const artboardEntity = this._artboardEntity
     const layerEntity = artboardEntity
       ? artboardEntity.getLayerById(layerId)
