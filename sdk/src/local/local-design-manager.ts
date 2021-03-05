@@ -1,5 +1,4 @@
-import { mkdir, stat } from 'fs'
-import { tmpdir } from 'os'
+import { stat } from 'fs'
 import { extname, join as joinPaths, resolve as resolvePath } from 'path'
 import { promisify } from 'util'
 import { writeJsonFile } from '../utils/fs'
@@ -15,10 +14,9 @@ import type { ApiDesignInfo } from '../types/local-design.iface'
 import type { ILocalDesignManager } from '../types/local-design-manager.iface'
 
 const statPromised = promisify(stat)
-const mkdirPromised = promisify(mkdir)
 
 export class LocalDesignManager implements ILocalDesignManager {
-  private _workingDirectory: string = tmpdir()
+  private _workingDirectory: string = resolvePath('.')
 
   resolvePath(relPath: string) {
     return resolvePath(this._workingDirectory, `${relPath}`)
@@ -116,9 +114,11 @@ export class LocalDesignManager implements ILocalDesignManager {
   }
 
   async _createTempLocation(): Promise<string> {
-    const dirname = `${tmpdir()}/opendesignsdk-temp-${uuid()}.octopus`
+    const dirname = this.resolvePath(
+      `./.opendesign/opendesignsdk-temp-${uuid()}.octopus`
+    )
 
-    await mkdirPromised(dirname)
+    await mkdirp(dirname)
 
     return dirname
   }
