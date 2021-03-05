@@ -118,9 +118,7 @@ export class LocalDesignManager implements ILocalDesignManager {
   }
 
   async _createTempLocation(): Promise<string> {
-    const dirname = this.resolvePath(
-      `./.opendesign/opendesignsdk-temp-${uuid()}.octopus`
-    )
+    const dirname = this.resolvePath(`./.opendesign/temp/${uuid()}.octopus`)
 
     await mkdirp(dirname)
 
