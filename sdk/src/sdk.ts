@@ -54,6 +54,30 @@ export class Sdk implements ISdk {
   }
 
   /**
+   * Creates an empty local `.octopus` file.
+   *
+   * Offline services have to be configured when using this method.
+   *
+   * @internal
+   * @category Local Design File Usage
+   * @param relPath An absolute `.octopus` file path or a path relative to the current working directory.
+   * @returns A design object which can be used for creating `.octopus` file content.
+   */
+  async createOctopusFile(relPath: string): Promise<DesignFacade> {
+    const localDesignManager = this._localDesignManager
+    if (!localDesignManager) {
+      throw new Error('Local design manager is not configured.')
+    }
+
+    const localDesign = await localDesignManager.createOctopusFile(relPath)
+    const designFacade = await createDesignFromLocalDesign(localDesign, {
+      sdk: this,
+    })
+
+    return designFacade
+  }
+
+  /**
    * Opens a local design file.
    *
    * Both online and offline services have to be configured when using this method.

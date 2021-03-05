@@ -102,10 +102,13 @@ describe('DesignFacade', () => {
       })
     })
 
-    it('should open a non-existent octopus file', async () => {
+    it('should fail opening a non-existent octopus file', async () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
-      await sdk.openOctopusFile('/tmp/random-file.octopus')
+      const [result] = await Promise.allSettled([
+        await sdk.openOctopusFile('/tmp/random-file.octopus'),
+      ])
+      strictEqual(result.status, 'rejected')
     })
 
     it('should fail opening an octopus file without the .octopus extension', async () => {

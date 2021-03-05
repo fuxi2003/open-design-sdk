@@ -28,7 +28,7 @@ export class LocalDesignManager implements ILocalDesignManager {
     this._checkOctopusFileName(filename)
 
     if (!(await this._checkDirectoryPresence(filename))) {
-      return this.createOctopusFile(filename)
+      throw new Error('No such .octopus file')
     }
 
     const manifestFilename = joinPaths(filename, MANIFEST_BASENAME)
