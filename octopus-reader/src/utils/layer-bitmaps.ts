@@ -7,6 +7,11 @@ export function getLayerBitmapAssets(
   const bitmap = layer.getBitmap()
   const bitmapAssetName = bitmap ? bitmap.getBitmapAssetName() : null
 
+  const maskBitmap = layer.getBitmapMask()?.getBitmap() || null
+  const maskBitmapAssetName = maskBitmap
+    ? maskBitmap.getBitmapAssetName()
+    : null
+
   const prerenderedBitmap = params.includePrerendered
     ? layer.getPrerenderedBitmap()
     : null
@@ -27,6 +32,7 @@ export function getLayerBitmapAssets(
     .filter(Boolean) as Array<string>
 
   const bitmapAssetNames = new Set([
+    ...(maskBitmapAssetName ? [maskBitmapAssetName] : []),
     ...(bitmapAssetName ? [bitmapAssetName] : []),
     ...patternBitmapAssetNames,
   ])

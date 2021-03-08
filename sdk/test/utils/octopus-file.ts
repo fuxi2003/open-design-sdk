@@ -63,6 +63,15 @@ export async function createOctopusFile(relPath: string) {
             'filename': 'https://example.com/images/zz.png',
           },
         },
+        // bitmap mask
+        {
+          'id': 'mm',
+          'name': 'Mm',
+          'type': 'layer',
+          'bitmapMask': {
+            'filename': 'https://example.com/images/mask-mm.png',
+          },
+        },
       ],
     },
   }
@@ -78,6 +87,10 @@ export async function createOctopusFile(relPath: string) {
     [
       'https://example.com/images/zz.png',
       `${filename}/bitmaps/prerendered/mapped-zz.png`,
+    ],
+    [
+      'https://example.com/images/mask-mm.png',
+      `${filename}/bitmaps/mapped-mask-mm.png`,
     ],
   ]
   const bitmapMapping = Object.fromEntries(

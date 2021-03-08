@@ -281,7 +281,7 @@ export class LayerFacade implements ILayerFacade {
   /**
    * Returns a list of bitmap assets used by the layer and layers nested within the layer (optionally down to a specific nesting level).
    *
-   * Note that this method aggregates results of the more granular bitmap asset-related methods of {@link LayerFacade.getBitmap} and {@link LayerFacade.getPrerenderedBitmap} and pattern fill bitmap assets discoverable via {@link LayerFacade.getEffects}.
+   * Note that this method aggregates results of the more granular bitmap asset-related methods of {@link LayerFacade.getBitmap}, {@link LayerFacade.getBitmapMask} and {@link LayerFacade.getPrerenderedBitmap} and pattern fill bitmap assets discoverable via {@link LayerFacade.getEffects}.
    *
    * @category Asset Aggregation
    * @param options.depth The maximum nesting level within the layer to search for bitmap asset usage. By default, all levels are searched. Specifying the depth of `0` leads to nested layer bitmap assets being omitted altogether.
@@ -312,6 +312,15 @@ export class LayerFacade implements ILayerFacade {
    */
   getBitmap() {
     return this._layerEntity.getBitmap()
+  }
+
+  /**
+   * Returns the bitmap mask of the layer if there is one.
+   *
+   * @category Asset Aggregation
+   */
+  getBitmapMask() {
+    return this._layerEntity.getBitmapMask()
   }
 
   /**

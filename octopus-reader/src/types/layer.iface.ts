@@ -1,5 +1,6 @@
 import type { IArtboard } from './artboard.iface'
 import type { AggregatedBitmapAssetDescriptor } from './bitmap-assets.type'
+import type { IBitmapMask } from './bitmap-mask.iface'
 import type { IBitmap } from './bitmap.iface'
 import type { IEffects } from './effects.iface'
 import type { AggregatedFontDescriptor } from './fonts.type'
@@ -56,6 +57,7 @@ export interface ILayer {
   ): Array<AggregatedFontDescriptor>
 
   getBitmap(): IBitmap | null
+  getBitmapMask(): IBitmapMask | null
   getPrerenderedBitmap(): IBitmap | null
   getShape(): IShape | null
   getText(): IText | null

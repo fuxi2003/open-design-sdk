@@ -27,6 +27,8 @@ import type { LayerOctopusData } from '../types/octopus.type'
 import type { LayerSelector } from '../types/selectors.type'
 import type { IShape } from '../types/shape.iface'
 import type { IText } from '../types/text.iface'
+import { BitmapMask } from '../layer-info/bitmap-mask'
+import { IBitmapMask } from '../types/bitmap-mask.iface'
 
 export class Layer implements ILayer {
   readonly octopus: LayerOctopusData
@@ -308,6 +310,12 @@ export class Layer implements ILayer {
   getPrerenderedBitmap = memoize((): IBitmap | null => {
     return this.type !== 'layer' && this.octopus['bitmap']
       ? new Bitmap(this.octopus['bitmap'])
+      : null
+  })
+
+  getBitmapMask = memoize((): IBitmapMask | null => {
+    return this.octopus['bitmapMask']
+      ? new BitmapMask(this.octopus['bitmapMask'])
       : null
   })
 
