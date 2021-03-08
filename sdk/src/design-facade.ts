@@ -2,13 +2,8 @@ import { ArtboardFacade } from './artboard-facade'
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { PageFacade } from './page-facade'
 
-import { createEmptyFile } from '@opendesign/octopus-reader/src/index'
-import { memoize } from '@opendesign/octopus-reader/src/utils/memoize'
-import { sequence } from './utils/async'
-import { getDesignFormatByFileName } from './utils/design-format-utils'
-
-import type { IApiDesign, IApiDesignConversion } from '@opendesign/api/types'
-import type {
+import {
+  createEmptyFile,
   ArtboardId,
   ArtboardOctopusData,
   ArtboardSelector,
@@ -21,7 +16,12 @@ import type {
   ManifestData,
   PageId,
   PageSelector,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
+import { memoize } from '@opendesign/octopus-reader/src/utils/memoize'
+import { sequence } from './utils/async'
+import { getDesignFormatByFileName } from './utils/design-format-utils'
+
+import type { IApiDesign, IApiDesignConversion } from '@opendesign/api/types'
 import type { components } from 'open-design-api-types'
 import type { Sdk } from './sdk'
 import type {

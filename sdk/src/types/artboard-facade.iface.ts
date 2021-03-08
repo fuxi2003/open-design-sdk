@@ -9,7 +9,7 @@ import type {
   LayerSelector,
   PageId,
   RgbaColor,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 import type { IDesignFacade } from './design-facade.iface'
 import type { ILayerCollectionFacade } from './layer-collection-facade.iface'
 import type { ILayerFacade } from './layer-facade.iface'

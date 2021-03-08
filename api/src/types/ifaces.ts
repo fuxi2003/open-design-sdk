@@ -1,4 +1,4 @@
-import type { ManifestData } from '@opendesign/octopus-reader/types'
+import type { ManifestData } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
 
 type ArtboardId = components['schemas']['ArtboardId']

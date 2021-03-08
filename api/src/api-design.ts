@@ -1,7 +1,4 @@
-import type {
-  ArtboardId,
-  PageId,
-} from '@opendesign/octopus-reader/src/types/ids.type'
+import type { ArtboardId, PageId } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
 import type { OpenDesignApi } from './open-design-api'
 import type { IApiDesign } from './types/ifaces'

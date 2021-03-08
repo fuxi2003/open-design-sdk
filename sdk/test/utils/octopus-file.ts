@@ -8,7 +8,7 @@ import type {
   ArtboardId,
   ArtboardOctopusData,
   ManifestData,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 import { basename, dirname } from 'path'
 
 const writeFile = promisify(fs.writeFile)

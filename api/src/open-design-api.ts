@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 import { ApiDesign } from './api-design'
 import { ApiDesignConversion } from './api-design-conversion'
 
-import type { ArtboardId } from '@opendesign/octopus-reader/src/types/ids.type'
+import type { ArtboardId } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
 import type { IOpenDesignApi } from './types/ifaces'
 

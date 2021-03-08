@@ -7,7 +7,7 @@ import type {
   LayerId,
   LayerSelector,
   PageId,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 import type { DesignLayerDescriptor } from '../design-layer-collection-facade'
 import type { IArtboardFacade } from './artboard-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'

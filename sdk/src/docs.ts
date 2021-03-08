@@ -9,7 +9,7 @@ import type {
   LayerSelector,
   PageId,
   PageSelector,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 
 import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'

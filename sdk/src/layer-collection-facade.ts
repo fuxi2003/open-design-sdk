@@ -6,7 +6,7 @@ import type {
   ILayerCollection,
   LayerId,
   LayerSelector,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 import type { ArtboardFacade } from './artboard-facade'
 import type { LayerFacade } from './layer-facade'
 import type { ILayerCollectionFacade } from './types/layer-collection-facade.iface'

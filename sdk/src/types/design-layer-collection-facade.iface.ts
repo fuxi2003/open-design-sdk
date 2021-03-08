@@ -3,7 +3,7 @@ import type {
   AggregatedFileFontDescriptor,
   ArtboardId,
   FileLayerSelector,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 import type { ILayerFacade } from './layer-facade.iface'
 
 export interface IDesignLayerCollectionFacade {

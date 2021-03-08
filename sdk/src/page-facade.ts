@@ -9,7 +9,7 @@ import type {
   IPage,
   LayerId,
   LayerSelector,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
 import type { IPageFacade } from './types/page-facade.iface'

@@ -4,7 +4,7 @@ import type {
   ILayer,
   LayerOctopusData as LayerOctopusDataType,
   LayerSelector,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 import type { ArtboardFacade } from './artboard-facade'
 import type { ILayerFacade } from './types/layer-facade.iface'
 

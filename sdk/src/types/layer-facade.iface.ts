@@ -8,7 +8,7 @@ import type {
   IText,
   LayerId,
   LayerSelector,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 import type { IArtboardFacade } from './artboard-facade.iface'
 import type { ILayerCollectionFacade } from './layer-collection-facade.iface'
 

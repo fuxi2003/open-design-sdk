@@ -3,7 +3,7 @@ import type {
   ArtboardOctopusData,
   ManifestData,
   PageId,
-} from '@opendesign/octopus-reader/types'
+} from '@opendesign/octopus-reader'
 
 export type ApiDesignInfo = {
   apiRoot?: string
