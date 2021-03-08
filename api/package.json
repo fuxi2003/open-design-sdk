@@ -1,6 +1,12 @@
 {
   "name": "@opendesign/api",
   "version": "0.0.0-dev",
+  "main": "dist",
+  "scripts": {
+    "build": "yarn run clean-build && yarn run build:ts",
+    "build:ts": "tsc --outDir dist --sourceMap --declaration --project ./tsconfig-build.json",
+    "clean-build": "rm -rf dist"
+  },
   "devDependencies": {
     "@opendesign/octopus-reader": "0.0.0-dev",
     "@types/node-fetch": "2.5.8",
