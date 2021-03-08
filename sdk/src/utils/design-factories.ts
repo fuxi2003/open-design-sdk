@@ -1,6 +1,6 @@
 import { DesignFacade } from '../design-facade'
 
-import type { IApiDesign, IApiDesignConversion } from '@opendesign/api/types'
+import type { IApiDesign, IApiDesignConversion } from '@opendesign/api'
 import type { ILocalDesign } from '../types/local-design.iface'
 import type { Sdk } from '../sdk'
 

@@ -1,4 +1,4 @@
-import type { IOpenDesignApi } from '@opendesign/api/types'
+import type { IOpenDesignApi } from '@opendesign/api'
 import type { IDesignFacade } from './design-facade.iface'
 import type { IDesignFileManager } from './design-file-manager.iface'
 import type { ILocalDesignManager } from './local-design-manager.iface'

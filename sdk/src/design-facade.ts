@@ -21,7 +21,7 @@ import { sequence } from './utils/async'
 import { memoize } from './utils/memoize'
 import { getDesignFormatByFileName } from './utils/design-format-utils'
 
-import type { IApiDesign, IApiDesignConversion } from '@opendesign/api/types'
+import type { IApiDesign, IApiDesignConversion } from '@opendesign/api'
 import type { components } from 'open-design-api-types'
 import type { Sdk } from './sdk'
 import type {

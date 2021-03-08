@@ -3,7 +3,7 @@ import {
   createDesignFromOpenDesignApiDesign,
 } from './utils/design-factories'
 
-import type { IOpenDesignApi } from '@opendesign/api/types'
+import type { IOpenDesignApi } from '@opendesign/api'
 import type { components } from 'open-design-api-types'
 import type { ISdk } from './types/sdk.iface'
 import type { DesignFacade } from './design-facade'

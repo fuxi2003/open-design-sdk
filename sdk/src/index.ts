@@ -1,4 +1,4 @@
-import { OpenDesignApi } from '@opendesign/api/src/open-design-api'
+import { OpenDesignApi } from '@opendesign/api'
 import { DesignFileManager } from './local/design-file-manager'
 import { LocalDesignManager } from './local/local-design-manager'
 import { Sdk } from './sdk'

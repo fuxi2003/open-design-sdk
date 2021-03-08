@@ -1,7 +1,7 @@
 import { ok } from 'assert'
 import { postToken } from './post-token'
 
-import { OpenDesignApi } from '@opendesign/api/src/open-design-api'
+import { OpenDesignApi } from '@opendesign/api'
 
 export async function createOpenDesignApi(
   params: { token?: string | null } = {}
