@@ -1,7 +1,5 @@
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
-import { matchArtboard } from '@opendesign/octopus-reader/src/utils/artboard-lookup'
-
 import type {
   ArtboardId,
   ArtboardSelector,
@@ -140,13 +138,13 @@ export class PageFacade implements IPageFacade {
       return this.getArtboardById(selector['id'])
     }
 
-    for (const artboard of this.getArtboards()) {
-      if (matchArtboard(selector, artboard.getArtboardEntity())) {
-        return artboard
-      }
-    }
+    const matchingArtboards = this._designFacade.findArtboards(selector)
 
-    return null
+    return (
+      matchingArtboards.find((artboard) => {
+        return artboard.pageId === this.id
+      }) || null
+    )
   }
 
   /**
@@ -166,8 +164,8 @@ export class PageFacade implements IPageFacade {
       return artboard ? [artboard] : []
     }
 
-    return this.getArtboards().filter((artboard) => {
-      return matchArtboard(selector, artboard.getArtboardEntity())
+    return this._designFacade.findArtboards(selector).filter((artboard) => {
+      return artboard.pageId === this.id
     })
   }
 

@@ -17,8 +17,8 @@ import {
   PageId,
   PageSelector,
 } from '@opendesign/octopus-reader'
-import { memoize } from '@opendesign/octopus-reader/src/utils/memoize'
 import { sequence } from './utils/async'
+import { memoize } from './utils/memoize'
 import { getDesignFormatByFileName } from './utils/design-format-utils'
 
 import type { IApiDesign, IApiDesignConversion } from '@opendesign/api/types'

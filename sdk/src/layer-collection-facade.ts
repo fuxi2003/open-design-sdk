@@ -1,4 +1,4 @@
-import { memoize } from '@opendesign/octopus-reader/src/utils/memoize'
+import { memoize } from './utils/memoize'
 
 import type {
   AggregatedBitmapAssetDescriptor,
