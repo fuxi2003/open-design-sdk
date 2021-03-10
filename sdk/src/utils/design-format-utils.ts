@@ -1,5 +1,4 @@
 import { components } from 'open-design-api-types'
-import * as path from 'path'
 
 type Design = components['schemas']['Design']
 
@@ -14,6 +13,6 @@ const fileExtensionDesignFormats: { [ext: string]: Design['format'] } = {
 export function getDesignFormatByFileName(
   fileName: string
 ): Design['format'] | null {
-  const ext = path.extname(fileName)
-  return fileExtensionDesignFormats[ext] || null
+  const [ext] = fileName.match(/\.\w+$/) || []
+  return ext ? fileExtensionDesignFormats[ext] || null : null
 }
