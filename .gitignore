@@ -2,6 +2,7 @@
 .opendesign/
 coverage/
 dist/
+dist-browser/
 docs/
 node_modules/
 yarn-error.log
