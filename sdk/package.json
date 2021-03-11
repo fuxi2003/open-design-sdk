@@ -5,8 +5,8 @@
   "scripts": {
     "build": "yarn run clean-build && yarn run build:ts",
     "build:ts": "tsc --outDir dist --sourceMap --declaration --project ./tsconfig-build.json",
-    "build:docs": "typedoc --options ./typedoc.json",
     "clean-build": "rm -rf dist",
+    "docs": "typedoc --options ./typedoc.json",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\" }' mocha",
     "test:coverage": "nyc --reporter=lcov --reporter=text-summary yarn run test"
   },
