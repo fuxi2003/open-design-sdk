@@ -16,14 +16,16 @@ import type { ILocalDesignManager } from '../types/local-design-manager.iface'
 const statPromised = promisify(stat)
 
 export class LocalDesignManager implements ILocalDesignManager {
-  private _workingDirectory: string = resolvePath('.')
+  private _workingDirectory: string | null = null
 
   setWorkingDirectory(workingDirectory: string | null) {
-    this._workingDirectory = resolvePath(workingDirectory || '.')
+    this._workingDirectory = workingDirectory
+      ? resolvePath(workingDirectory)
+      : null
   }
 
   resolvePath(relPath: string) {
-    return resolvePath(this._workingDirectory, `${relPath}`)
+    return resolvePath(this._workingDirectory || '.', `${relPath}`)
   }
 
   async openOctopusFile(
