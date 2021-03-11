@@ -6,7 +6,16 @@ import type { IDesignFileManager } from '../types/design-file-manager.iface'
 export class DesignFileManager implements IDesignFileManager {
   async readDesignFileStream(relPath: string): Promise<NodeJS.ReadableStream> {
     const filename = resolvePath(relPath)
-    return createReadStream(filename)
+    const stream = createReadStream(filename)
+
+    return new Promise((resolve, reject) => {
+      stream.once('ready', () => {
+        resolve(stream)
+      })
+      stream.once('error', (err) => {
+        reject(err)
+      })
+    })
   }
 
   async saveDesignFileStream(
