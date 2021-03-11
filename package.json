@@ -12,6 +12,8 @@
   "scripts": {
     "build": "yarn run build:octopus-reader",
     "build:octopus-reader": "yarn workspace @opendesign/octopus-reader run build",
+    "docs": "yarn run docs:octopus-reader",
+    "docs:octopus-reader": "yarn workspace @opendesign/octopus-reader docs",
     "lint": "yarn run lint:prettier",
     "lint:prettier": "yarn run prettier -c .",
     "test": "yarn run test:octopus-reader",
