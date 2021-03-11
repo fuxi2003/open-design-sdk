@@ -77,6 +77,8 @@ export class Sdk implements ISdk {
   /**
    * Creates an empty local `.octopus` file.
    *
+   * This method expects a path value previously obtained from {@link DesignFacade.filename}.
+   *
    * Offline services have to be configured when using this method.
    *
    * @internal
