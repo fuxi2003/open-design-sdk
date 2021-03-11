@@ -541,6 +541,11 @@ onigasm@^2.2.5:
   dependencies:
     lru-cache "^5.1.1"
 
+open-design-api-types@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/open-design-api-types/-/open-design-api-types-0.2.0.tgz#eb73ce827dc49743fa3d090201cfb850ec837ae6"
+  integrity sha512-pcd5bSVd+BZ5O8R6tCYFGOuHqMLLTPIpvrCcURgGWx9HRvRBXBwLsAc5C9Mn/zgRVYbYcDr/6EkS9Yvkh1CuQQ==
+
 p-limit@^2.0.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-2.3.0.tgz#3dd33c647a214fdfffd835933eb086da0dc21db1"
