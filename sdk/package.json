@@ -6,7 +6,8 @@
     "build": "yarn run clean-build && yarn run build:ts",
     "build:ts": "tsc --outDir dist --sourceMap --project ./tsconfig-build.json",
     "clean-build": "rm -rf dist",
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\" }' mocha"
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\" }' mocha",
+    "test:coverage": "nyc --reporter=lcov --reporter=text-summary yarn run test"
   },
   "devDependencies": {
     "@opendesign/api": "0.0.0-dev",
@@ -25,6 +26,7 @@
     "fs-extra": "^9.1.0",
     "mkdirp": "1.0.4",
     "node-fetch": "2.6.1",
+    "nyc": "^15.1.0",
     "open-design-api-types": "0.2.0",
     "uuid": "8.3.2"
   }
