@@ -11,7 +11,9 @@
   },
   "scripts": {
     "lint": "yarn run lint:prettier",
-    "lint:prettier": "yarn run prettier -c ."
+    "lint:prettier": "yarn run prettier -c .",
+    "test": "yarn run test:octopus-reader",
+    "test:octopus-reader": "yarn workspace @opendesign/octopus-reader run test"
   },
   "devDependencies": {
     "@types/node": "*",

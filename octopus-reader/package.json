@@ -1,7 +1,14 @@
 {
   "name": "@opendesign/octopus-reader",
   "version": "0.0.0-dev",
+  "scripts": {
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\" }' mocha"
+  },
   "devDependencies": {
+    "@types/mocha": "8.2.0",
+    "mocha": "8.2.1",
+    "source-map-support": "0.5.19",
+    "ts-node": "9.0.0",
     "typescript": "4.1.2"
   }
 }
