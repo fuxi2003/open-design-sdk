@@ -96,6 +96,14 @@ export class LocalDesign implements ILocalDesign {
     return checkFile(contentFilename)
   }
 
+  async getArtboardContentFilename(artboardId: ArtboardId) {
+    if (!this.hasArtboardContent(artboardId)) {
+      return null
+    }
+
+    return this._getArtboardContentFilename(artboardId)
+  }
+
   async getArtboardContent(artboardId: ArtboardId) {
     const contentFilename = this._getArtboardContentFilename(artboardId)
     const content = (await readJsonFile(contentFilename)) as ArtboardOctopusData
@@ -161,6 +169,10 @@ export class LocalDesign implements ILocalDesign {
       bitmapAssetDesc
     )
     return checkFile(bitmapAssetFilename)
+  }
+
+  getBitmapAssetDirectory() {
+    return joinPaths(this._filename, BITMAP_ASSET_DIRECTORY_BASENAME)
   }
 
   async getBitmapAssetStream(bitmapAssetDesc: LocalBitmapAssetDescriptor) {

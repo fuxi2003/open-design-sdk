@@ -33,6 +33,7 @@ export interface ILocalDesign {
 
   // Design Structure
 
+  getArtboardContentFilename(artboardId: ArtboardId): Promise<string | null>
   getArtboardContent(artboardId: ArtboardId): Promise<ArtboardOctopusData>
   getArtboardContentJsonStream(
     artboardId: ArtboardId
@@ -59,6 +60,7 @@ export interface ILocalDesign {
   ): Promise<void>
 
   hasBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor): Promise<boolean>
+  getBitmapAssetDirectory(): string
   getBitmapAssetStream(
     bitmapAssetDesc: LocalBitmapAssetDescriptor
   ): Promise<NodeJS.ReadableStream>
