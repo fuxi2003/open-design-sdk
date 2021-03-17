@@ -363,6 +363,20 @@ export class ArtboardFacade implements IArtboardFacade {
     )
   }
 
+  /** @internal */
+  async resolveVisibleLayerSubtree(layerId: LayerId): Promise<Array<LayerId>> {
+    const layer = await this.getLayerById(layerId)
+    if (!layer) {
+      throw new Error('No such layer')
+    }
+
+    const visibleNestedLayerIds = layer
+      .findNestedLayers({ visible: true })
+      .map((nestedLayer) => nestedLayer.id)
+
+    return [layer.id].concat(visibleNestedLayerIds)
+  }
+
   private _createLayerFacade(layerId: LayerId): LayerFacade | null {
     const artboardEntity = this._artboardEntity
     const layerEntity = artboardEntity

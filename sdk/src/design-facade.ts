@@ -619,9 +619,14 @@ export class DesignFacade implements IDesignFacade {
 
     await this._loadRenderingDesignArtboard(artboardId)
 
-    return renderingDesign.renderArtboardLayerToFile(
+    const resolvedLayerIds = await this._resolveVisibleArtboardLayerSubtree(
       artboardId,
-      layerId,
+      layerId
+    )
+
+    return renderingDesign.renderArtboardLayersToFile(
+      artboardId,
+      resolvedLayerIds,
       relPath
     )
   }
@@ -650,9 +655,16 @@ export class DesignFacade implements IDesignFacade {
 
     await this._loadRenderingDesignArtboard(artboardId)
 
+    const resolvedLayerSubtrees = await Promise.all(
+      layerIds.map((layerId) => {
+        return this._resolveVisibleArtboardLayerSubtree(artboardId, layerId)
+      })
+    )
+    const resolvedLayerIds = resolvedLayerSubtrees.flat(1)
+
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
-      layerIds,
+      resolvedLayerIds,
       relPath
     )
   }
@@ -951,5 +963,17 @@ export class DesignFacade implements IDesignFacade {
     if (!renderingDesign.isArtboardReady(artboardId)) {
       throw new Error('The artboard failed to be loaded to a ready state')
     }
+  }
+
+  private _resolveVisibleArtboardLayerSubtree(
+    artboardId: ArtboardId,
+    layerId: LayerId
+  ): Promise<Array<LayerId>> {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    return artboard.resolveVisibleLayerSubtree(layerId)
   }
 }
