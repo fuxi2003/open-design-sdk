@@ -1,4 +1,5 @@
 import { OpenDesignApi } from '@opendesign/api'
+import { RenderingEngine } from '@opendesign/rendering'
 import { DesignFileManager } from './local/design-file-manager'
 import { LocalDesignManager } from './local/local-design-manager'
 import { Sdk } from './sdk'
@@ -105,6 +106,7 @@ function configureOfflineCacheServices(
   params: { workingDirectory?: string | null }
 ): ISdk {
   sdk.useLocalDesignManager(new LocalDesignManager())
+  sdk.useRenderingEngine(new RenderingEngine())
   sdk.setWorkingDirectory(params.workingDirectory || null)
   return sdk
 }

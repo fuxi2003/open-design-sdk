@@ -4,6 +4,7 @@ import {
 } from './utils/design-factories'
 
 import type { IOpenDesignApi } from '@opendesign/api'
+import type { IRenderingEngine } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
 import type { ISdk } from './types/sdk.iface'
 import type { DesignFacade } from './design-facade'
@@ -17,6 +18,7 @@ export class Sdk implements ISdk {
   private _openDesignApi: IOpenDesignApi | null = null
   private _designFileManager: DesignFileManager | null = null
   private _localDesignManager: LocalDesignManager | null = null
+  private _renderingEngine: IRenderingEngine | null = null
 
   /** @internal */
   constructor() {}
@@ -270,6 +272,11 @@ export class Sdk implements ISdk {
   /** @internal */
   useOpenDesignApi(api: IOpenDesignApi): void {
     this._openDesignApi = api
+  }
+
+  /** @internal */
+  useRenderingEngine(renderingEngine: IRenderingEngine): void {
+    this._renderingEngine = renderingEngine
   }
 
   private _getCommonApiDesignInfo() {
