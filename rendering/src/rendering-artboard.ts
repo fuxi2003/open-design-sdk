@@ -112,4 +112,24 @@ export class RenderingArtboard implements IRenderingArtboard {
       throw new Error('Failed to render artboard')
     }
   }
+
+  async renderLayerToFile(layerId: string, relPath: string): Promise<void> {
+    if (!this.ready) {
+      throw new Error('The artboard is not ready')
+    }
+
+    const result = await this._renderingProcess.execCommand('render-layer', {
+      'design': this._designId,
+      'artboard': this.id,
+      'layer': layerId,
+      'file': relPath,
+    })
+    if (!result['ok']) {
+      console.error(
+        'RenderingDesign#renderArtboardLayerToFile() render-layer:',
+        result
+      )
+      throw new Error('Failed to render artboard layer')
+    }
+  }
 }

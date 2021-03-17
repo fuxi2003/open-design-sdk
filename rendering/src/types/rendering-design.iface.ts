@@ -13,4 +13,10 @@ export interface IRenderingDesign {
   ): Promise<{ ready: boolean; pendingSymbolIds: Array<string> }>
 
   renderArtboardToFile(artboardId: string, relPath: string): Promise<void>
+
+  renderArtboardLayerToFile(
+    artboardId: string,
+    layerId: string,
+    relPath: string
+  ): Promise<void>
 }
