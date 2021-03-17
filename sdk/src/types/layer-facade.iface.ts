@@ -63,4 +63,6 @@ export interface ILayerFacade {
   getText(): IText | null
 
   getEffects(): IEffects
+
+  renderToFile(filePath: string): Promise<void>
 }

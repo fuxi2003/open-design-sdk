@@ -7,6 +7,7 @@ import {
   AggregatedFileFontDescriptor,
   FileLayerSelector,
   ArtboardId,
+  LayerId,
 } from '@opendesign/octopus-reader'
 import type { DesignFacade } from './design-facade'
 import type { LayerFacade } from './layer-facade'
@@ -267,5 +268,67 @@ export class DesignLayerCollectionFacade
     return layerFacade
       ? { artboardId: layerEntityDesc.artboardId, layer: layerFacade }
       : null
+  }
+
+  /**
+   * Renders the specified layer from the specified artboard as an image file.
+   *
+   * In case of group layers, all visible nested layers are also included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param artboardId The ID of the artboard from which to render the layer.
+   * @param layerId The ID of the artboard layer to render.
+   * @param relPath The target location of the produced image file.
+   */
+  async renderArtboardLayerToFile(
+    artboardId: ArtboardId,
+    layerId: LayerId,
+    relPath: string
+  ): Promise<void> {
+    const layerDesc = this._getLayersMemoized().find((desc) => {
+      return desc.artboardId === artboardId && desc.layer.id === layerId
+    })
+    if (!layerDesc) {
+      throw new Error('No such layer in the collection')
+    }
+
+    return this._designFacade.renderArtboardLayerToFile(
+      artboardId,
+      layerId,
+      relPath
+    )
+  }
+
+  /**
+   * Renders the specified layer from the specified artboard as an image file.
+   *
+   * In case of group layers, all visible nested layers are also included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param artboardId The ID of the artboard from which to render the layer.
+   * @param layerIds The IDs of the artboard layers to render.
+   * @param relPath The target location of the produced image file.
+   */
+  async renderArtboardLayersToFile(
+    artboardId: ArtboardId,
+    layerIds: Array<LayerId>,
+    relPath: string
+  ): Promise<void> {
+    const layerDescs = this._getLayersMemoized().filter((desc) => {
+      return desc.artboardId === artboardId && layerIds.includes(desc.layer.id)
+    })
+    if (layerDescs.length !== layerIds.length) {
+      throw new Error('Some of the layers are not in the collection')
+    }
+
+    return this._designFacade.renderArtboardLayersToFile(
+      artboardId,
+      layerIds,
+      relPath
+    )
   }
 }

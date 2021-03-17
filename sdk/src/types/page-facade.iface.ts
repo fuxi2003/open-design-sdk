@@ -49,4 +49,6 @@ export interface IPageFacade {
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
   ): Promise<IDesignLayerCollectionFacade>
+
+  renderToFile(relPath: string): Promise<void>
 }

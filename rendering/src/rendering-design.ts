@@ -77,6 +77,18 @@ export class RenderingDesign implements IRenderingDesign {
     return artboard.renderToFile(relPath)
   }
 
+  async renderPageToFile(pageId: string, relPath: string): Promise<void> {
+    const result = await this._renderingProcess.execCommand('render-page', {
+      'design': this.id,
+      'page': pageId,
+      'file': relPath,
+    })
+    if (!result['ok']) {
+      console.error('RenderingDesign#renderPageToFile() render-page:', result)
+      throw new Error('Failed to render page')
+    }
+  }
+
   async renderArtboardLayerToFile(
     artboardId: string,
     layerId: string,

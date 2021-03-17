@@ -368,4 +368,18 @@ export class LayerFacade implements ILayerFacade {
   getEffects() {
     return this._layerEntity.getEffects()
   }
+
+  /**
+   * Renders the layer as an image file.
+   *
+   * In case the layer is a group layer, all visible nested layers are also included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param relPath The target location of the produced image file.
+   */
+  async renderToFile(relPath: string): Promise<void> {
+    return this._artboardFacade.renderLayerToFile(this.id, relPath)
+  }
 }

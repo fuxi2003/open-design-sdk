@@ -264,4 +264,18 @@ export class PageFacade implements IPageFacade {
       designFacade: this._designFacade,
     })
   }
+
+  /**
+   * Renders all artboards from the page as a single image file.
+   *
+   * All visible layers from the artboards are included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param relPath The target location of the produced image file.
+   */
+  renderToFile(relPath: string) {
+    return this._designFacade.renderPageToFile(this.id, relPath)
+  }
 }

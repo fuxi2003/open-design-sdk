@@ -22,6 +22,7 @@ import { memoize } from './utils/memoize'
 import { getDesignFormatByFileName } from './utils/design-format-utils'
 
 import type { IApiDesign, IApiDesignConversion } from '@opendesign/api'
+import type { IRenderingDesign } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
 import type { Sdk } from './sdk'
 import type {
@@ -39,6 +40,7 @@ export class DesignFacade implements IDesignFacade {
   private _designEntity: IFile | null = null
   private _localDesign: ILocalDesign | null = null
   private _apiDesign: IApiDesign | null = null
+  private _renderingDesign: IRenderingDesign | null = null
 
   private _artboardFacades: Map<ArtboardId, ArtboardFacade> = new Map()
   private _pageFacades: Map<PageId, PageFacade> = new Map()
@@ -130,6 +132,11 @@ export class DesignFacade implements IDesignFacade {
     if (!this._manifestLoaded) {
       this.setManifest(await apiDesign.getManifest())
     }
+  }
+
+  /** @internal */
+  setRenderingDesign(renderingDesign: IRenderingDesign) {
+    this._renderingDesign = renderingDesign
   }
 
   /**
@@ -541,6 +548,115 @@ export class DesignFacade implements IDesignFacade {
     return entity.getFonts(options)
   }
 
+  /**
+   * Renders the specified artboard as an image file.
+   *
+   * All visible layers from the artboard are included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param artboardId The ID of the artboard to render.
+   * @param relPath The target location of the produced image file.
+   */
+  async renderArtboardToFile(
+    artboardId: ArtboardId,
+    relPath: string
+  ): Promise<void> {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    await this._loadRenderingDesignArtboard(artboardId)
+
+    return renderingDesign.renderArtboardToFile(artboardId, relPath)
+  }
+
+  /**
+   * Renders all artboards from the specified page as a single image file.
+   *
+   * All visible layers from the artboards are included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param pageId The ID of the page to render.
+   * @param relPath The target location of the produced image file.
+   */
+  async renderPageToFile(pageId: PageId, relPath: string): Promise<void> {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    await this._loadRenderingDesignPage(pageId)
+
+    return renderingDesign.renderPageToFile(pageId, relPath)
+  }
+
+  /**
+   * Renders the specified layer from the specified artboard as an image file.
+   *
+   * In case of group layers, all visible nested layers are also included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param artboardId The ID of the artboard from which to render the layer.
+   * @param layerId The ID of the artboard layer to render.
+   * @param relPath The target location of the produced image file.
+   */
+  async renderArtboardLayerToFile(
+    artboardId: ArtboardId,
+    layerId: LayerId,
+    relPath: string
+  ): Promise<void> {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    await this._loadRenderingDesignArtboard(artboardId)
+
+    return renderingDesign.renderArtboardLayerToFile(
+      artboardId,
+      layerId,
+      relPath
+    )
+  }
+
+  /**
+   * Renders the specified layers from the specified artboard into as a single composed image file.
+   *
+   * In case of group layers, all visible nested layers are also included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param artboardId The ID of the artboard from which to render the layer.
+   * @param layerIds The IDs of the artboard layers to render.
+   * @param relPath The target location of the produced image file.
+   */
+  async renderArtboardLayersToFile(
+    artboardId: ArtboardId,
+    layerIds: Array<LayerId>,
+    relPath: string
+  ): Promise<void> {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    await this._loadRenderingDesignArtboard(artboardId)
+
+    return renderingDesign.renderArtboardLayersToFile(
+      artboardId,
+      layerIds,
+      relPath
+    )
+  }
+
   /** @internal */
   getArtboardLayerFacade(
     artboardId: ArtboardId,
@@ -776,5 +892,64 @@ export class DesignFacade implements IDesignFacade {
     this._conversions.set(format, conversion)
 
     return conversion
+  }
+
+  private async _loadRenderingDesignPage(pageId: string) {
+    const pageArtboards = this.getPageArtboards(pageId)
+
+    await sequence(pageArtboards, (artboard) => {
+      return this._loadRenderingDesignArtboard(artboard.id)
+    })
+  }
+
+  private async _loadRenderingDesignArtboard(artboardId: string) {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    if (renderingDesign.isArtboardReady(artboardId)) {
+      return
+    }
+
+    const localDesign = this._localDesign
+    if (!localDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    await artboard.load()
+
+    const octopusFilename = await localDesign.getArtboardContentFilename(
+      artboardId
+    )
+    if (!octopusFilename) {
+      throw new Error('The artboard octopus location is not available')
+    }
+
+    const desc = await renderingDesign.loadArtboard(artboardId, {
+      octopusFilename,
+      symbolId: artboard.componentId,
+    })
+
+    // NOTE: This logic is more a future-proofing of the logic rather than a required step
+    //   as the SDK works with "expanded" octopus documents only and there should thus not be
+    //   any pending symbols.
+    await sequence(desc.pendingSymbolIds, async (componentId: string) => {
+      const componentArtboard = this.getArtboardByComponentId(componentId)
+      if (!componentArtboard) {
+        throw new Error('A dependency component artboard is not available')
+      }
+
+      return this._loadRenderingDesignArtboard(componentArtboard.id)
+    })
+
+    if (!renderingDesign.isArtboardReady(artboardId)) {
+      throw new Error('The artboard failed to be loaded to a ready state')
+    }
   }
 }

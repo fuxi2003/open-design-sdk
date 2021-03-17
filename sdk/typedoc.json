@@ -12,7 +12,8 @@
     "Layer Lookup",
     "Asset Aggregation",
     "Iteration",
-    "Collection Manipulation"
+    "Collection Manipulation",
+    "Rendering"
   ],
   "entryPoints": ["./src/docs.ts"],
   "readme": "none",

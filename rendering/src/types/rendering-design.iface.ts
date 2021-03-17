@@ -14,6 +14,8 @@ export interface IRenderingDesign {
 
   renderArtboardToFile(artboardId: string, relPath: string): Promise<void>
 
+  renderPageToFile(pageId: string, relPath: string): Promise<void>
+
   renderArtboardLayerToFile(
     artboardId: string,
     layerId: string,

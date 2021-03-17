@@ -311,6 +311,58 @@ export class ArtboardFacade implements IArtboardFacade {
     return this._artboardEntity.isComponent()
   }
 
+  /**
+   * Renders the artboard as an image file.
+   *
+   * All visible layers from the artboard are included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param relPath The target location of the produced image file.
+   */
+  renderToFile(relPath: string): Promise<void> {
+    return this._designFacade.renderArtboardToFile(this.id, relPath)
+  }
+
+  /**
+   * Renders the specified layer from the artboard as an image file.
+   *
+   * In case of group layers, all visible nested layers are also included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param layerId The ID of the artboard layer to render.
+   * @param relPath The target location of the produced image file.
+   */
+  renderLayerToFile(layerId: LayerId, relPath: string): Promise<void> {
+    return this._designFacade.renderArtboardLayerToFile(
+      this.id,
+      layerId,
+      relPath
+    )
+  }
+
+  /**
+   * Renders the specified layers from the artboard as a single image file.
+   *
+   * In case of group layers, all visible nested layers are also included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param layerIds The IDs of the artboard layers to render.
+   * @param relPath The target location of the produced image file.
+   */
+  renderLayersToFile(layerIds: Array<LayerId>, relPath: string): Promise<void> {
+    return this._designFacade.renderArtboardLayersToFile(
+      this.id,
+      layerIds,
+      relPath
+    )
+  }
+
   private _createLayerFacade(layerId: LayerId): LayerFacade | null {
     const artboardEntity = this._artboardEntity
     const layerEntity = artboardEntity

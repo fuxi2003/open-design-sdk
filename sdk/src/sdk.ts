@@ -2,6 +2,7 @@ import {
   createDesignFromLocalDesign,
   createDesignFromOpenDesignApiDesign,
 } from './utils/design-factories'
+import { v4 as uuid } from 'uuid'
 
 import type { IOpenDesignApi } from '@opendesign/api'
 import type { IRenderingEngine } from '@opendesign/rendering'
@@ -241,6 +242,15 @@ export class Sdk implements ISdk {
           : {}
       )
       await designFacade.setLocalDesign(localDesign)
+
+      const renderingEngine = this._renderingEngine
+      if (renderingEngine) {
+        const renderingDesign = await renderingEngine.createDesign(uuid(), {
+          bitmapAssetDirectoryPath: localDesign.getBitmapAssetDirectory(),
+          // fontDirectoryPath: localDesign.getFontDirectory(),
+        })
+        designFacade.setRenderingDesign(renderingDesign)
+      }
     }
 
     return designFacade

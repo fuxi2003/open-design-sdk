@@ -256,4 +256,43 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
   getFonts(options: { depth?: number } = {}): Array<AggregatedFontDescriptor> {
     return this._layerCollection.getFonts(options)
   }
+
+  /**
+   * Renders all layers in the collection as a single image file.
+   *
+   * In case of group layers, all visible nested layers are also included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param layerIds The IDs of the artboard layers to render.
+   * @param relPath The target location of the produced image file.
+   */
+  async renderToFile(relPath: string): Promise<void> {
+    const layerIds = this.getLayers().map((layer) => {
+      return layer.id
+    })
+
+    return this._artboardFacade.renderLayersToFile(layerIds, relPath)
+  }
+
+  /**
+   * Renders the specified layer from the collection as an image file.
+   *
+   * In case of group layers, all visible nested layers are also included.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Rendering
+   * @param layerId The ID of the artboard layer to render.
+   * @param relPath The target location of the produced image file.
+   */
+  async renderLayerToFile(layerId: LayerId, relPath: string): Promise<void> {
+    const layer = this.getLayerById(layerId)
+    if (!layer) {
+      throw new Error('No such layer in the collection')
+    }
+
+    return this._artboardFacade.renderLayerToFile(layerId, relPath)
+  }
 }

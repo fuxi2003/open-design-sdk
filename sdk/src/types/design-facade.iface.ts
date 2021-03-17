@@ -78,4 +78,20 @@ export interface IDesignFacade {
   getFonts(
     options?: Partial<{ depth: number }>
   ): Promise<Array<AggregatedFileFontDescriptor>>
+
+  renderArtboardToFile(artboardId: ArtboardId, relPath: string): Promise<void>
+
+  renderPageToFile(pageId: ArtboardId, relPath: string): Promise<void>
+
+  renderArtboardLayerToFile(
+    artboardId: ArtboardId,
+    layerId: LayerId,
+    relPath: string
+  ): Promise<void>
+
+  renderArtboardLayersToFile(
+    artboardId: ArtboardId,
+    layerIds: Array<LayerId>,
+    filePath: string
+  ): Promise<void>
 }

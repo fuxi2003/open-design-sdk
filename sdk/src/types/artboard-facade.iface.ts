@@ -62,4 +62,10 @@ export interface IArtboardFacade {
   getLayerDepth(layerId: LayerId): Promise<number | null>
 
   isComponent(): boolean
+
+  renderToFile(relPath: string): Promise<void>
+
+  renderLayerToFile(layerId: LayerId, filePath: string): Promise<void>
+
+  renderLayersToFile(layerIds: Array<LayerId>, filePath: string): Promise<void>
 }
