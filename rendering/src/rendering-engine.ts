@@ -32,6 +32,9 @@ export class RenderingEngine implements IRenderingEngine {
 
     const design = new RenderingDesign({
       id: designId,
+      renderingProcess: this._renderingProcess,
+      bitmapAssetDirectoryPath: params.bitmapAssetDirectoryPath || null,
+      fontDirectoryPath: params.fontDirectoryPath || null,
     })
 
     this._designs.set(designId, design)
