@@ -93,4 +93,23 @@ export class RenderingArtboard implements IRenderingArtboard {
 
     return dependencyResult['symbols'] || []
   }
+
+  async renderToFile(relPath: string): Promise<void> {
+    if (!this.ready) {
+      throw new Error('The artboard is not ready')
+    }
+
+    const result = await this._renderingProcess.execCommand('render-artboard', {
+      'design': this._designId,
+      'artboard': this.id,
+      'file': relPath,
+    })
+    if (!result['ok']) {
+      console.error(
+        'RenderingDesign#renderArtboardToFile() render-artboard:',
+        result
+      )
+      throw new Error('Failed to render artboard')
+    }
+  }
 }

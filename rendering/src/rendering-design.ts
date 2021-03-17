@@ -64,4 +64,16 @@ export class RenderingDesign implements IRenderingDesign {
 
     return artboard
   }
+
+  async renderArtboardToFile(
+    artboardId: string,
+    relPath: string
+  ): Promise<void> {
+    const artboard = this._artboards.get(artboardId)
+    if (!artboard || !artboard.ready) {
+      throw new Error('The artboard is not ready')
+    }
+
+    return artboard.renderToFile(relPath)
+  }
 }

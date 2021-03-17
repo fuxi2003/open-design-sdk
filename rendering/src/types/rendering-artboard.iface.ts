@@ -10,4 +10,6 @@ export interface IRenderingArtboard {
     bitmapAssetDirectoryPath?: string | null
     fontDirectoryPath?: string | null
   }): Promise<void>
+
+  renderToFile(relPath: string): Promise<void>
 }
