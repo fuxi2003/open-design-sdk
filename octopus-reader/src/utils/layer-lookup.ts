@@ -66,6 +66,10 @@ const layerDataMatchers = {
         : fontDesc.fontPostScriptName === postScriptNameSelector
     })
   },
+  visible: (visibleSelector: LayerSelector['visible'], layer: ILayer) => {
+    const layerVisible = layer.octopus['visible'] !== false
+    return layerVisible === visibleSelector
+  },
 }
 
 export function matchLayer(selector: LayerSelector, layer: ILayer): boolean {
@@ -80,7 +84,12 @@ export function matchLayer(selector: LayerSelector, layer: ILayer): boolean {
     (selector.bitmapAssetName === undefined ||
       layerDataMatchers.bitmapAssetName(selector.bitmapAssetName, layer)) &&
     (selector.fontPostScriptName === undefined ||
-      layerDataMatchers.fontPostScriptName(selector.fontPostScriptName, layer))
+      layerDataMatchers.fontPostScriptName(
+        selector.fontPostScriptName,
+        layer
+      )) &&
+    (selector.visible === undefined ||
+      layerDataMatchers.visible(selector.visible, layer))
   )
 }
 

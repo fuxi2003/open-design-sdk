@@ -21,6 +21,7 @@ export type LayerSelector = {
   text?: string | Array<string> | RegExp
   bitmapAssetName?: string | Array<string>
   fontPostScriptName?: string | Array<string>
+  visible?: boolean
 }
 
 /** @category Layer Lookup */
@@ -35,4 +36,5 @@ export type FileLayerSelector = {
   text?: string | Array<string> | RegExp
   bitmapAssetName?: string | Array<string>
   fontPostScriptName?: string | Array<string>
+  visible?: boolean
 }
