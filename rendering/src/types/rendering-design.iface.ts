@@ -19,4 +19,10 @@ export interface IRenderingDesign {
     layerId: string,
     relPath: string
   ): Promise<void>
+
+  renderArtboardLayersToFile(
+    artboardId: string,
+    layerIds: Array<string>,
+    relPath: string
+  ): Promise<void>
 }

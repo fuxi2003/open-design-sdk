@@ -89,4 +89,17 @@ export class RenderingDesign implements IRenderingDesign {
 
     return artboard.renderLayerToFile(layerId, relPath)
   }
+
+  async renderArtboardLayersToFile(
+    artboardId: string,
+    layerIds: Array<string>,
+    relPath: string
+  ): Promise<void> {
+    const artboard = this._artboards.get(artboardId)
+    if (!artboard || !artboard.ready) {
+      throw new Error('The artboard is not ready')
+    }
+
+    return artboard.renderLayersToFile(layerIds, relPath)
+  }
 }

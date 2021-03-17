@@ -1,4 +1,5 @@
 import type { RenderingProcess } from './rendering-process'
+import type { LayerAttributes } from './types/commands.type'
 import type { IRenderingArtboard } from './types/rendering-artboard.iface'
 
 export class RenderingArtboard implements IRenderingArtboard {
@@ -130,6 +131,41 @@ export class RenderingArtboard implements IRenderingArtboard {
         result
       )
       throw new Error('Failed to render artboard layer')
+    }
+  }
+
+  async renderLayersToFile(
+    layerIds: Array<string>,
+    relPath: string
+  ): Promise<void> {
+    if (!this.ready) {
+      throw new Error('The artboard is not ready')
+    }
+
+    const result = await this._renderingProcess.execCommand(
+      'render-artboard-composition',
+      {
+        'design': this._designId,
+        'artboard': this.id,
+        'background': { 'enable': false },
+        'draw-shown-only': true,
+        'layer-attributes': layerIds.map(
+          (layerId): LayerAttributes => {
+            return {
+              'layer': layerId,
+              'visibility': 'force-show',
+            }
+          }
+        ),
+        'file': relPath,
+      }
+    )
+    if (!result['ok']) {
+      console.error(
+        'RenderingDesign#renderLayersToFile() render-artboard-composition:',
+        result
+      )
+      throw new Error('Failed to render artboard layers')
     }
   }
 }

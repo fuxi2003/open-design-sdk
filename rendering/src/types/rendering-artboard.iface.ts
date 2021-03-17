@@ -14,4 +14,6 @@ export interface IRenderingArtboard {
   renderToFile(relPath: string): Promise<void>
 
   renderLayerToFile(layerId: string, relPath: string): Promise<void>
+
+  renderLayersToFile(layerIds: Array<string>, relPath: string): Promise<void>
 }
