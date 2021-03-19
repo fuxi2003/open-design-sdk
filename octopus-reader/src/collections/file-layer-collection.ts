@@ -14,7 +14,7 @@ import type {
 } from '../types/file-layer-collection.iface'
 import type { IFile } from '../types/file.iface'
 import type { AggregatedFileFontDescriptor } from '../types/fonts.type'
-import type { LayerSelector } from '../types/selectors.type'
+import type { FileLayerSelector } from '../types/selectors.type'
 
 export class FileLayerCollection implements IFileLayerCollection {
   readonly length: number
@@ -41,14 +41,14 @@ export class FileLayerCollection implements IFileLayerCollection {
   }
 
   findLayer(
-    selector: LayerSelector,
+    selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
   ): FileLayerDescriptor | null {
     return findLayerInFileLayers(selector, this._layerDescList, options)
   }
 
   findLayers(
-    selector: LayerSelector,
+    selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
   ): IFileLayerCollection {
     const matchedLayers = findLayersInFileLayers(

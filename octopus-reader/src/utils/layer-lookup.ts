@@ -1,6 +1,6 @@
 import type { FileLayerDescriptor } from '../types/file-layer-collection.iface'
 import type { ILayer } from '../types/layer.iface'
-import type { LayerSelector } from '../types/selectors.type'
+import type { FileLayerSelector, LayerSelector } from '../types/selectors.type'
 
 const layerDataMatchers = {
   id: (idSelector: LayerSelector['id'], layer: ILayer) => {
@@ -145,7 +145,7 @@ export function findLayersInLayers(
 // --- file layers ---
 
 export function findLayerInFileLayers(
-  selector: LayerSelector,
+  selector: FileLayerSelector,
   layerSubtrees: Array<FileLayerDescriptor>,
   options: Partial<{ depth: number }> = {}
 ): FileLayerDescriptor | null {
@@ -169,7 +169,7 @@ export function findLayerInFileLayers(
 }
 
 export function findLayersInFileLayers(
-  selector: LayerSelector,
+  selector: FileLayerSelector,
   layerSubtrees: Array<FileLayerDescriptor>,
   options: Partial<{ depth: number }> = {}
 ): Array<FileLayerDescriptor> {

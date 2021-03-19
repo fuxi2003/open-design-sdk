@@ -26,7 +26,7 @@ import type { IArtboard } from '../types/artboard.iface'
 import type { ArtboardOctopusData } from '../types/octopus.type'
 import type {
   ArtboardSelector,
-  LayerSelector,
+  FileLayerSelector,
   PageSelector,
 } from '../types/selectors.type'
 import type { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
@@ -219,14 +219,14 @@ export class File implements IFile {
   }
 
   findLayer(
-    selector: LayerSelector,
+    selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
   ): FileLayerDescriptor | null {
     return findLayer(this.getArtboards(), selector, options)
   }
 
   findLayers(
-    selector: LayerSelector,
+    selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
   ): FileLayerCollection {
     const layers = findLayers(this.getArtboards(), selector, options)
