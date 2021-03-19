@@ -43,14 +43,14 @@ export class LayerCollection implements ILayerCollection {
   }
 
   findLayer(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options: Partial<{ depth: number }> = {}
   ): ILayer | null {
     return findLayerInLayers(selector, this._layerList, options)
   }
 
   findLayers(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options: Partial<{ depth: number }> = {}
   ): ILayerCollection {
     const matchedLayers = findLayersInLayers(selector, this._layerList, options)

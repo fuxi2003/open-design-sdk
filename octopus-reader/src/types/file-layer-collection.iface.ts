@@ -12,11 +12,11 @@ export interface IFileLayerCollection {
   getLayers(): Array<FileLayerDescriptor>
 
   findLayer(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
     options?: Partial<{ depth: number }>
   ): FileLayerDescriptor | null
   findLayers(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
     options?: Partial<{ depth: number }>
   ): IFileLayerCollection
 

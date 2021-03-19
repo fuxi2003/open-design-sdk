@@ -72,7 +72,14 @@ const layerDataMatchers = {
   },
 }
 
-export function matchLayer(selector: LayerSelector, layer: ILayer): boolean {
+export function matchLayer(
+  selector: LayerSelector | ((layer: ILayer) => boolean),
+  layer: ILayer
+): boolean {
+  if (typeof selector === 'function') {
+    return selector(layer)
+  }
+
   return (
     (selector.id === undefined || layerDataMatchers.id(selector.id, layer)) &&
     (selector.type === undefined ||
@@ -93,8 +100,23 @@ export function matchLayer(selector: LayerSelector, layer: ILayer): boolean {
   )
 }
 
+export function matchFileLayer(
+  selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
+  layerDesc: FileLayerDescriptor
+): boolean {
+  if (typeof selector === 'function') {
+    return selector(layerDesc)
+  }
+
+  return (
+    (selector.artboardId === undefined ||
+      layerDesc.artboardId === selector.artboardId) &&
+    matchLayer(selector, layerDesc.layer)
+  )
+}
+
 export function findLayerInLayers(
-  selector: LayerSelector,
+  selector: LayerSelector | ((layer: ILayer) => boolean),
   layerSubtrees: Array<ILayer>,
   options: Partial<{ depth: number }> = {}
 ): ILayer | null {
@@ -120,7 +142,7 @@ export function findLayerInLayers(
 }
 
 export function findLayersInLayers(
-  selector: LayerSelector,
+  selector: LayerSelector | ((layer: ILayer) => boolean),
   layerSubtrees: Array<ILayer>,
   options: Partial<{ depth: number }> = {}
 ): Array<ILayer> {
@@ -134,7 +156,6 @@ export function findLayersInLayers(
             .getNestedLayers({ depth: depth - 1 })
             .findLayers(selector, { depth: 1 })
             .getLayers()
-    // .filter((nestedLayer) => nestedLayer.id !== layer.id)
 
     return matchLayer(selector, layer)
       ? [layer].concat(matchedNestedLayers)
@@ -145,21 +166,36 @@ export function findLayersInLayers(
 // --- file layers ---
 
 export function findLayerInFileLayers(
-  selector: FileLayerSelector,
+  selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
   layerSubtrees: Array<FileLayerDescriptor>,
   options: Partial<{ depth: number }> = {}
 ): FileLayerDescriptor | null {
   const depth = options.depth || Infinity
 
   for (const { artboardId, layer } of layerSubtrees) {
-    if (matchLayer(selector, layer)) {
+    if (
+      typeof selector !== 'function' &&
+      selector.artboardId !== undefined &&
+      selector.artboardId !== artboardId
+    ) {
+      continue
+    }
+
+    if (matchFileLayer(selector, { artboardId, layer })) {
       return { artboardId, layer }
     }
 
     const nestedLayerMatch =
       depth === 1
         ? null
-        : layer.getNestedLayers({ depth: depth - 1 }).findLayer(selector)
+        : layer
+            .getNestedLayers({ depth: depth - 1 })
+            .findLayer(
+              typeof selector === 'function'
+                ? (layer: ILayer) => selector({ artboardId, layer })
+                : selector
+            )
+
     if (nestedLayerMatch) {
       return { artboardId, layer: nestedLayerMatch }
     }
@@ -169,24 +205,37 @@ export function findLayerInFileLayers(
 }
 
 export function findLayersInFileLayers(
-  selector: FileLayerSelector,
+  selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
   layerSubtrees: Array<FileLayerDescriptor>,
   options: Partial<{ depth: number }> = {}
 ): Array<FileLayerDescriptor> {
   const depth = options.depth || Infinity
 
   return layerSubtrees.flatMap(({ artboardId, layer }) => {
+    if (
+      typeof selector !== 'function' &&
+      selector.artboardId !== undefined &&
+      selector.artboardId !== artboardId
+    ) {
+      return []
+    }
+
     const matchedNestedLayers =
       depth === 1
         ? []
         : layer
             .getNestedLayers({ depth: depth - 1 })
-            .findLayers(selector)
+            .findLayers(
+              typeof selector === 'function'
+                ? (layer: ILayer) => selector({ artboardId, layer })
+                : selector
+            )
             .getLayers()
             .map((nestedLayer) => {
               return { artboardId, layer: nestedLayer }
             })
-    return matchLayer(selector, layer)
+
+    return matchFileLayer(selector, { artboardId, layer })
       ? [{ artboardId, layer }].concat(matchedNestedLayers)
       : matchedNestedLayers
   })

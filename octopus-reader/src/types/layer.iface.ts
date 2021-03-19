@@ -25,17 +25,21 @@ export interface ILayer {
   getParentLayer(): ILayer | null
   getParentLayers(): ILayerCollection
   getParentLayerIds(): Array<LayerId>
-  findParentLayer(selector: LayerSelector): ILayer | null
-  findParentLayers(selector: LayerSelector): ILayerCollection
+  findParentLayer(
+    selector: LayerSelector | ((layer: ILayer) => boolean)
+  ): ILayer | null
+  findParentLayers(
+    selector: LayerSelector | ((layer: ILayer) => boolean)
+  ): ILayerCollection
 
   hasNestedLayers(): boolean
   getNestedLayers(options?: Partial<{ depth: number }>): ILayerCollection
   findNestedLayer(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options?: Partial<{ depth: number }>
   ): ILayer | null
   findNestedLayers(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options?: Partial<{ depth: number }>
   ): ILayerCollection
 

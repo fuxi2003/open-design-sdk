@@ -88,12 +88,12 @@ export interface IFile {
   findLayersById(layerId: LayerId): IFileLayerCollection
   /** @category Layer Lookup */
   findLayer(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
     options?: Partial<{ depth: number }>
   ): FileLayerDescriptor | null
   /** @category Layer Lookup */
   findLayers(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
     options?: Partial<{ depth: number }>
   ): IFileLayerCollection
 

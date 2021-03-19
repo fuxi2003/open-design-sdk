@@ -13,11 +13,11 @@ export interface ILayerCollection {
   getLayerById(layerId: LayerId): ILayer | null
 
   findLayer(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options?: Partial<{ depth: number }>
   ): ILayer | null
   findLayers(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options?: Partial<{ depth: number }>
   ): ILayerCollection
 

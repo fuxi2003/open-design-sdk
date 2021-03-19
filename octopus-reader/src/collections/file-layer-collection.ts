@@ -41,14 +41,14 @@ export class FileLayerCollection implements IFileLayerCollection {
   }
 
   findLayer(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
     options: Partial<{ depth: number }> = {}
   ): FileLayerDescriptor | null {
     return findLayerInFileLayers(selector, this._layerDescList, options)
   }
 
   findLayers(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
     options: Partial<{ depth: number }> = {}
   ): IFileLayerCollection {
     const matchedLayers = findLayersInFileLayers(

@@ -128,12 +128,16 @@ export class Layer implements ILayer {
       : new LayerCollection([], this._artboard)
   }
 
-  findParentLayer(selector: LayerSelector): ILayer | null {
+  findParentLayer(
+    selector: LayerSelector | ((layer: ILayer) => boolean)
+  ): ILayer | null {
     const parentLayers = this.getParentLayers()
     return parentLayers.findLayer(selector, { depth: 1 })
   }
 
-  findParentLayers(selector: LayerSelector): ILayerCollection {
+  findParentLayers(
+    selector: LayerSelector | ((layer: ILayer) => boolean)
+  ): ILayerCollection {
     const parentLayers = this.getParentLayers()
     return parentLayers.findLayers(selector, { depth: 1 })
   }
@@ -156,7 +160,7 @@ export class Layer implements ILayer {
   )
 
   findNestedLayer(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options: Partial<{ depth: number }> = {}
   ): ILayer | null {
     const depth = options.depth || Infinity
@@ -166,7 +170,7 @@ export class Layer implements ILayer {
   }
 
   findNestedLayers(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options: Partial<{ depth: number }> = {}
   ): ILayerCollection {
     const depth = options.depth || Infinity
