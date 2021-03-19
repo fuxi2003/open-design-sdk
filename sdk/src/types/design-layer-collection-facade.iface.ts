@@ -22,6 +22,14 @@ export interface IDesignLayerCollectionFacade {
     options?: Partial<{ depth: number }>
   ): IDesignLayerCollectionFacade
 
+  forEach(
+    fn: (
+      layerDesc: DesignLayerDescriptor,
+      index: number,
+      layerDescs: Array<DesignLayerDescriptor>
+    ) => any
+  ): void
+
   filter(
     filter: (layerDesc: DesignLayerDescriptor, index: number) => boolean
   ): IDesignLayerCollectionFacade

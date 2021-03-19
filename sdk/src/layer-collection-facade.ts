@@ -157,6 +157,20 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
   }
 
   /**
+   * Iterates over the the layers in the collection and invokes the provided function with each one of them.
+   *
+   * Layers nested in the layers explicitly included in the collection are not iterated over.
+   *
+   * @category Iteration
+   * @param fn The fn function to apply to the layers in the collection.
+   */
+  forEach(
+    fn: (layer: LayerFacade, index: number, layers: Array<LayerFacade>) => void
+  ) {
+    return this.getLayers().forEach(fn)
+  }
+
+  /**
    * Returns a native `Array` which returns mapper function results for each of the layers from the collection.
    *
    * Layers nested in the layers explicitly included in the collection are not iterated over.

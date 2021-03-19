@@ -23,6 +23,13 @@ export interface ILayerCollectionFacade {
     options?: Partial<{ depth: number }>
   ): ILayerCollectionFacade
 
+  forEach(
+    fn: (
+      layer: ILayerFacade,
+      index: number,
+      layers: Array<ILayerFacade>
+    ) => void
+  ): void
 
   filter(
     filter: (layer: ILayerFacade, index: number) => boolean
