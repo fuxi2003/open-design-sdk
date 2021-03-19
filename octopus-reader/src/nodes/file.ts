@@ -12,7 +12,6 @@ import {
   getFonts,
 } from '../utils/aggregation'
 import { matchArtboard } from '../utils/artboard-lookup'
-import { memoize } from '../utils/memoize'
 import { matchPage } from '../utils/page-lookup'
 
 import type { IFile } from '../types/file.iface'
