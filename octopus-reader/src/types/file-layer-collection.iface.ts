@@ -20,6 +20,14 @@ export interface IFileLayerCollection {
     options?: Partial<{ depth: number }>
   ): IFileLayerCollection
 
+  forEach(
+    fn: (
+      layerDesc: FileLayerDescriptor,
+      index: number,
+      layerDescs: Array<FileLayerDescriptor>
+    ) => void
+  ): void
+
   filter(
     filter: (
       layerDesc: FileLayerDescriptor,

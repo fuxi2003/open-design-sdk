@@ -64,6 +64,12 @@ export class LayerCollection implements ILayerCollection {
     return new LayerCollection(filteredLayers, this._artboard)
   }
 
+  forEach(
+    fn: (layer: ILayer, index: number, layers: Array<ILayer>) => boolean
+  ) {
+    this.getLayers().forEach(fn)
+  }
+
   map<T>(
     mapper: (layer: ILayer, index: number, layers: Array<ILayer>) => T
   ): Array<T> {

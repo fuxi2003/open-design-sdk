@@ -21,6 +21,9 @@ export interface ILayerCollection {
     options?: Partial<{ depth: number }>
   ): ILayerCollection
 
+  forEach(
+    fn: (layer: ILayer, index: number, layers: Array<ILayer>) => any
+  ): void
 
   filter(
     filter: (layer: ILayer, index: number, layers: Array<ILayer>) => boolean

@@ -59,6 +59,16 @@ export class FileLayerCollection implements IFileLayerCollection {
     return new FileLayerCollection(matchedLayers, this._file)
   }
 
+  forEach(
+    fn: (
+      layerDesc: FileLayerDescriptor,
+      index: number,
+      layerDescs: Array<FileLayerDescriptor>
+    ) => any
+  ): void {
+    this.getLayers().forEach(fn)
+  }
+
   filter(
     filter: (
       layerDesc: FileLayerDescriptor,
