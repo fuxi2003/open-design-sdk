@@ -23,11 +23,23 @@ export interface IDesignLayerCollectionFacade {
   ): IDesignLayerCollectionFacade
 
   filter(
-    filter: (layerDesc: DesignLayerDescriptor) => boolean
+    filter: (layerDesc: DesignLayerDescriptor, index: number) => boolean
   ): IDesignLayerCollectionFacade
 
-  map<T>(mapper: (layerDesc: DesignLayerDescriptor) => T): Array<T>
-  flatMap<T>(mapper: (layerDesc: DesignLayerDescriptor) => Array<T>): Array<T>
+  map<T>(
+    mapper: (
+      layerDesc: DesignLayerDescriptor,
+      index: number,
+      layerDescs: Array<DesignLayerDescriptor>
+    ) => T
+  ): Array<T>
+  flatMap<T>(
+    mapper: (
+      layerDesc: DesignLayerDescriptor,
+      index: number,
+      layerDescs: Array<DesignLayerDescriptor>
+    ) => Array<T>
+  ): Array<T>
 
   reduce<T>(
     reducer: (state: T, layerDesc: DesignLayerDescriptor, index: number) => T,

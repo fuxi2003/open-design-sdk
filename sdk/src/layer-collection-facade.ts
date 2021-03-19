@@ -143,10 +143,12 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
    * @category Iteration
    * @param filter The filter to apply to the layers in the collection.
    */
-  filter(filter: (layer: LayerFacade) => boolean): LayerCollectionFacade {
-    const layerCollection = this._layerCollection.filter((layer) => {
+  filter(
+    filter: (layer: LayerFacade, index: number) => boolean
+  ): LayerCollectionFacade {
+    const layerCollection = this._layerCollection.filter((layer, index) => {
       const layerFacade = this._artboardFacade.getLayerFacadeById(layer.id)
-      return Boolean(layerFacade && filter(layerFacade))
+      return Boolean(layerFacade && filter(layerFacade, index))
     })
 
     return new LayerCollectionFacade(layerCollection, {
@@ -162,7 +164,9 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
    * @category Iteration
    * @param mapper The mapper function to apply to the layers in the collection.
    */
-  map<T>(mapper: (layer: LayerFacade) => T): Array<T> {
+  map<T>(
+    mapper: (layer: LayerFacade, index: number, layers: Array<LayerFacade>) => T
+  ): Array<T> {
     return this.getLayers().map(mapper)
   }
 
@@ -174,7 +178,13 @@ export class LayerCollectionFacade implements ILayerCollectionFacade {
    * @category Iteration
    * @param mapper The mapper function to apply to the layers in the collection.
    */
-  flatMap<T>(mapper: (layer: LayerFacade) => Array<T>): Array<T> {
+  flatMap<T>(
+    mapper: (
+      layer: LayerFacade,
+      index: number,
+      layers: Array<LayerFacade>
+    ) => Array<T>
+  ): Array<T> {
     return this.getLayers().flatMap(mapper)
   }
 

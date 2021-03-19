@@ -23,10 +23,25 @@ export interface ILayerCollectionFacade {
     options?: Partial<{ depth: number }>
   ): ILayerCollectionFacade
 
-  filter(filter: (layer: ILayerFacade) => boolean): ILayerCollectionFacade
 
-  map<T>(mapper: (layer: ILayerFacade) => T): Array<T>
-  flatMap<T>(mapper: (layer: ILayerFacade) => Array<T>): Array<T>
+  filter(
+    filter: (layer: ILayerFacade, index: number) => boolean
+  ): ILayerCollectionFacade
+
+  map<T>(
+    mapper: (
+      layer: ILayerFacade,
+      index: number,
+      layers: Array<ILayerFacade>
+    ) => T
+  ): Array<T>
+  flatMap<T>(
+    mapper: (
+      layer: ILayerFacade,
+      index: number,
+      layers: Array<ILayerFacade>
+    ) => Array<T>
+  ): Array<T>
 
   reduce<T>(
     reducer: (state: T, layer: ILayerFacade, index: number) => T,

@@ -132,14 +132,16 @@ export class DesignLayerCollectionFacade
    * @param filter The filter to apply to the layers in the collection.
    */
   filter(
-    filter: (layerDesc: DesignLayerDescriptor) => boolean
+    filter: (layerDesc: DesignLayerDescriptor, index: number) => boolean
   ): DesignLayerCollectionFacade {
-    const layerCollection = this._layerCollection.filter((layerEntityDesc) => {
-      const layerFacadeDesc = this._resolveArtboardLayerDescriptor(
-        layerEntityDesc
-      )
-      return Boolean(layerFacadeDesc && filter(layerFacadeDesc))
-    })
+    const layerCollection = this._layerCollection.filter(
+      (layerEntityDesc, index) => {
+        const layerFacadeDesc = this._resolveArtboardLayerDescriptor(
+          layerEntityDesc
+        )
+        return Boolean(layerFacadeDesc && filter(layerFacadeDesc, index))
+      }
+    )
 
     return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
@@ -154,7 +156,13 @@ export class DesignLayerCollectionFacade
    * @category Iteration
    * @param mapper The mapper function to apply to the layers in the collection.
    */
-  map<T>(mapper: (layerDesc: DesignLayerDescriptor) => T): Array<T> {
+  map<T>(
+    mapper: (
+      layerDesc: DesignLayerDescriptor,
+      index: number,
+      layerDescs: Array<DesignLayerDescriptor>
+    ) => T
+  ): Array<T> {
     return this.getLayers().map(mapper)
   }
 
@@ -166,7 +174,13 @@ export class DesignLayerCollectionFacade
    * @category Iteration
    * @param mapper The mapper function to apply to the layers in the collection.
    */
-  flatMap<T>(mapper: (layerDesc: DesignLayerDescriptor) => Array<T>): Array<T> {
+  flatMap<T>(
+    mapper: (
+      layerDesc: DesignLayerDescriptor,
+      index: number,
+      layerDescs: Array<DesignLayerDescriptor>
+    ) => Array<T>
+  ): Array<T> {
     return this.getLayers().flatMap(mapper)
   }
 
