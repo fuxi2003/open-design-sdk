@@ -21,11 +21,27 @@ export interface IFileLayerCollection {
   ): IFileLayerCollection
 
   filter(
-    filter: (layerDesc: FileLayerDescriptor) => boolean
+    filter: (
+      layerDesc: FileLayerDescriptor,
+      index: number,
+      layerDescs: Array<FileLayerDescriptor>
+    ) => boolean
   ): IFileLayerCollection
 
-  map<T>(mapper: (layerDesc: FileLayerDescriptor) => T): Array<T>
-  flatMap<T>(mapper: (layerDesc: FileLayerDescriptor) => Array<T>): Array<T>
+  map<T>(
+    mapper: (
+      layerDesc: FileLayerDescriptor,
+      index: number,
+      layerDescs: Array<FileLayerDescriptor>
+    ) => T
+  ): Array<T>
+  flatMap<T>(
+    mapper: (
+      layerDesc: FileLayerDescriptor,
+      index: number,
+      layerDescs: Array<FileLayerDescriptor>
+    ) => Array<T>
+  ): Array<T>
 
   reduce<T>(
     reducer: (state: T, layerDesc: FileLayerDescriptor, index: number) => T,

@@ -60,17 +60,33 @@ export class FileLayerCollection implements IFileLayerCollection {
   }
 
   filter(
-    filter: (layerDesc: FileLayerDescriptor) => boolean
+    filter: (
+      layerDesc: FileLayerDescriptor,
+      index: number,
+      layerDescs: Array<FileLayerDescriptor>
+    ) => boolean
   ): IFileLayerCollection {
     const filteredLayerDescs = this.getLayers().filter(filter)
     return new FileLayerCollection(filteredLayerDescs, this._file)
   }
 
-  map<T>(mapper: (layerDesc: FileLayerDescriptor) => T): Array<T> {
+  map<T>(
+    mapper: (
+      layerDesc: FileLayerDescriptor,
+      index: number,
+      layerDescs: Array<FileLayerDescriptor>
+    ) => T
+  ): Array<T> {
     return this.getLayers().map(mapper)
   }
 
-  flatMap<T>(mapper: (layerDesc: FileLayerDescriptor) => Array<T>): Array<T> {
+  flatMap<T>(
+    mapper: (
+      layerDesc: FileLayerDescriptor,
+      index: number,
+      layerDescs: Array<FileLayerDescriptor>
+    ) => Array<T>
+  ): Array<T> {
     return this.getLayers().flatMap(mapper)
   }
 

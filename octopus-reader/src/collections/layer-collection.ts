@@ -57,16 +57,22 @@ export class LayerCollection implements ILayerCollection {
     return new LayerCollection(matchedLayers, this._artboard)
   }
 
-  filter(filter: (layer: ILayer) => boolean): ILayerCollection {
+  filter(
+    filter: (layer: ILayer, index: number, layers: Array<ILayer>) => boolean
+  ): ILayerCollection {
     const filteredLayers = this.getLayers().filter(filter)
     return new LayerCollection(filteredLayers, this._artboard)
   }
 
-  map<T>(mapper: (layer: ILayer) => T): Array<T> {
+  map<T>(
+    mapper: (layer: ILayer, index: number, layers: Array<ILayer>) => T
+  ): Array<T> {
     return this.getLayers().map(mapper)
   }
 
-  flatMap<T>(mapper: (layer: ILayer) => Array<T>): Array<T> {
+  flatMap<T>(
+    mapper: (layer: ILayer, index: number, layers: Array<ILayer>) => Array<T>
+  ): Array<T> {
     return this.getLayers().flatMap(mapper)
   }
 

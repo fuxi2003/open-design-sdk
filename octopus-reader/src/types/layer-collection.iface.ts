@@ -21,10 +21,17 @@ export interface ILayerCollection {
     options?: Partial<{ depth: number }>
   ): ILayerCollection
 
-  filter(filter: (layer: ILayer) => boolean): ILayerCollection
 
-  map<T>(mapper: (layer: ILayer) => T): Array<T>
-  flatMap<T>(mapper: (layer: ILayer) => Array<T>): Array<T>
+  filter(
+    filter: (layer: ILayer, index: number, layers: Array<ILayer>) => boolean
+  ): ILayerCollection
+
+  map<T>(
+    mapper: (layer: ILayer, index: number, layers: Array<ILayer>) => T
+  ): Array<T>
+  flatMap<T>(
+    mapper: (layer: ILayer, index: number, layers: Array<ILayer>) => Array<T>
+  ): Array<T>
 
   reduce<T>(
     reducer: (state: T, layer: ILayer, index: number) => T,
