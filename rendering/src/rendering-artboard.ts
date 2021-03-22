@@ -168,4 +168,39 @@ export class RenderingArtboard implements IRenderingArtboard {
       throw new Error('Failed to render artboard layers')
     }
   }
+
+  async getLayerBounds(layerId: string) {
+    if (!this.ready) {
+      throw new Error('The artboard is not ready')
+    }
+
+    const result = await this._renderingProcess.execCommand('get-layer', {
+      'design': this._designId,
+      'artboard': this.id,
+      'layer': layerId,
+    })
+    if (!result['ok']) {
+      console.error('RenderingDesign#getLayerBounds() get-layer:', result)
+      throw new Error('Failed to retrieve artboard layer info')
+    }
+
+    return {
+      bounds: parseBounds(result['bounds']),
+      fullBounds: parseBounds(result['full-bounds']),
+      affectedBounds: parseBounds(result['affected-bounds']),
+      logicalBounds: parseBounds(result['logical-bounds']),
+      untransformedBounds: parseBounds(result['untransformed-bounds']),
+    }
+  }
+}
+
+function parseBounds(
+  coordinates: [number, number, number, number]
+): { left: number; top: number; width: number; height: number } {
+  return {
+    left: coordinates[0],
+    top: coordinates[1],
+    width: coordinates[2] - coordinates[0],
+    height: coordinates[3] - coordinates[1],
+  }
 }

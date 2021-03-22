@@ -1,3 +1,18 @@
+export type Bounds = {
+  left: number
+  top: number
+  width: number
+  height: number
+}
+
+export type LayerBounds = {
+  bounds: Bounds
+  fullBounds: Bounds
+  affectedBounds: Bounds
+  logicalBounds: Bounds
+  untransformedBounds: Bounds
+}
+
 export interface IRenderingArtboard {
   readonly id: string
   readonly symbolId: string | null
@@ -16,4 +31,6 @@ export interface IRenderingArtboard {
   renderLayerToFile(layerId: string, relPath: string): Promise<void>
 
   renderLayersToFile(layerIds: Array<string>, relPath: string): Promise<void>
+
+  getLayerBounds(layerId: string): Promise<LayerBounds>
 }

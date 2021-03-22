@@ -1,3 +1,5 @@
+import type { LayerBounds } from './rendering-artboard.iface'
+
 export interface IRenderingDesign {
   readonly id: string
 
@@ -27,4 +29,9 @@ export interface IRenderingDesign {
     layerIds: Array<string>,
     relPath: string
   ): Promise<void>
+
+  getArtboardLayerBounds(
+    artboardId: string,
+    layerId: string
+  ): Promise<LayerBounds>
 }

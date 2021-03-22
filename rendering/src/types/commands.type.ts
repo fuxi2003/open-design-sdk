@@ -1,4 +1,12 @@
+export type LayerType =
+  | 'layer'
+  | 'shapeLayer'
+  | 'groupLayer'
+  | 'textLayer'
+  | 'adjustmentLayer'
+
 export type BlendingMode = string
+export type ClippingMode = string
 
 export type LayerAttributes = {
   'layer': string
@@ -221,9 +229,31 @@ export type CommonResult = SuccessResult | ErrorResult
 export type CommandResults = {
   // 'create-design': (SuccessResult & {
   // }) | ErrorResult
+
   'get-artboard-dependencies':
     | (SuccessResult & {
         'symbols': Array<string>
+      })
+    | ErrorResult
+
+  'get-layer':
+    | (SuccessResult & {
+        'design': string
+        'artboard': string
+        'layer': string
+        'base': string
+        'type': LayerType
+        'name': string
+        'bounds': [number, number, number, number]
+        'full-bounds': [number, number, number, number]
+        'affected-bounds': [number, number, number, number]
+        'logical-bounds': [number, number, number, number]
+        'untransformed-bounds': [number, number, number, number]
+        'visibility': boolean
+        'blend-mode': BlendingMode
+        'clipping-mode': ClippingMode
+        'opacity': number
+        'fill-opacity': number
       })
     | ErrorResult
 }

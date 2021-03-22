@@ -70,8 +70,8 @@ export class RenderingDesign implements IRenderingDesign {
     relPath: string
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
-    if (!artboard || !artboard.ready) {
-      throw new Error('The artboard is not ready')
+    if (!artboard) {
+      throw new Error('No such artboard')
     }
 
     return artboard.renderToFile(relPath)
@@ -95,8 +95,8 @@ export class RenderingDesign implements IRenderingDesign {
     relPath: string
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
-    if (!artboard || !artboard.ready) {
-      throw new Error('The artboard is not ready')
+    if (!artboard) {
+      throw new Error('No such artboard')
     }
 
     return artboard.renderLayerToFile(layerId, relPath)
@@ -108,10 +108,19 @@ export class RenderingDesign implements IRenderingDesign {
     relPath: string
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
-    if (!artboard || !artboard.ready) {
-      throw new Error('The artboard is not ready')
+    if (!artboard) {
+      throw new Error('No such artboard')
     }
 
     return artboard.renderLayersToFile(layerIds, relPath)
+  }
+
+  async getArtboardLayerBounds(artboardId: string, layerId: string) {
+    const artboard = this._artboards.get(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    return artboard.getLayerBounds(layerId)
   }
 }
