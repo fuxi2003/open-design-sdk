@@ -259,6 +259,7 @@ export class Sdk implements ISdk {
         designFacade.getManifest(),
         apiDesign
           ? {
+              name: apiDesign.name,
               apiDesignInfo: {
                 apiRoot: apiDesign.getApiRoot(),
                 designId: apiDesign.id,

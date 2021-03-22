@@ -74,10 +74,11 @@ export class LocalDesignManager implements ILocalDesignManager {
   async createOctopusFileFromManifest(
     manifest: ManifestData,
     options: Partial<{
+      name: string | null
       apiDesignInfo: ApiDesignInfo | null
     }> = {}
   ): Promise<LocalDesign> {
-    const filename = await this._createTempLocation()
+    const filename = await this._createTempLocation(options.name || null)
     const localDesign = await this.createOctopusFile(filename)
     console.log('temp octopus file from manifest', filename)
 
@@ -119,8 +120,10 @@ export class LocalDesignManager implements ILocalDesignManager {
     }
   }
 
-  async _createTempLocation(): Promise<string> {
-    const dirname = this.resolvePath(`./.opendesign/temp/${uuid()}.octopus`)
+  async _createTempLocation(name: string | null = null): Promise<string> {
+    const dirname = this.resolvePath(
+      `./.opendesign/temp/${uuid()}/${sanitizeName(name || 'design')}.octopus`
+    )
 
     await mkdirp(dirname)
 
@@ -144,4 +147,8 @@ export class LocalDesignManager implements ILocalDesignManager {
         prevApiDesignInfo.designId === nextApiDesignInfo.designId)
     )
   }
+}
+
+function sanitizeName(name: string): string {
+  return name.replace(/\.[^\.]+$/, '').replace(/[\^:~\/\\]/g, '-')
 }
