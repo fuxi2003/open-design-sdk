@@ -57,6 +57,14 @@ export class LayerFacade implements ILayerFacade {
   }
 
   /**
+   * The ID of the artboard in which the layer is placed.
+   * @category Reference
+   */
+  get artboardId() {
+    return this._layerEntity.artboardId
+  }
+
+  /**
    * Returns the artboard object associated with the layer object.
    * @category Reference
    */

@@ -61,6 +61,10 @@ export class Layer implements ILayer {
     return this.octopus['type']
   }
 
+  get artboardId() {
+    return this._artboard?.id || null
+  }
+
   getArtboard(): IArtboard | null {
     return this._artboard
   }

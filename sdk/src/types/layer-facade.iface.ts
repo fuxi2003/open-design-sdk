@@ -1,6 +1,7 @@
 import type {
   AggregatedBitmapAssetDescriptor,
   AggregatedFontDescriptor,
+  ArtboardId,
   IBitmap,
   IEffects,
   ILayer,
@@ -17,6 +18,8 @@ export interface ILayerFacade {
   readonly name: ILayer['name']
   readonly type: ILayer['type']
   readonly octopus: ILayer['octopus']
+
+  readonly artboardId: ArtboardId | null
 
   getArtboard(): IArtboardFacade | null
 

@@ -4,7 +4,7 @@ import type { IBitmapMask } from './bitmap-mask.iface'
 import type { IBitmap } from './bitmap.iface'
 import type { IEffects } from './effects.iface'
 import type { AggregatedFontDescriptor } from './fonts.type'
-import type { LayerId } from './ids.type'
+import type { ArtboardId, LayerId } from './ids.type'
 import type { ILayerCollection } from './layer-collection.iface'
 import type { LayerOctopusData } from './octopus.type'
 import type { LayerSelector } from './selectors.type'
@@ -16,6 +16,8 @@ export interface ILayer {
   readonly name: string | null
   readonly type: LayerOctopusData['type']
   readonly octopus: LayerOctopusData
+
+  readonly artboardId: ArtboardId | null
 
   getArtboard(): IArtboard | null
 
