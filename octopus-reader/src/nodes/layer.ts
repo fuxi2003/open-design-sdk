@@ -126,10 +126,8 @@ export class Layer implements ILayer {
   getParentLayers(): ILayerCollection {
     const parentLayer = this.getParentLayer()
     return parentLayer
-      ? new LayerCollection([parentLayer], this._artboard).concat(
-          parentLayer.getParentLayers()
-        )
-      : new LayerCollection([], this._artboard)
+      ? new LayerCollection([parentLayer]).concat(parentLayer.getParentLayers())
+      : new LayerCollection([])
   }
 
   findParentLayer(
@@ -189,8 +187,7 @@ export class Layer implements ILayer {
         createLayers(this.octopus['layers'] || [], {
           parentLayerId: this.id,
           artboard: this._artboard,
-        }),
-        this._artboard
+        })
       )
     }
   )

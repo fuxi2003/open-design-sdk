@@ -6,7 +6,6 @@ import { createLayerMap } from '../utils/layer-factories'
 import { findLayerInLayers, findLayersInLayers } from '../utils/layer-lookup'
 
 import type { ILayerCollection } from '../types/layer-collection.iface'
-import type { IArtboard } from '../types/artboard.iface'
 import type { LayerId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
 import type { LayerSelector } from '../types/selectors.type'
@@ -16,15 +15,12 @@ import type { AggregatedFontDescriptor } from '../types/fonts.type'
 export class LayerCollection implements ILayerCollection {
   readonly length: number
 
-  private _artboard: IArtboard | null
   private _layerList: Array<ILayer>
-
   private _layersById: Record<LayerId, ILayer>
 
-  constructor(layerList: Array<ILayer>, artboard: IArtboard | null = null) {
+  constructor(layerList: Array<ILayer>) {
     this.length = layerList.length
 
-    this._artboard = artboard
     this._layerList = layerList
 
     this._layersById = createLayerMap(layerList)
@@ -54,14 +50,14 @@ export class LayerCollection implements ILayerCollection {
     options: Partial<{ depth: number }> = {}
   ): ILayerCollection {
     const matchedLayers = findLayersInLayers(selector, this._layerList, options)
-    return new LayerCollection(matchedLayers, this._artboard)
+    return new LayerCollection(matchedLayers)
   }
 
   filter(
     filter: (layer: ILayer, index: number, layers: Array<ILayer>) => boolean
   ): ILayerCollection {
     const filteredLayers = this.getLayers().filter(filter)
-    return new LayerCollection(filteredLayers, this._artboard)
+    return new LayerCollection(filteredLayers)
   }
 
   forEach(
@@ -95,7 +91,7 @@ export class LayerCollection implements ILayerCollection {
       : addedLayers.getLayers()
     const layers = [...this.getLayers(), ...addedLayerList]
 
-    return new LayerCollection(layers, this._artboard)
+    return new LayerCollection(layers)
   }
 
   flatten(options: Partial<{ depth: number }> = {}): ILayerCollection {
@@ -105,7 +101,7 @@ export class LayerCollection implements ILayerCollection {
       return [layer, ...layer.getNestedLayers({ depth })]
     })
 
-    return new LayerCollection(flattenedLayers, this._artboard)
+    return new LayerCollection(flattenedLayers)
   }
 
   getBitmapAssets(
