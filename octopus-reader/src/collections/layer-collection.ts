@@ -98,7 +98,11 @@ export class LayerCollection implements ILayerCollection {
     const depth = options.depth || Infinity
 
     const flattenedLayers = this.getLayers().flatMap((layer) => {
-      return [layer, ...layer.getNestedLayers({ depth })]
+      const nestedLayers = layer.getNestedLayers({ depth }).filter((layer) => {
+        return !this._layersById[layer.id]
+      })
+
+      return [layer, ...nestedLayers]
     })
 
     return new LayerCollection(flattenedLayers)

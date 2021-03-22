@@ -485,6 +485,28 @@ describe('Artboard', () => {
         strictEqual(layersCD.getLayerById('c')?.id, 'c')
         strictEqual(layersCD.getLayerById('d')?.id, 'd')
       })
+
+      it('should not return duplicate results when both a group layer and layers nested within it are matched', () => {
+        const octopus = createOctopus({
+          'layers': [
+            createLayerOctopus({
+              'id': 'a',
+              'name': 'Layer A',
+              'layers': [
+                createLayerOctopus({ 'id': 'b', 'name': 'Layer B' }),
+                createLayerOctopus({ 'id': 'c', 'name': 'Layer A' }),
+              ],
+            }),
+          ],
+        })
+        const artboard = new Artboard('a', octopus)
+
+        const layersABC = artboard.findLayers({ id: ['a', 'b', 'c'] })
+        strictEqual(layersABC.length, 3)
+        strictEqual(layersABC.getLayerById('a')?.id, 'a')
+        strictEqual(layersABC.getLayerById('b')?.id, 'b')
+        strictEqual(layersABC.getLayerById('c')?.id, 'c')
+      })
     })
 
     describe('batch bitmap asset name selector-based layer lookup', () => {
@@ -625,6 +647,31 @@ describe('Artboard', () => {
         strictEqual(layersCD.getLayerById('c')?.id, 'c')
         strictEqual(layersCD.getLayerById('d')?.id, 'd')
       })
+    })
+  })
+
+  describe('layer collection flattening', () => {
+    it('should not return duplicate results when both a group layer and layers nested within it are matched', () => {
+      const octopus = createOctopus({
+        'layers': [
+          createLayerOctopus({
+            'id': 'a',
+            'name': 'Layer A',
+            'layers': [
+              createLayerOctopus({ 'id': 'b', 'name': 'Layer B' }),
+              createLayerOctopus({ 'id': 'c', 'name': 'Layer A' }),
+            ],
+          }),
+        ],
+      })
+      const artboard = new Artboard('a', octopus)
+
+      const layersABC = artboard.findLayers({ id: ['a', 'b', 'c'] })
+      const flattened = layersABC.flatten()
+      strictEqual(flattened.length, 3)
+      strictEqual(flattened.getLayerById('a')?.id, 'a')
+      strictEqual(flattened.getLayerById('b')?.id, 'b')
+      strictEqual(flattened.getLayerById('c')?.id, 'c')
     })
   })
 
