@@ -419,22 +419,13 @@ export class DesignFacade implements IDesignFacade {
     await this.load()
 
     const entity = this._getDesignEntity()
-    const layerEntityDesc = entity.findLayerById(layerId)
-    if (!layerEntityDesc) {
+    const layerEntity = entity.findLayerById(layerId)
+    const artboardId = layerEntity ? layerEntity.artboardId : null
+    if (!layerEntity || !artboardId) {
       return null
     }
 
-    const layerFacade = this.getArtboardLayerFacade(
-      layerEntityDesc.artboardId,
-      layerEntityDesc.layer.id
-    )
-
-    return layerFacade
-      ? {
-          artboardId: layerEntityDesc.artboardId,
-          layer: layerFacade,
-        }
-      : null
+    return this.getArtboardLayerFacade(artboardId, layerEntity.id)
   }
 
   /**
@@ -474,22 +465,13 @@ export class DesignFacade implements IDesignFacade {
     await this.load()
 
     const entity = this._getDesignEntity()
-    const layerEntityDesc = entity.findLayer(selector, options)
-    if (!layerEntityDesc) {
+    const layerEntity = entity.findLayer(selector, options)
+    const artboardId = layerEntity ? layerEntity.artboardId : null
+    if (!layerEntity || !artboardId) {
       return null
     }
 
-    const layerFacade = this.getArtboardLayerFacade(
-      layerEntityDesc.artboardId,
-      layerEntityDesc.layer.id
-    )
-
-    return layerFacade
-      ? {
-          artboardId: layerEntityDesc.artboardId,
-          layer: layerFacade,
-        }
-      : null
+    return this.getArtboardLayerFacade(artboardId, layerEntity.id)
   }
 
   /**

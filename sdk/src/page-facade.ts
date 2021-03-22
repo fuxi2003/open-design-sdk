@@ -212,20 +212,16 @@ export class PageFacade implements IPageFacade {
   async findLayerById(layerId: LayerId, options: { depth?: number } = {}) {
     await this.load()
 
-    const layerEntityDesc = this._pageEntity.findLayerById(layerId, options)
-    const layerFacade = layerEntityDesc
-      ? this._designFacade.getArtboardLayerFacade(
-          layerEntityDesc.artboardId,
-          layerEntityDesc.layer.id
-        )
-      : null
+    const layerEntity = this._pageEntity.findLayerById(layerId, options)
+    const layerFacade =
+      layerEntity && layerEntity.artboardId
+        ? this._designFacade.getArtboardLayerFacade(
+            layerEntity.artboardId,
+            layerEntity.id
+          )
+        : null
 
-    return layerFacade && layerEntityDesc
-      ? {
-          artboardId: layerEntityDesc.artboardId,
-          layer: layerFacade,
-        }
-      : null
+    return layerFacade
   }
 
   async findLayersById(layerId: LayerId, options: { depth?: number } = {}) {
@@ -240,20 +236,16 @@ export class PageFacade implements IPageFacade {
   async findLayer(selector: LayerSelector, options: { depth?: number } = {}) {
     await this.load()
 
-    const layerEntityDesc = this._pageEntity.findLayer(selector, options)
-    const layerFacade = layerEntityDesc
-      ? this._designFacade.getArtboardLayerFacade(
-          layerEntityDesc.artboardId,
-          layerEntityDesc.layer.id
-        )
-      : null
+    const layerEntity = this._pageEntity.findLayer(selector, options)
+    const layerFacade =
+      layerEntity && layerEntity.artboardId
+        ? this._designFacade.getArtboardLayerFacade(
+            layerEntity.artboardId,
+            layerEntity.id
+          )
+        : null
 
-    return layerFacade && layerEntityDesc
-      ? {
-          artboardId: layerEntityDesc.artboardId,
-          layer: layerFacade,
-        }
-      : null
+    return layerFacade
   }
 
   async findLayers(selector: LayerSelector, options: { depth?: number } = {}) {

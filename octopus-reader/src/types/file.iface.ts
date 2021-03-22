@@ -1,11 +1,11 @@
 import type { IArtboard } from './artboard.iface'
 import type { AggregatedFileBitmapAssetDescriptor } from './bitmap-assets.type'
 import type {
-  FileLayerDescriptor,
   IFileLayerCollection,
 } from './file-layer-collection.iface'
 import type { AggregatedFileFontDescriptor } from './fonts.type'
 import type { ArtboardId, ComponentId, LayerId, PageId } from './ids.type'
+import type { ILayer } from './layer.iface'
 import type { ArtboardManifestData, ManifestData } from './manifest.type'
 import type { ArtboardOctopusData } from './octopus.type'
 import type { IPage } from './page.iface'
@@ -83,17 +83,17 @@ export interface IFile {
   /** @category Layer Lookup */
   getFlattenedLayers(options?: Partial<{ depth: number }>): IFileLayerCollection
   /** @category Layer Lookup */
-  findLayerById(layerId: LayerId): FileLayerDescriptor | null
+  findLayerById(layerId: LayerId): ILayer | null
   /** @category Layer Lookup */
   findLayersById(layerId: LayerId): IFileLayerCollection
   /** @category Layer Lookup */
   findLayer(
-    selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
+    selector: FileLayerSelector | ((layer: ILayer) => boolean),
     options?: Partial<{ depth: number }>
-  ): FileLayerDescriptor | null
+  ): ILayer | null
   /** @category Layer Lookup */
   findLayers(
-    selector: FileLayerSelector | ((layerDesc: FileLayerDescriptor) => boolean),
+    selector: FileLayerSelector | ((layer: ILayer) => boolean),
     options?: Partial<{ depth: number }>
   ): IFileLayerCollection
 

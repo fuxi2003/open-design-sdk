@@ -10,9 +10,9 @@ import type {
   PageId,
   PageSelector,
 } from '@opendesign/octopus-reader'
-import type { DesignLayerDescriptor } from '../design-layer-collection-facade'
 import type { IArtboardFacade } from './artboard-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
+import type { ILayerFacade } from './layer-facade.iface'
 import type { IPageFacade } from './page-facade.iface'
 
 export interface IDesignFacade {
@@ -56,14 +56,14 @@ export interface IDesignFacade {
   ): Promise<IDesignLayerCollectionFacade>
 
   /** @category Layer Lookup */
-  findLayerById(layerId: LayerId): Promise<DesignLayerDescriptor | null>
+  findLayerById(layerId: LayerId): Promise<ILayerFacade | null>
   /** @category Layer Lookup */
   findLayersById(layerId: LayerId): Promise<IDesignLayerCollectionFacade>
   /** @category Layer Lookup */
   findLayer(
     selector: FileLayerSelector,
     options?: Partial<{ depth: number }>
-  ): Promise<DesignLayerDescriptor | null>
+  ): Promise<ILayerFacade | null>
   /** @category Layer Lookup */
   findLayers(
     selector: FileLayerSelector,

@@ -1,6 +1,5 @@
 import { Artboard } from './artboard'
 import { FileData } from '../data/file-data'
-import { FileLayerCollection } from '../collections/file-layer-collection'
 
 import {
   findLayer,
@@ -15,6 +14,7 @@ import { matchArtboard } from '../utils/artboard-lookup'
 import { matchPage } from '../utils/page-lookup'
 
 import type { IFile } from '../types/file.iface'
+import type { ILayer } from '../types/layer.iface'
 import type {
   ArtboardId,
   ComponentId,
@@ -207,7 +207,7 @@ export class File implements IFile {
     return new FileLayerCollection(layers, this)
   }
 
-  findLayerById(layerId: LayerId): FileLayerDescriptor | null {
+  findLayerById(layerId: LayerId): ILayer | null {
     return findLayerById(this.getArtboards(), layerId)
   }
 
@@ -220,7 +220,7 @@ export class File implements IFile {
   findLayer(
     selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
-  ): FileLayerDescriptor | null {
+  ): ILayer | null {
     return findLayer(this.getArtboards(), selector, options)
   }
 

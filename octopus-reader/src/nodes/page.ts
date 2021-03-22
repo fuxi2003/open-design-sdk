@@ -1,10 +1,10 @@
 import { FileLayerCollection } from '../collections/file-layer-collection'
 import { IArtboard } from '../types/artboard.iface'
 import { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
-import { FileLayerDescriptor } from '../types/file-layer-collection.iface'
 import { IFile } from '../types/file.iface'
 import { AggregatedFileFontDescriptor } from '../types/fonts.type'
 import { ArtboardId, ComponentId, LayerId, PageId } from '../types/ids.type'
+import { ILayer } from '../types/layer.iface'
 import { IPage } from '../types/page.iface'
 import { ArtboardSelector, LayerSelector } from '../types/selectors.type'
 import {
@@ -150,7 +150,7 @@ export class Page implements IPage {
     return new FileLayerCollection(layers, this._file)
   }
 
-  findLayerById(layerId: LayerId): FileLayerDescriptor | null {
+  findLayerById(layerId: LayerId): ILayer | null {
     return findLayerById(this.getArtboards(), layerId)
   }
 
@@ -163,7 +163,7 @@ export class Page implements IPage {
   findLayer(
     selector: LayerSelector,
     options: Partial<{ depth: number }> = {}
-  ): FileLayerDescriptor | null {
+  ): ILayer | null {
     return findLayer(this.getArtboards(), selector, options)
   }
 

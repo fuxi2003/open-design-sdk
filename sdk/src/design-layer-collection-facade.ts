@@ -2,22 +2,16 @@ import { memoize } from './utils/memoize'
 
 import {
   AggregatedFileBitmapAssetDescriptor,
-  FileLayerDescriptor,
   IFileLayerCollection,
   AggregatedFileFontDescriptor,
   FileLayerSelector,
   ArtboardId,
   LayerId,
+  ILayer,
 } from '@opendesign/octopus-reader'
 import type { DesignFacade } from './design-facade'
 import type { LayerFacade } from './layer-facade'
 import type { IDesignLayerCollectionFacade } from './types/design-layer-collection-facade.iface'
-
-/** @category Layer Lookup */
-export type DesignLayerDescriptor = {
-  artboardId: ArtboardId
-  layer: LayerFacade
-}
 
 export class DesignLayerCollectionFacade
   implements IDesignLayerCollectionFacade {
@@ -40,7 +34,7 @@ export class DesignLayerCollectionFacade
    *
    * @category Iteration
    */
-  [Symbol.iterator](): Iterator<DesignLayerDescriptor> {
+  [Symbol.iterator](): Iterator<LayerFacade> {
     return this.getLayers().values()
   }
 
@@ -72,12 +66,12 @@ export class DesignLayerCollectionFacade
   }
 
   private _getLayersMemoized = memoize(
-    (): Array<DesignLayerDescriptor> => {
+    (): Array<LayerFacade> => {
       return this._layerCollection
-        .map((layerEntityDesc) => {
-          return this._resolveArtboardLayerDescriptor(layerEntityDesc)
+        .map((layerEntity) => {
+          return this._resolveArtboardLayer(layerEntity)
         })
-        .filter(Boolean) as Array<DesignLayerDescriptor>
+        .filter(Boolean) as Array<LayerFacade>
     }
   )
 
@@ -95,11 +89,9 @@ export class DesignLayerCollectionFacade
   findLayer(
     selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
-  ): DesignLayerDescriptor | null {
-    const layerEntityDesc = this._layerCollection.findLayer(selector, options)
-    return layerEntityDesc
-      ? this._resolveArtboardLayerDescriptor(layerEntityDesc)
-      : null
+  ): LayerFacade | null {
+    const layerEntity = this._layerCollection.findLayer(selector, options)
+    return layerEntity ? this._resolveArtboardLayer(layerEntity) : null
   }
 
   /**
@@ -132,14 +124,12 @@ export class DesignLayerCollectionFacade
    * @param filter The filter to apply to the layers in the collection.
    */
   filter(
-    filter: (layerDesc: DesignLayerDescriptor, index: number) => boolean
+    filter: (layer: LayerFacade, index: number) => boolean
   ): DesignLayerCollectionFacade {
     const layerCollection = this._layerCollection.filter(
-      (layerEntityDesc, index) => {
-        const layerFacadeDesc = this._resolveArtboardLayerDescriptor(
-          layerEntityDesc
-        )
-        return Boolean(layerFacadeDesc && filter(layerFacadeDesc, index))
+      (layerEntity, index) => {
+        const layerFacade = this._resolveArtboardLayer(layerEntity)
+        return Boolean(layerFacade && filter(layerFacade, index))
       }
     )
 
@@ -157,11 +147,7 @@ export class DesignLayerCollectionFacade
    * @param fn The function to apply to the layers in the collection.
    */
   forEach(
-    fn: (
-      layerDesc: DesignLayerDescriptor,
-      index: number,
-      layerDescs: Array<DesignLayerDescriptor>
-    ) => any
+    fn: (layer: LayerFacade, index: number, layers: Array<LayerFacade>) => any
   ) {
     this.getLayers().forEach(fn)
   }
@@ -175,11 +161,7 @@ export class DesignLayerCollectionFacade
    * @param mapper The mapper function to apply to the layers in the collection.
    */
   map<T>(
-    mapper: (
-      layerDesc: DesignLayerDescriptor,
-      index: number,
-      layerDescs: Array<DesignLayerDescriptor>
-    ) => T
+    mapper: (layer: LayerFacade, index: number, layers: Array<LayerFacade>) => T
   ): Array<T> {
     return this.getLayers().map(mapper)
   }
@@ -194,9 +176,9 @@ export class DesignLayerCollectionFacade
    */
   flatMap<T>(
     mapper: (
-      layerDesc: DesignLayerDescriptor,
+      layer: LayerFacade,
       index: number,
-      layerDescs: Array<DesignLayerDescriptor>
+      layers: Array<LayerFacade>
     ) => Array<T>
   ): Array<T> {
     return this.getLayers().flatMap(mapper)
@@ -212,7 +194,7 @@ export class DesignLayerCollectionFacade
    * @param initialValue The value passed as the first argument to the reducer function applied to the first layer in the collection.
    */
   reduce<T>(
-    reducer: (state: T, layer: DesignLayerDescriptor, index: number) => T,
+    reducer: (state: T, layer: LayerFacade, index: number) => T,
     initialValue: T
   ): T {
     return this.getLayers().reduce(reducer, initialValue)
@@ -227,16 +209,11 @@ export class DesignLayerCollectionFacade
    * @param addedLayers The layer collection to concatenate with the original collection. A native `Array` of layer objects can be provided instead of an actual collection object.
    */
   concat(
-    addedLayers:
-      | DesignLayerCollectionFacade
-      | Array<{
-          artboardId: ArtboardId
-          layer: LayerFacade
-        }>
+    addedLayers: DesignLayerCollectionFacade | Array<LayerFacade>
   ): DesignLayerCollectionFacade {
     const addedLayerList = Array.isArray(addedLayers)
-      ? addedLayers.map(({ artboardId, layer: layerFacade }) => {
-          return { artboardId, layer: layerFacade.getLayerEntity() }
+      ? addedLayers.map((layerFacade) => {
+          return layerFacade.getLayerEntity()
         })
       : addedLayers.getFileLayerCollectionEntity()
 
@@ -290,16 +267,13 @@ export class DesignLayerCollectionFacade
     return this._layerCollection.getFonts(options)
   }
 
-  private _resolveArtboardLayerDescriptor(
-    layerEntityDesc: FileLayerDescriptor
-  ): DesignLayerDescriptor | null {
-    const layerFacade = this._designFacade.getArtboardLayerFacade(
-      layerEntityDesc.artboardId,
-      layerEntityDesc.layer.id
-    )
-    return layerFacade
-      ? { artboardId: layerEntityDesc.artboardId, layer: layerFacade }
-      : null
+  private _resolveArtboardLayer(layerEntity: ILayer): LayerFacade | null {
+    const artboardId = layerEntity.artboardId
+    if (!artboardId) {
+      return null
+    }
+
+    return this._designFacade.getArtboardLayerFacade(artboardId, layerEntity.id)
   }
 
   /**
@@ -319,10 +293,10 @@ export class DesignLayerCollectionFacade
     layerId: LayerId,
     relPath: string
   ): Promise<void> {
-    const layerDesc = this._getLayersMemoized().find((desc) => {
-      return desc.artboardId === artboardId && desc.layer.id === layerId
+    const layer = this._getLayersMemoized().find((layer) => {
+      return layer.artboardId === artboardId && layer.id === layerId
     })
-    if (!layerDesc) {
+    if (!layer) {
       throw new Error('No such layer in the collection')
     }
 
@@ -350,10 +324,10 @@ export class DesignLayerCollectionFacade
     layerIds: Array<LayerId>,
     relPath: string
   ): Promise<void> {
-    const layerDescs = this._getLayersMemoized().filter((desc) => {
-      return desc.artboardId === artboardId && layerIds.includes(desc.layer.id)
+    const layers = this._getLayersMemoized().filter((layer) => {
+      return layer.artboardId === artboardId && layerIds.includes(layer.id)
     })
-    if (layerDescs.length !== layerIds.length) {
+    if (layers.length !== layerIds.length) {
       throw new Error('Some of the layers are not in the collection')
     }
 

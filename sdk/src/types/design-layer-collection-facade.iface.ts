@@ -1,7 +1,6 @@
 import type {
   AggregatedFileBitmapAssetDescriptor,
   AggregatedFileFontDescriptor,
-  ArtboardId,
   FileLayerSelector,
 } from '@opendesign/octopus-reader'
 import type { ILayerFacade } from './layer-facade.iface'
@@ -9,53 +8,49 @@ import type { ILayerFacade } from './layer-facade.iface'
 export interface IDesignLayerCollectionFacade {
   readonly length: number
 
-  [Symbol.iterator](): Iterator<DesignLayerDescriptor>
+  [Symbol.iterator](): Iterator<ILayerFacade>
 
-  getLayers(): Array<DesignLayerDescriptor>
+  getLayers(): Array<ILayerFacade>
 
   findLayer(
     selector: FileLayerSelector,
     options?: Partial<{ depth: number }>
-  ): DesignLayerDescriptor | null
+  ): ILayerFacade | null
   findLayers(
     selector: FileLayerSelector,
     options?: Partial<{ depth: number }>
   ): IDesignLayerCollectionFacade
 
   forEach(
-    fn: (
-      layerDesc: DesignLayerDescriptor,
-      index: number,
-      layerDescs: Array<DesignLayerDescriptor>
-    ) => any
+    fn: (layer: ILayerFacade, index: number, layers: Array<ILayerFacade>) => any
   ): void
 
   filter(
-    filter: (layerDesc: DesignLayerDescriptor, index: number) => boolean
+    filter: (layer: ILayerFacade, index: number) => boolean
   ): IDesignLayerCollectionFacade
 
   map<T>(
     mapper: (
-      layerDesc: DesignLayerDescriptor,
+      layer: ILayerFacade,
       index: number,
-      layerDescs: Array<DesignLayerDescriptor>
+      layers: Array<ILayerFacade>
     ) => T
   ): Array<T>
   flatMap<T>(
     mapper: (
-      layerDesc: DesignLayerDescriptor,
+      layer: ILayerFacade,
       index: number,
-      layerDescs: Array<DesignLayerDescriptor>
+      layers: Array<ILayerFacade>
     ) => Array<T>
   ): Array<T>
 
   reduce<T>(
-    reducer: (state: T, layerDesc: DesignLayerDescriptor, index: number) => T,
+    reducer: (state: T, layer: ILayerFacade, index: number) => T,
     initialValue?: T
   ): T
 
   concat(
-    addedLayers: IDesignLayerCollectionFacade | Array<DesignLayerDescriptor>
+    addedLayers: IDesignLayerCollectionFacade | Array<ILayerFacade>
   ): IDesignLayerCollectionFacade
 
   flatten(options?: Partial<{ depth: number }>): IDesignLayerCollectionFacade
@@ -66,9 +61,4 @@ export interface IDesignLayerCollectionFacade {
   getFonts(
     options?: Partial<{ depth: number }>
   ): Array<AggregatedFileFontDescriptor>
-}
-
-export type DesignLayerDescriptor = {
-  artboardId: ArtboardId
-  layer: ILayerFacade
 }

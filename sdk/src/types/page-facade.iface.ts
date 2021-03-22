@@ -8,9 +8,9 @@ import type {
   LayerSelector,
   PageId,
 } from '@opendesign/octopus-reader'
-import type { DesignLayerDescriptor } from '../design-layer-collection-facade'
 import type { IArtboardFacade } from './artboard-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
+import type { ILayerFacade } from './layer-facade.iface'
 
 export interface IPageFacade {
   readonly id: PageId
@@ -36,7 +36,7 @@ export interface IPageFacade {
   findLayerById(
     layerId: LayerId,
     options?: Partial<{ depth: number }>
-  ): Promise<DesignLayerDescriptor | null>
+  ): Promise<ILayerFacade | null>
   findLayersById(
     layerId: LayerId,
     options?: Partial<{ depth: number }>
@@ -44,7 +44,7 @@ export interface IPageFacade {
   findLayer(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
-  ): Promise<DesignLayerDescriptor | null>
+  ): Promise<ILayerFacade | null>
   findLayers(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
