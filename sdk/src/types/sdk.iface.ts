@@ -6,6 +6,7 @@ import type { ILocalDesignManager } from './local-design-manager.iface'
 
 export interface ISdk {
   openDesignFile(relPath: string): Promise<IDesignFacade>
+  openDesignLink(url: string): Promise<IDesignFacade>
   openOctopusFile(relPath: string): Promise<IDesignFacade>
   fetchDesignById(designId: string): Promise<IDesignFacade>
 

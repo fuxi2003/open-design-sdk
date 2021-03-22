@@ -4,7 +4,7 @@ import {
 } from './utils/design-factories'
 import { v4 as uuid } from 'uuid'
 
-import type { IOpenDesignApi } from '@opendesign/api'
+import type { DesignImportFormatEnum, IOpenDesignApi } from '@opendesign/api'
 import type { IRenderingEngine } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
 import type { ISdk } from './types/sdk.iface'
@@ -129,6 +129,31 @@ export class Sdk implements ISdk {
       relPath
     )
     const apiDesign = await openDesignApi.importDesignFile(designFileStream)
+
+    return this.fetchDesignById(apiDesign.id)
+  }
+
+  /**
+   * Opens a design file located at the specified URL.
+   *
+   * Online services have to be configured when using this method.
+   *
+   * The design file is not downloaded to the local environment but rather imported via the API directly. Once imported via the API, the design behaves exactly like a design fetched via {@link Sdk.fetchDesignById}.
+   *
+   * @category Local Design File Usage
+   * @param relPath An absolute design file path or a path relative to the current working directory.
+   * @returns A design object which can be used for retrieving data from the local design file using the API.
+   */
+  async openDesignLink(
+    url: string,
+    options: { format?: DesignImportFormatEnum } = {}
+  ): Promise<DesignFacade> {
+    const openDesignApi = this._openDesignApi
+    if (!openDesignApi) {
+      throw new Error('Open Design API is not configured.')
+    }
+
+    const apiDesign = await openDesignApi.importDesignLink(url, options)
 
     return this.fetchDesignById(apiDesign.id)
   }
