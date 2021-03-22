@@ -20,8 +20,6 @@ import type { LayerSelector } from '../types/selectors.type'
 import { IPage } from '../types/page.iface'
 
 export class Artboard implements IArtboard {
-  readonly pageId: PageId | null
-
   private _manifest: ArtboardManifestData
   private _octopus: ArtboardOctopusData | null
   private _file: IFile | null
@@ -44,9 +42,8 @@ export class Artboard implements IArtboard {
       pageId,
       ...manifestParams,
     })
-    this._octopus = octopus || null
-    this.pageId = pageId || null
 
+    this._octopus = octopus || null
     this._file = file || null
   }
 
@@ -70,6 +67,10 @@ export class Artboard implements IArtboard {
 
   get componentId(): ComponentId | null {
     return this._manifest['symbol_id'] || null
+  }
+
+  get pageId(): ComponentId | null {
+    return this._manifest['page_original_id'] || null
   }
 
   get name(): string | null {
