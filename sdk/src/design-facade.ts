@@ -35,6 +35,12 @@ import type { LayerFacade } from './layer-facade'
 type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 
 export class DesignFacade implements IDesignFacade {
+  /**
+   * The absolute path of the original design file. This is not available for designs loaded from the API.
+   * @category Identification
+   */
+  readonly sourceFilename: string | null
+
   private _sdk: Sdk
 
   private _designEntity: IFile | null = null
@@ -54,7 +60,9 @@ export class DesignFacade implements IDesignFacade {
   > = new Map()
 
   /** @internal */
-  constructor(params: { sdk: Sdk }) {
+  constructor(params: { sdk: Sdk; sourceFilename?: string | null }) {
+    this.sourceFilename = params.sourceFilename || null
+
     this._sdk = params.sdk
   }
 

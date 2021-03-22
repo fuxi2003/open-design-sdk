@@ -130,7 +130,9 @@ export class Sdk implements ISdk {
     )
     const apiDesign = await openDesignApi.importDesignFile(designFileStream)
 
-    return this.fetchDesignById(apiDesign.id)
+    return this._fetchDesignById(apiDesign.id, {
+      sourceFilename: String(designFileStream.path),
+    })
   }
 
   /**
@@ -243,6 +245,13 @@ export class Sdk implements ISdk {
    * @returns A design object which can be used for retrieving data from the design using the API.
    */
   async fetchDesignById(designId: string): Promise<DesignFacade> {
+    return this._fetchDesignById(designId, {})
+  }
+
+  private async _fetchDesignById(
+    designId: string,
+    params: { sourceFilename?: string | null }
+  ): Promise<DesignFacade> {
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
       throw new Error('Open Design API is not configured.')
@@ -251,6 +260,7 @@ export class Sdk implements ISdk {
     const apiDesign = await openDesignApi.getDesignById(designId)
     const designFacade = await createDesignFromOpenDesignApiDesign(apiDesign, {
       sdk: this,
+      sourceFilename: params.sourceFilename || null,
     })
 
     const localDesignManager = this._localDesignManager

@@ -8,6 +8,7 @@ export async function createDesignFromLocalDesign(
   localDesign: ILocalDesign,
   params: {
     sdk: Sdk
+    sourceFilename?: string | null
   }
 ): Promise<DesignFacade> {
   const design = new DesignFacade(params)
@@ -21,6 +22,7 @@ export async function createDesignFromOpenDesignApiDesign(
   apiDesign: IApiDesign,
   params: {
     sdk: Sdk
+    sourceFilename?: string | null
     conversions?: Array<IApiDesignConversion> | null
   }
 ): Promise<DesignFacade> {

@@ -18,6 +18,7 @@ import type { IPageFacade } from './page-facade.iface'
 
 export interface IDesignFacade {
   readonly id: string | null
+  readonly sourceFilename: string | null
   readonly octopusFilename: string | null
 
   saveOctopusFile(filePath?: string | null): Promise<void>
