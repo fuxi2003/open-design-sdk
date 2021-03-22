@@ -9,13 +9,13 @@ import type { ArtboardId } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
 import type { IOpenDesignApi } from './types/ifaces'
 
-type ConversionId = components['schemas']['ConversionId']
-type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
-type Design = components['schemas']['Design']
-type DesignId = components['schemas']['DesignId']
-type DesignImportFormatEnum = components['schemas']['DesignImportFormatEnum']
-type DesignSummary = components['schemas']['DesignSummary']
-type OctopusDocument = components['schemas']['OctopusDocument']
+export type ConversionId = components['schemas']['ConversionId']
+export type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
+export type Design = components['schemas']['Design']
+export type DesignId = components['schemas']['DesignId']
+export type DesignImportFormatEnum = components['schemas']['DesignImportFormatEnum']
+export type DesignSummary = components['schemas']['DesignSummary']
+export type OctopusDocument = components['schemas']['OctopusDocument']
 
 export class OpenDesignApi implements IOpenDesignApi {
   _apiRoot: string
