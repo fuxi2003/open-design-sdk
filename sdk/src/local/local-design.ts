@@ -22,7 +22,6 @@ import {
   MANIFEST_BASENAME,
   PAGE_CONTENT_BASENAME,
   PAGE_DIRECTORY_BASENAME,
-  PRERENDERED_BITMAP_ASSET_SUBDIRECTORY_BASENAME,
 } from './consts'
 
 import type {
@@ -358,14 +357,11 @@ export class LocalDesign implements ILocalDesign {
     return {
       basename,
       mapped,
-      filename: bitmapAssetDesc.prerendered
-        ? joinPaths(
-            this._filename,
-            BITMAP_ASSET_DIRECTORY_BASENAME,
-            PRERENDERED_BITMAP_ASSET_SUBDIRECTORY_BASENAME,
-            basename
-          )
-        : joinPaths(this._filename, BITMAP_ASSET_DIRECTORY_BASENAME, basename),
+      filename: joinPaths(
+        this._filename,
+        BITMAP_ASSET_DIRECTORY_BASENAME,
+        basename
+      ),
     }
   }
 
