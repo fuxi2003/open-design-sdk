@@ -43,9 +43,7 @@ restoreCommit() {
 bumpPackageVersions() {
   log "Bumping package versions…"
 
-  yarn workspace @opendesign/octopus-reader version --no-git-tag-version --new-version "$VERSION" || return 1
-  yarn workspace @opendesign/api version --no-git-tag-version --new-version "$VERSION" || return 1
-  yarn workspace @opendesign/sdk version --no-git-tag-version --new-version "$VERSION" || return 1
+  ts-node ./scripts/bump-versions.ts || return 1
 
   logSuccess "Versions bumped"
 }
