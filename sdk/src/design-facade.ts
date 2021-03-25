@@ -819,27 +819,10 @@ export class DesignFacade implements IDesignFacade {
       })
     )
 
-    const bitmapAssetDescs = await this.getBitmapAssets()
-
-    await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
-      if (await localDesign.hasBitmapAsset(bitmapAssetDesc)) {
-        return
-      }
-
-      if (!apiDesign) {
-        throw new Error('The API is not configured, cannot save bitmap assets')
-      }
-
-      const bitmapAssetStream = await apiDesign.getBitmapAssetStream(
-        bitmapAssetDesc.name
-      )
-      await localDesign.saveBitmapAssetStream(
-        bitmapAssetDesc,
-        bitmapAssetStream
-      )
-    })
-
     await this.setLocalDesign(localDesign)
+
+    const bitmapAssetDescs = await this.getBitmapAssets()
+    await this.downloadBitmapAssets(bitmapAssetDescs)
   }
 
   /**
