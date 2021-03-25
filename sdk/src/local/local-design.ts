@@ -164,10 +164,8 @@ export class LocalDesign implements ILocalDesign {
   }
 
   async hasBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
-    const { filename: bitmapAssetFilename } = await this._resolveBitmapAsset(
-      bitmapAssetDesc
-    )
-    return checkFile(bitmapAssetFilename)
+    const { available } = await this.resolveBitmapAsset(bitmapAssetDesc)
+    return available
   }
 
   getBitmapAssetDirectory() {
@@ -175,16 +173,26 @@ export class LocalDesign implements ILocalDesign {
   }
 
   async getBitmapAssetStream(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
-    const { filename: bitmapAssetFilename } = await this._resolveBitmapAsset(
-      bitmapAssetDesc
-    )
+    const {
+      filename: bitmapAssetFilename,
+      available,
+    } = await this.resolveBitmapAsset(bitmapAssetDesc)
+    if (!available) {
+      throw new Error('No such asset')
+    }
+
     return readFileStream(bitmapAssetFilename)
   }
 
   async getBitmapAssetBlob(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
-    const { filename: bitmapAssetFilename } = await this._resolveBitmapAsset(
-      bitmapAssetDesc
-    )
+    const {
+      filename: bitmapAssetFilename,
+      available,
+    } = await this.resolveBitmapAsset(bitmapAssetDesc)
+    if (!available) {
+      throw new Error('No such asset')
+    }
+
     return readFileBlob(bitmapAssetFilename)
   }
 
@@ -198,7 +206,7 @@ export class LocalDesign implements ILocalDesign {
       filename: bitmapAssetFilename,
       basename,
       mapped,
-    } = await this._resolveBitmapAsset(bitmapAssetDesc)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc)
     await writeJsonFile(bitmapAssetFilename, content)
 
     if (mapped) {
@@ -219,7 +227,7 @@ export class LocalDesign implements ILocalDesign {
       filename: bitmapAssetFilename,
       basename,
       mapped,
-    } = await this._resolveBitmapAsset(bitmapAssetDesc)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc)
     await writeJsonFileStream(bitmapAssetFilename, contentStream)
 
     if (mapped) {
@@ -240,7 +248,7 @@ export class LocalDesign implements ILocalDesign {
       filename: bitmapAssetFilename,
       basename,
       mapped,
-    } = await this._resolveBitmapAsset(bitmapAssetDesc)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc)
     await writeFileBlob(bitmapAssetFilename, bitmapAssetBlob)
 
     if (mapped) {
@@ -347,21 +355,28 @@ export class LocalDesign implements ILocalDesign {
     )
   }
 
-  async _resolveBitmapAsset(
+  async resolveBitmapAsset(
     bitmapAssetDesc: LocalBitmapAssetDescriptor
-  ): Promise<{ basename: string; mapped: boolean; filename: string }> {
+  ): Promise<{
+    basename: string
+    mapped: boolean
+    filename: string
+    available: boolean
+  }> {
     const { basename, mapped } = await this._getBitmapAssetBasename(
       bitmapAssetDesc
+    )
+    const filename = joinPaths(
+      this._filename,
+      BITMAP_ASSET_DIRECTORY_BASENAME,
+      basename
     )
 
     return {
       basename,
       mapped,
-      filename: joinPaths(
-        this._filename,
-        BITMAP_ASSET_DIRECTORY_BASENAME,
-        basename
-      ),
+      filename,
+      available: await checkFile(filename),
     }
   }
 
@@ -386,10 +401,10 @@ export class LocalDesign implements ILocalDesign {
       return { basename: bitmapKey, mapped: false }
     }
 
-    const ext = extname(bitmapKey)
-    const name = basename(bitmapKey, ext).replace(/#:\?\/\*(.*?)$/, '$1')
+    // const ext = extname(bitmapKey)
+    const name = basename(bitmapKey).replace(/[#:\?\/\*](.*?)$/, '$1')
 
-    return { basename: `${name}-${uuid()}${ext || '.png'}`, mapped: true }
+    return { basename: name, mapped: true }
   }
 
   _checkBitmapBasenameValid(basename: string): boolean {

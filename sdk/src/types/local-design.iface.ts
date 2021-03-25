@@ -75,4 +75,12 @@ export interface ILocalDesign {
     bitmapAssetDesc: LocalBitmapAssetDescriptor,
     bitmapAssetBlob: Buffer
   ): Promise<void>
+  resolveBitmapAsset(
+    bitmapAssetDesc: LocalBitmapAssetDescriptor
+  ): Promise<{
+    basename: string
+    mapped: boolean
+    filename: string
+    available: boolean
+  }>
 }
