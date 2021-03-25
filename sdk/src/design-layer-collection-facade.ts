@@ -1,3 +1,4 @@
+import { inspect } from 'util'
 import { memoize } from './utils/memoize'
 
 import {
@@ -27,6 +28,22 @@ export class DesignLayerCollectionFacade
   ) {
     this._layerCollection = layerCollection
     this._designFacade = params.designFacade
+  }
+
+  /** @internal */
+  toString() {
+    const layers = this.toJSON()
+    return `DesignLayerCollection ${inspect(layers)}`
+  }
+
+  /** @internal */
+  [inspect.custom]() {
+    return this.toString()
+  }
+
+  /** @internal */
+  toJSON() {
+    return this.getLayers()
   }
 
   /**

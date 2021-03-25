@@ -2,6 +2,7 @@ import {
   createDesignFromLocalDesign,
   createDesignFromOpenDesignApiDesign,
 } from './utils/design-factories'
+import { inspect } from 'util'
 import { v4 as uuid } from 'uuid'
 
 import type { DesignImportFormatEnum, IOpenDesignApi } from '@opendesign/api'
@@ -25,6 +26,23 @@ export class Sdk implements ISdk {
 
   /** @internal */
   constructor() {}
+
+  /** @internal */
+  toString() {
+    return `OpenDesignSdk ${inspect(this.toJSON())}`
+  }
+
+  /** @internal */
+  [inspect.custom]() {
+    return this.toString()
+  }
+
+  /** @internal */
+  toJSON() {
+    return {
+      workingDirectory: this.getWorkingDirectory(),
+    }
+  }
 
   /**
    * Returns the current "working directory" which is used for storing the local cache and temporary files.

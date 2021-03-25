@@ -2,6 +2,7 @@ import { ArtboardFacade } from './artboard-facade'
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { PageFacade } from './page-facade'
 
+import { inspect } from 'util'
 import {
   createEmptyFile,
   ArtboardId,
@@ -82,6 +83,26 @@ export class DesignFacade implements IDesignFacade {
   get octopusFilename() {
     const localDesign = this._localDesign
     return localDesign?.filename || null
+  }
+
+  /** @internal */
+  toString() {
+    const designInfo = this.toJSON()
+    return `Design ${inspect(designInfo)}`
+  }
+
+  /** @internal */
+  [inspect.custom]() {
+    return this.toString()
+  }
+
+  /** @internal */
+  toJSON() {
+    return {
+      id: this.id,
+      sourceFilename: this.sourceFilename,
+      octopusFilename: this.octopusFilename,
+    }
   }
 
   /** @internal */

@@ -1,3 +1,5 @@
+import { inspect } from 'util'
+
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { LayerFacade } from './layer-facade'
 
@@ -86,6 +88,27 @@ export class ArtboardFacade implements IArtboardFacade {
    */
   get name() {
     return this._artboardEntity.name
+  }
+
+  /** @internal */
+  toString() {
+    const artboardInfo = this.toJSON()
+    return `Artboard ${inspect(artboardInfo)}`
+  }
+
+  /** @internal */
+  [inspect.custom]() {
+    return this.toString()
+  }
+
+  /** @internal */
+  toJSON() {
+    return {
+      id: this.id,
+      pageId: this.pageId,
+      componentId: this.componentId,
+      name: this.name,
+    }
   }
 
   /** @internal */

@@ -1,3 +1,5 @@
+import { inspect } from 'util'
+
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
 import type {
@@ -62,6 +64,21 @@ export class LayerFacade implements ILayerFacade {
    */
   get artboardId() {
     return this._layerEntity.artboardId
+  }
+
+  /** @internal */
+  toString() {
+    return `Layer ${inspect(this.octopus)}`
+  }
+
+  /** @internal */
+  [inspect.custom]() {
+    return this.toString()
+  }
+
+  /** @internal */
+  toJSON() {
+    return this.octopus
   }
 
   /**

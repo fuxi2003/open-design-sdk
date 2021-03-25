@@ -1,3 +1,5 @@
+import { inspect } from 'util'
+
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
 import type {
@@ -36,6 +38,25 @@ export class PageFacade implements IPageFacade {
    */
   get name() {
     return this._pageEntity.name
+  }
+
+  /** @internal */
+  toString() {
+    const artboardInfo = this.toJSON()
+    return `Artboard ${inspect(artboardInfo)}`
+  }
+
+  /** @internal */
+  [inspect.custom]() {
+    return this.toString()
+  }
+
+  /** @internal */
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+    }
   }
 
   /** @internal */
