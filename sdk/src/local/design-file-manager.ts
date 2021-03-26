@@ -1,10 +1,10 @@
-import { createReadStream, createWriteStream } from 'fs'
+import { createReadStream, createWriteStream, ReadStream } from 'fs'
 import { resolve as resolvePath } from 'path'
 
 import type { IDesignFileManager } from '../types/design-file-manager.iface'
 
 export class DesignFileManager implements IDesignFileManager {
-  async readDesignFileStream(filePath: string): Promise<NodeJS.ReadableStream> {
+  async readDesignFileStream(filePath: string): Promise<ReadStream> {
     const filename = resolvePath(filePath)
     const stream = createReadStream(filename)
 

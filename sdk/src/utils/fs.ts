@@ -31,7 +31,7 @@ export async function writeJsonFile(
   await writeFile(filename, json)
 }
 
-export function readFileStream(filename: string): NodeJS.ReadableStream {
+export function readFileStream(filename: string): fs.ReadStream {
   return fs.createReadStream(filename)
 }
 

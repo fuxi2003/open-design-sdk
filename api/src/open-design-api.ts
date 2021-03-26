@@ -5,6 +5,7 @@ import fetch from 'node-fetch'
 import { ApiDesign } from './api-design'
 import { ApiDesignConversion } from './api-design-conversion'
 
+import type { ReadStream } from 'fs'
 import type { ArtboardId } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
 import type { IOpenDesignApi } from './types/ifaces'
@@ -90,7 +91,7 @@ export class OpenDesignApi implements IOpenDesignApi {
   }
 
   async importDesignFile(
-    designFileStream: NodeJS.ReadableStream,
+    designFileStream: ReadStream,
     options: { format?: DesignImportFormatEnum } = {}
   ): Promise<ApiDesign> {
     const res = await postMultipart(

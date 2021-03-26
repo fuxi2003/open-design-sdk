@@ -2,6 +2,7 @@ import { populatePathPattern, PathParams } from './paths'
 import fetchInternal, { Headers, RequestInit } from 'node-fetch'
 import FormData from 'form-data'
 
+import type { ReadStream } from 'fs'
 import type { OptionalKeys, RequiredKeys } from 'utility-types'
 import type { paths } from 'open-design-api-types'
 import type {
@@ -94,12 +95,12 @@ export async function postMultipart<
   data: {
     [K in Extract<RequiredKeys<MultipartBody>, string>]:
       | MultipartBody[K]
-      | NodeJS.ReadableStream
+      | ReadStream
   } &
     {
       [K in Extract<OptionalKeys<MultipartBody>, string>]?:
         | MultipartBody[K]
-        | NodeJS.ReadableStream
+        | ReadStream
     },
   authInfo: AuthInfo
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {

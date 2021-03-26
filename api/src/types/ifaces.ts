@@ -1,3 +1,4 @@
+import type { ReadStream } from 'fs'
 import type { ManifestData } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
 
@@ -23,7 +24,7 @@ export interface IOpenDesignApi {
   // Import
 
   importDesignFile(
-    stream: NodeJS.ReadableStream,
+    stream: ReadStream,
     options?: { format?: DesignImportFormatEnum }
   ): Promise<IApiDesign>
 

@@ -1,5 +1,7 @@
+import type { ReadStream } from 'fs'
+
 export interface IDesignFileManager {
-  readDesignFileStream(filePath: string): Promise<NodeJS.ReadableStream>
+  readDesignFileStream(filePath: string): Promise<ReadStream>
 
   saveDesignFileStream(
     filePath: string,
