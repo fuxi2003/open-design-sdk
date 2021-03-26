@@ -27,6 +27,20 @@ export class Sdk implements ISdk {
   constructor() {}
 
   /**
+   * Returns the current "working directory" which is used for storing the local cache and temporary files.
+   *
+   * The SDK creates and reads from a `.opendesign` subdirectory within the working directory.
+   *
+   * Note that the `.opendesign` subdirectory should likely not be included in version control systems.
+   *
+   * @category Configuration
+   * @returns An absolute path to the working directory. Defaults to the current process working directory (`process.cwd()` in node.js) when the workspace directory is not configured via {@link Sdk.setWorkingDirectory}.
+   */
+  getWorkingDirectory(): string | null {
+    return this._localDesignManager?.getWorkingDirectory() || null
+  }
+
+  /**
    * Sets the "working directory" which is used for storing the local cache and temporary files.
    *
    * The SDK creates and reads from a `.opendesign` subdirectory within the working directory.
