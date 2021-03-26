@@ -13,9 +13,6 @@
     "test:coverage": "nyc --reporter=lcov --reporter=text-summary yarn run test"
   },
   "devDependencies": {
-    "@opendesign/api": "0.0.0-dev",
-    "@opendesign/octopus-reader": "0.0.0-dev",
-    "@opendesign/rendering": "0.0.0-dev",
     "@types/fs-extra": "^9.0.7",
     "@types/mkdirp": "1.0.1",
     "@types/mocha": "8.2.0",
@@ -30,6 +27,9 @@
     "typescript": "4.1.2"
   },
   "dependencies": {
+    "@opendesign/api": "0.0.0-dev",
+    "@opendesign/octopus-reader": "0.0.0-dev",
+    "@opendesign/rendering": "0.0.0-dev",
     "fs-extra": "^9.1.0",
     "mkdirp": "1.0.4",
     "node-fetch": "2.6.1",
