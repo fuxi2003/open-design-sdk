@@ -1,6 +1,11 @@
+import { sequence } from './utils/async'
+
 import type { RenderingProcess } from './rendering-process'
 import type { LayerAttributes } from './types/commands.type'
-import type { IRenderingArtboard } from './types/rendering-artboard.iface'
+import type {
+  Bounds,
+  IRenderingArtboard,
+} from './types/rendering-artboard.iface'
 
 export class RenderingArtboard implements IRenderingArtboard {
   readonly id: string
@@ -119,11 +124,14 @@ export class RenderingArtboard implements IRenderingArtboard {
       throw new Error('The artboard is not ready')
     }
 
+    const bounds = await this._getLayerRenderBounds(layerId, layerAttributes)
+
     const result = await this._renderingProcess.execCommand('render-layer', {
       'design': this._designId,
       'artboard': this.id,
       'layer': layerId,
       'file': filePath,
+      'bounds': serializeBounds(bounds),
     })
     if (!result['ok']) {
       console.error(
@@ -142,11 +150,17 @@ export class RenderingArtboard implements IRenderingArtboard {
       throw new Error('The artboard is not ready')
     }
 
+    const bounds = await this._getCompoundLayerRenderBounds(
+      layerIds,
+      layerAttributes
+    )
+
     const result = await this._renderingProcess.execCommand(
       'render-artboard-composition',
       {
         'design': this._designId,
         'artboard': this.id,
+        'bounds': serializeBounds(bounds),
         'background': { 'enable': false },
         'draw-shown-only': true,
         'layer-attributes': layerIds.map(
@@ -192,6 +206,33 @@ export class RenderingArtboard implements IRenderingArtboard {
       untransformedBounds: parseBounds(result['untransformed-bounds']),
     }
   }
+
+  async _getLayerRenderBounds(
+    layerId: string,
+    layerAttributes: LayerAttributesConfig
+  ): Promise<Bounds> {
+    const layerBounds = await this.getLayerBounds(layerId)
+    return layerAttributes.includeEffects
+      ? layerBounds.fullBounds
+      : layerBounds.bounds
+  }
+
+  async _getCompoundLayerRenderBounds(
+    layerIds: Array<string>,
+    layerAttributes: Record<string, LayerAttributesConfig>
+  ): Promise<Bounds> {
+    if (layerIds.length === 0) {
+      throw new Error('Empty layer list provided')
+    }
+
+    const layerBoundsList = await sequence(layerIds, async (layerId) => {
+      return this._getLayerRenderBounds(layerId, layerAttributes[layerId] || {})
+    })
+
+    return layerBoundsList.reduce((compoundBounds, partialBounds) => {
+      return mergeBounds(compoundBounds, partialBounds)
+    })
+  }
 }
 
 function parseBounds(
@@ -202,5 +243,34 @@ function parseBounds(
     top: coordinates[1],
     width: coordinates[2] - coordinates[0],
     height: coordinates[3] - coordinates[1],
+  }
+}
+
+function serializeBounds(bounds: Bounds): [number, number, number, number] {
+  return [
+    bounds.left,
+    bounds.top,
+    bounds.left + bounds.width,
+    bounds.top + bounds.height,
+  ]
+}
+
+function mergeBounds(prevBounds: Bounds, nextBounds: Bounds): Bounds {
+  const left = Math.min(prevBounds.left, nextBounds.left)
+  const top = Math.min(prevBounds.top, nextBounds.top)
+  const right = Math.max(
+    prevBounds.left + prevBounds.width,
+    nextBounds.left + nextBounds.width
+  )
+  const bottom = Math.max(
+    prevBounds.top + prevBounds.height,
+    nextBounds.top + nextBounds.height
+  )
+
+  return {
+    left,
+    top,
+    width: right - left,
+    height: bottom - top,
   }
 }
