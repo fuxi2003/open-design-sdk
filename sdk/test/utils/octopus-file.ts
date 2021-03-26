@@ -14,8 +14,8 @@ import { basename, dirname } from 'path'
 const writeFile = promisify(fs.writeFile)
 
 export async function createOctopusFile(filePath: string) {
-  const filename = await createTempFileTarget(filePath)
-  await mkdirp(filename)
+  const octopusFilename = await createTempFileTarget(filePath)
+  await mkdirp(octopusFilename)
 
   const manifest: ManifestData = {
     'artboards': [
@@ -31,7 +31,7 @@ export async function createOctopusFile(filePath: string) {
     ],
     'pages': null,
   }
-  await writeFile(`${filename}/manifest.json`, JSON.stringify(manifest))
+  await writeFile(`${octopusFilename}/manifest.json`, JSON.stringify(manifest))
 
   const artboardOctopuses: Record<ArtboardId, ArtboardOctopusData> = {
     'a': {
@@ -75,22 +75,28 @@ export async function createOctopusFile(filePath: string) {
       ],
     },
   }
-  await mkdirp(`${filename}/artboards/a`)
+  await mkdirp(`${octopusFilename}/artboards/a`)
   await writeFile(
-    `${filename}/artboards/a/data.json`,
+    `${octopusFilename}/artboards/a/data.json`,
     JSON.stringify(artboardOctopuses['a'])
   )
 
   const bitmapFilenames: Array<[string, string]> = [
-    ['https://example.com/images/xx.png', `${filename}/bitmaps/mapped-xx.png`],
-    ['https://example.com/images/yy.png', `${filename}/bitmaps/mapped-yy.png`],
+    [
+      'https://example.com/images/xx.png',
+      `${octopusFilename}/bitmaps/mapped-xx.png`,
+    ],
+    [
+      'https://example.com/images/yy.png',
+      `${octopusFilename}/bitmaps/mapped-yy.png`,
+    ],
     [
       'https://example.com/images/zz.png',
-      `${filename}/bitmaps/prerendered/mapped-zz.png`,
+      `${octopusFilename}/bitmaps/prerendered/mapped-zz.png`,
     ],
     [
       'https://example.com/images/mask-mm.png',
-      `${filename}/bitmaps/mapped-mask-mm.png`,
+      `${octopusFilename}/bitmaps/mapped-mask-mm.png`,
     ],
   ]
   const bitmapMapping = Object.fromEntries(
@@ -102,10 +108,13 @@ export async function createOctopusFile(filePath: string) {
       })
     )
   )
-  await writeFile(`${filename}/bitmaps.json`, JSON.stringify(bitmapMapping))
+  await writeFile(
+    `${octopusFilename}/bitmaps.json`,
+    JSON.stringify(bitmapMapping)
+  )
 
   return {
-    filename,
+    octopusFilename,
     manifest,
     artboardOctopuses,
     bitmapFilenames,

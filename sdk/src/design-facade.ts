@@ -71,7 +71,7 @@ export class DesignFacade implements IDesignFacade {
    * The absolute path of the open local `.octopus` design or the local cache. This is not available when online services are not configured for the SDK.
    * @category Identification
    */
-  get filename() {
+  get octopusFilename() {
     const localDesign = this._localDesign
     return localDesign?.filename || null
   }

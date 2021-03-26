@@ -22,8 +22,10 @@ describe('DesignFacade', () => {
     it('should return the manifest read from disk', async () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
-      const { filename, manifest } = await createOctopusFile('file.octopus')
-      const designFacade = await sdk.openOctopusFile(filename)
+      const { octopusFilename, manifest } = await createOctopusFile(
+        'file.octopus'
+      )
+      const designFacade = await sdk.openOctopusFile(octopusFilename)
 
       deepStrictEqual(designFacade.getManifest(), manifest)
     })
@@ -31,10 +33,10 @@ describe('DesignFacade', () => {
     it('should return artboard octopus data read from disk', async () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
-      const { filename, artboardOctopuses } = await createOctopusFile(
+      const { octopusFilename, artboardOctopuses } = await createOctopusFile(
         'file.octopus'
       )
-      const designFacade = await sdk.openOctopusFile(filename)
+      const designFacade = await sdk.openOctopusFile(octopusFilename)
 
       const artboardFacade = designFacade.getArtboardById('a')
       ok(artboardFacade)
@@ -44,9 +46,10 @@ describe('DesignFacade', () => {
     it('should save its manifest to a new location', async () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
-      const { filename: originalFilename, manifest } = await createOctopusFile(
-        'original.octopus'
-      )
+      const {
+        octopusFilename: originalFilename,
+        manifest,
+      } = await createOctopusFile('original.octopus')
       const designFacade = await sdk.openOctopusFile(originalFilename)
 
       const copyFilename = await createTempFileTarget('copy.octopus')
@@ -62,7 +65,7 @@ describe('DesignFacade', () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
       const {
-        filename: originalFilename,
+        octopusFilename: originalFilename,
         artboardOctopuses,
       } = await createOctopusFile('original.octopus')
       const designFacade = await sdk.openOctopusFile(originalFilename)
@@ -82,7 +85,7 @@ describe('DesignFacade', () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
       const {
-        filename: originalFilename,
+        octopusFilename: originalFilename,
         bitmapFilenames,
         bitmapMapping,
       } = await createOctopusFile('original.octopus')
@@ -115,18 +118,22 @@ describe('DesignFacade', () => {
     it('should fail opening an octopus file without the .octopus extension', async () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
-      const { filename } = await createOctopusFile('file.random')
-      const [result] = await Promise.allSettled([sdk.openOctopusFile(filename)])
+      const { octopusFilename } = await createOctopusFile('file.random')
+      const [result] = await Promise.allSettled([
+        sdk.openOctopusFile(octopusFilename),
+      ])
       strictEqual(result.status, 'rejected')
     })
 
     it('should fail opening an octopus file without a manifest', async () => {
       const { sdk } = await createSdk({ localDesigns: true })
 
-      const { filename } = await createOctopusFile('file.octopus')
-      unlinkSync(`${filename}/manifest.json`)
+      const { octopusFilename } = await createOctopusFile('file.octopus')
+      unlinkSync(`${octopusFilename}/manifest.json`)
 
-      const [result] = await Promise.allSettled([sdk.openOctopusFile(filename)])
+      const [result] = await Promise.allSettled([
+        sdk.openOctopusFile(octopusFilename),
+      ])
       strictEqual(result.status, 'rejected')
     })
   })
@@ -263,7 +270,7 @@ describe('DesignFacade', () => {
 
       const designFacade = await sdk.fetchDesignById(designId)
 
-      const filename = designFacade.filename
+      const filename = designFacade.octopusFilename
       ok(filename)
 
       const manifest: ManifestData = JSON.parse(
@@ -284,7 +291,7 @@ describe('DesignFacade', () => {
 
       const designFacade = await sdk.fetchDesignById(designId)
 
-      const filename = designFacade.filename
+      const filename = designFacade.octopusFilename
       ok(filename)
 
       const [fixtureArtboardDesc] = singleArtboardSketchFileFixture.artboards
@@ -313,7 +320,7 @@ describe('DesignFacade', () => {
       })
 
       const designFacade = await sdk.fetchDesignById(designId)
-      const filename = designFacade.filename
+      const filename = designFacade.octopusFilename
       ok(filename)
 
       const reopenedDesignFacade = await sdk.openOctopusFile(filename)
@@ -341,7 +348,7 @@ describe('DesignFacade', () => {
         multiArtboardSketchFileFixture.filename
       )
 
-      const filename = designFacade.filename
+      const filename = designFacade.octopusFilename
       ok(filename)
 
       const bitmapAssetDescs = await designFacade.getBitmapAssets()
@@ -367,7 +374,7 @@ describe('DesignFacade', () => {
         singleInlineArtboardPhotoshopFileFixture.filename
       )
 
-      const filename = designFacade.filename
+      const filename = designFacade.octopusFilename
       ok(filename)
 
       const bitmapAssetDescs = await designFacade.getBitmapAssets()
