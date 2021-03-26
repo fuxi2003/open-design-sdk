@@ -10,6 +10,8 @@ export class RenderingDesign implements IRenderingDesign {
 
   private _renderingProcess: RenderingProcess
   private _artboards: Map<string, RenderingArtboard> = new Map()
+  private _loadedBitmaps: Set<string> = new Set()
+  private _loadedFonts: Set<string> = new Set()
 
   constructor(params: {
     id: string
@@ -63,6 +65,34 @@ export class RenderingDesign implements IRenderingDesign {
     })
 
     return artboard
+  }
+
+  async loadFont(postscriptName: string, filename: string): Promise<void> {
+    if (this._loadedFonts.has(postscriptName)) {
+      return
+    }
+
+    await this._renderingProcess.execCommand('load-font', {
+      'design': this.id,
+      'key': postscriptName,
+      'file': filename,
+    })
+
+    this._loadedFonts.add(postscriptName)
+  }
+
+  async loadImage(bitmapKey: string, filename: string): Promise<void> {
+    if (this._loadedBitmaps.has(bitmapKey)) {
+      return
+    }
+
+    await this._renderingProcess.execCommand('load-image', {
+      'design': this.id,
+      'key': bitmapKey,
+      'file': filename,
+    })
+
+    this._loadedBitmaps.add(bitmapKey)
   }
 
   async renderArtboardToFile(
