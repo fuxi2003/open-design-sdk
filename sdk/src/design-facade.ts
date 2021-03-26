@@ -1,4 +1,4 @@
-import { ArtboardFacade } from './artboard-facade'
+import { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { PageFacade } from './page-facade'
 
@@ -23,7 +23,7 @@ import { memoize } from './utils/memoize'
 import { getDesignFormatByFileName } from './utils/design-format-utils'
 
 import type { IApiDesign, IApiDesignConversion } from '@opendesign/api'
-import type { IRenderingDesign } from '@opendesign/rendering'
+import type { IRenderingDesign, BlendingMode } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
 import type { Sdk } from './sdk'
 import type {
@@ -634,11 +634,23 @@ export class DesignFacade implements IDesignFacade {
    * @param artboardId The ID of the artboard from which to render the layer.
    * @param layerId The ID of the artboard layer to render.
    * @param filePath The target location of the produced image file.
+   * @param options.blendingMode The blending mode to use for rendering the layer instead of its default blending mode. Note that this configuration has no effect when the artboard background is not included via `includeArtboardBackground=true`.
+   * @param options.clip Whether to apply clipping by a mask layer if any such mask is set for the layer (see {@link LayerFacade.isMasked}). Clipping is disabled by default. Setting this flag for layers which do not have a mask layer set has no effect on the results.
+   * @param options.includeArtboardBackground Whether to render the artboard background below the layer. By default, the background is not included.
+   * @param options.includeEffects Whether to apply layer effects of the layer. Rendering of effects of nested layers is not affected. By defaults, effects of the layer are applied.
+   * @param options.opacity The opacity to use for the layer instead of its default opacity.
    */
   async renderArtboardLayerToFile(
     artboardId: ArtboardId,
     layerId: LayerId,
-    filePath: string
+    filePath: string,
+    options: {
+      includeEffects?: boolean
+      clip?: boolean
+      includeArtboardBackground?: boolean
+      blendingMode?: BlendingMode
+      opacity?: number
+    } = {}
   ): Promise<void> {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {
@@ -671,7 +683,10 @@ export class DesignFacade implements IDesignFacade {
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
       resolvedLayerIds,
-      filePath
+      filePath,
+      {
+        layerAttributes: { [layerId]: options },
+      }
     )
   }
 
@@ -688,11 +703,15 @@ export class DesignFacade implements IDesignFacade {
    * @param artboardId The ID of the artboard from which to render the layer.
    * @param layerIds The IDs of the artboard layers to render.
    * @param filePath The target location of the produced image file.
+   * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    */
   async renderArtboardLayersToFile(
     artboardId: ArtboardId,
     layerIds: Array<LayerId>,
-    filePath: string
+    filePath: string,
+    options: {
+      layerAttributes?: Record<string, LayerAttributesConfig>
+    } = {}
   ): Promise<void> {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {
@@ -736,7 +755,8 @@ export class DesignFacade implements IDesignFacade {
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
       resolvedLayerIds,
-      filePath
+      filePath,
+      options
     )
   }
 

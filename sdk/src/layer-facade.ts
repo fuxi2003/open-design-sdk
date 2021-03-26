@@ -7,6 +7,7 @@ import type {
   LayerOctopusData as LayerOctopusDataType,
   LayerSelector,
 } from '@opendesign/octopus-reader'
+import type { BlendingMode, Bounds } from '@opendesign/rendering'
 import type { DesignFacade } from './design-facade'
 import type { ILayerFacade } from './types/layer-facade.iface'
 
@@ -404,8 +405,22 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Rendering
    * @param filePath The target location of the produced image file.
+   * @param options.blendingMode The blending mode to use for rendering the layer instead of its default blending mode. Note that this configuration has no effect when the artboard background is not included via `includeArtboardBackground=true`.
+   * @param options.clip Whether to apply clipping by a mask layer if any such mask is set for the layer (see {@link LayerFacade.isMasked}). Clipping is disabled by default. Setting this flag for layers which do not have a mask layer set has no effect on the results.
+   * @param options.includeArtboardBackground Whether to render the artboard background below the layer. By default, the background is not included.
+   * @param options.includeEffects Whether to apply layer effects of the layer. Rendering of effects of nested layers is not affected. By defaults, effects of the layer are applied.
+   * @param options.opacity The opacity to use for the layer instead of its default opacity.
    */
-  async renderToFile(filePath: string): Promise<void> {
+  async renderToFile(
+    filePath: string,
+    options: {
+      includeEffects?: boolean
+      clip?: boolean
+      includeArtboardBackground?: boolean
+      blendingMode?: BlendingMode
+      opacity?: number
+    } = {}
+  ): Promise<void> {
     const artboardId = this.artboardId
     if (!artboardId) {
       throw new Error('Detached layers cannot be rendered')
@@ -414,7 +429,8 @@ export class LayerFacade implements ILayerFacade {
     return this._designFacade.renderArtboardLayerToFile(
       artboardId,
       this.id,
-      filePath
+      filePath,
+      options
     )
   }
 

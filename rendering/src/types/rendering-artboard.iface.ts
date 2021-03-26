@@ -1,3 +1,5 @@
+import { BlendingMode } from './commands.type'
+
 export type Bounds = {
   left: number
   top: number
@@ -11,6 +13,14 @@ export type LayerBounds = {
   affectedBounds: Bounds
   logicalBounds: Bounds
   untransformedBounds: Bounds
+}
+
+export type LayerAttributesConfig = {
+  includeEffects?: boolean
+  clip?: boolean
+  includeArtboardBackground?: boolean
+  blendingMode?: BlendingMode
+  opacity?: number
 }
 
 export interface IRenderingArtboard {
@@ -28,9 +38,19 @@ export interface IRenderingArtboard {
 
   renderToFile(filePath: string): Promise<void>
 
-  renderLayerToFile(layerId: string, filePath: string): Promise<void>
+  renderLayerToFile(
+    layerId: string,
+    filePath: string,
+    options?: LayerAttributesConfig
+  ): Promise<void>
 
-  renderLayersToFile(layerIds: Array<string>, filePath: string): Promise<void>
+  renderLayersToFile(
+    layerIds: Array<string>,
+    filePath: string,
+    options?: {
+      layerAttributes?: Record<string, LayerAttributesConfig>
+    }
+  ): Promise<void>
 
   getLayerBounds(layerId: string): Promise<LayerBounds>
 }

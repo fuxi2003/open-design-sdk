@@ -10,7 +10,11 @@ import type {
   LayerId,
   LayerSelector,
 } from '@opendesign/octopus-reader'
-import type { LayerBounds } from '@opendesign/rendering'
+import type {
+  BlendingMode,
+  LayerAttributesConfig,
+  LayerBounds,
+} from '@opendesign/rendering'
 import type { IArtboardFacade } from './artboard-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
 
@@ -70,7 +74,7 @@ export interface ILayerFacade {
 
   getEffects(): IEffects
 
-  renderToFile(filePath: string): Promise<void>
+  renderToFile(filePath: string, options?: LayerAttributesConfig): Promise<void>
 
   getBounds(): Promise<LayerBounds>
 }

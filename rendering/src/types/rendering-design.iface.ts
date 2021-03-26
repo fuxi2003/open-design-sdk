@@ -1,4 +1,7 @@
-import type { LayerBounds } from './rendering-artboard.iface'
+import type {
+  LayerAttributesConfig,
+  LayerBounds,
+} from './rendering-artboard.iface'
 
 export interface IRenderingDesign {
   readonly id: string
@@ -25,13 +28,17 @@ export interface IRenderingDesign {
   renderArtboardLayerToFile(
     artboardId: string,
     layerId: string,
-    filePath: string
+    filePath: string,
+    options?: LayerAttributesConfig
   ): Promise<void>
 
   renderArtboardLayersToFile(
     artboardId: string,
     layerIds: Array<string>,
-    filePath: string
+    filePath: string,
+    options?: {
+      layerAttributes?: Record<string, LayerAttributesConfig>
+    }
   ): Promise<void>
 
   getArtboardLayerBounds(

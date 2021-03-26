@@ -6,10 +6,9 @@ import {
   ILayerCollection,
   AggregatedFileFontDescriptor,
   FileLayerSelector,
-  ArtboardId,
-  LayerId,
   ILayer,
 } from '@opendesign/octopus-reader'
+import type { LayerAttributesConfig } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
 import type { LayerFacade } from './layer-facade'
 import type { IDesignLayerCollectionFacade } from './types/design-layer-collection-facade.iface'
@@ -306,8 +305,14 @@ export class DesignLayerCollectionFacade
    *
    * @category Rendering
    * @param filePath The target location of the produced image file.
+   * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    */
-  async renderToFile(filePath: string): Promise<void> {
+  async renderToFile(
+    filePath: string,
+    options?: {
+      layerAttributes?: Record<string, LayerAttributesConfig>
+    }
+  ): Promise<void> {
     const layerIds = this.getLayers().map((layer) => {
       return layer.id
     })
@@ -323,7 +328,8 @@ export class DesignLayerCollectionFacade
     return this._designFacade.renderArtboardLayersToFile(
       artboardId,
       layerIds,
-      filePath
+      filePath,
+      options
     )
   }
 }

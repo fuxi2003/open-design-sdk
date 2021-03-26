@@ -1,6 +1,7 @@
 import { RenderingArtboard } from './rendering-artboard'
 
 import type { RenderingProcess } from './rendering-process'
+import type { LayerAttributesConfig } from './types/rendering-artboard.iface'
 import type { IRenderingDesign } from './types/rendering-design.iface'
 
 export class RenderingDesign implements IRenderingDesign {
@@ -122,27 +123,31 @@ export class RenderingDesign implements IRenderingDesign {
   async renderArtboardLayerToFile(
     artboardId: string,
     layerId: string,
-    filePath: string
+    filePath: string,
+    options: LayerAttributesConfig = {}
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
     if (!artboard) {
       throw new Error('No such artboard')
     }
 
-    return artboard.renderLayerToFile(layerId, filePath)
+    return artboard.renderLayerToFile(layerId, filePath, options)
   }
 
   async renderArtboardLayersToFile(
     artboardId: string,
     layerIds: Array<string>,
-    filePath: string
+    filePath: string,
+    options: {
+      layerAttributes?: Record<string, LayerAttributesConfig>
+    } = {}
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
     if (!artboard) {
       throw new Error('No such artboard')
     }
 
-    return artboard.renderLayersToFile(layerIds, filePath)
+    return artboard.renderLayersToFile(layerIds, filePath, options)
   }
 
   async getArtboardLayerBounds(artboardId: string, layerId: string) {

@@ -5,6 +5,7 @@ import type { LayerAttributes } from './types/commands.type'
 import type {
   Bounds,
   IRenderingArtboard,
+  LayerAttributesConfig,
 } from './types/rendering-artboard.iface'
 
 export class RenderingArtboard implements IRenderingArtboard {
@@ -119,11 +120,16 @@ export class RenderingArtboard implements IRenderingArtboard {
     }
   }
 
-  async renderLayerToFile(layerId: string, filePath: string): Promise<void> {
+  async renderLayerToFile(
+    layerId: string,
+    filePath: string,
+    options: LayerAttributesConfig = {}
+  ): Promise<void> {
     if (!this.ready) {
       throw new Error('The artboard is not ready')
     }
 
+    const layerAttributes = options
     const bounds = await this._getLayerRenderBounds(layerId, layerAttributes)
 
     const result = await this._renderingProcess.execCommand('render-layer', {
@@ -132,6 +138,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       'layer': layerId,
       'file': filePath,
       'bounds': serializeBounds(bounds),
+      ...serializeLayerAttributes(options),
     })
     if (!result['ok']) {
       console.error(
@@ -144,12 +151,16 @@ export class RenderingArtboard implements IRenderingArtboard {
 
   async renderLayersToFile(
     layerIds: Array<string>,
-    filePath: string
+    filePath: string,
+    options: {
+      layerAttributes?: Record<string, LayerAttributesConfig>
+    } = {}
   ): Promise<void> {
     if (!this.ready) {
       throw new Error('The artboard is not ready')
     }
 
+    const layerAttributes = options.layerAttributes || {}
     const bounds = await this._getCompoundLayerRenderBounds(
       layerIds,
       layerAttributes
@@ -168,6 +179,7 @@ export class RenderingArtboard implements IRenderingArtboard {
             return {
               'layer': layerId,
               'visibility': 'force-show',
+              ...serializeLayerAttributes(layerAttributes[layerId] || {}),
             }
           }
         ),
@@ -253,6 +265,20 @@ function serializeBounds(bounds: Bounds): [number, number, number, number] {
     bounds.left + bounds.width,
     bounds.top + bounds.height,
   ]
+}
+
+function serializeLayerAttributes(layerAttributes: LayerAttributesConfig) {
+  return {
+    'draw-effects': layerAttributes.includeEffects !== false,
+    'enable-clipping': layerAttributes.clip !== false,
+    'draw-background': Boolean(layerAttributes.includeArtboardBackground),
+    ...(typeof layerAttributes.blendingMode === 'undefined'
+      ? {}
+      : { 'blend-mode': layerAttributes.blendingMode }),
+    ...(typeof layerAttributes.opacity === 'undefined'
+      ? {}
+      : { 'opacity': layerAttributes.opacity }),
+  }
 }
 
 function mergeBounds(prevBounds: Bounds, nextBounds: Bounds): Bounds {

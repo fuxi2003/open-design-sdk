@@ -10,7 +10,11 @@ import type {
   PageId,
   RgbaColor,
 } from '@opendesign/octopus-reader'
-import type { LayerBounds } from '@opendesign/rendering'
+import type {
+  BlendingMode,
+  LayerAttributesConfig,
+  LayerBounds,
+} from '@opendesign/rendering'
 import type { IDesignFacade } from './design-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
 import type { ILayerFacade } from './layer-facade.iface'
@@ -66,9 +70,19 @@ export interface IArtboardFacade {
 
   renderToFile(filePath: string): Promise<void>
 
-  renderLayerToFile(layerId: LayerId, filePath: string): Promise<void>
+  renderLayerToFile(
+    layerId: LayerId,
+    filePath: string,
+    options?: LayerAttributesConfig
+  ): Promise<void>
 
-  renderLayersToFile(layerIds: Array<LayerId>, filePath: string): Promise<void>
+  renderLayersToFile(
+    layerIds: Array<LayerId>,
+    filePath: string,
+    options?: {
+      layerAttributes?: Record<string, LayerAttributesConfig>
+    }
+  ): Promise<void>
 
   getLayerBounds(layerId: LayerId): Promise<LayerBounds>
 }

@@ -10,7 +10,11 @@ import type {
   PageId,
   PageSelector,
 } from '@opendesign/octopus-reader'
-import type { LayerBounds } from '@opendesign/rendering'
+import type {
+  BlendingMode,
+  LayerAttributesConfig,
+  LayerBounds,
+} from '@opendesign/rendering'
 import type { IArtboardFacade } from './artboard-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
 import type { ILayerFacade } from './layer-facade.iface'
@@ -88,13 +92,17 @@ export interface IDesignFacade {
   renderArtboardLayerToFile(
     artboardId: ArtboardId,
     layerId: LayerId,
-    filePath: string
+    filePath: string,
+    options?: LayerAttributesConfig
   ): Promise<void>
 
   renderArtboardLayersToFile(
     artboardId: ArtboardId,
     layerIds: Array<LayerId>,
-    filePath: string
+    filePath: string,
+    options?: {
+      layerAttributes?: Record<string, LayerAttributesConfig>
+    }
   ): Promise<void>
 
   getArtboardLayerBounds(

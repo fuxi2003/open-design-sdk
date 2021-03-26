@@ -1,8 +1,11 @@
 import type {
   AggregatedFileBitmapAssetDescriptor,
   AggregatedFileFontDescriptor,
+  ArtboardId,
   FileLayerSelector,
+  LayerId,
 } from '@opendesign/octopus-reader'
+import type { Bounds, LayerAttributesConfig } from '@opendesign/rendering/dist'
 import type { ILayerFacade } from './layer-facade.iface'
 
 export interface IDesignLayerCollectionFacade {
@@ -61,4 +64,11 @@ export interface IDesignLayerCollectionFacade {
   getFonts(
     options?: Partial<{ depth: number }>
   ): Array<AggregatedFileFontDescriptor>
+
+  renderToFile(
+    filePath: string,
+    options: {
+      layerAttributes?: Record<string, LayerAttributesConfig>
+    }
+  ): Promise<void>
 }

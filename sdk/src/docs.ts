@@ -11,7 +11,9 @@ import type {
   PageSelector,
 } from '@opendesign/octopus-reader'
 
-import type { ArtboardFacade } from './artboard-facade'
+import type { BlendingMode } from '@opendesign/rendering'
+
+import type { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
 import type { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import type { LayerFacade } from './layer-facade'
@@ -31,8 +33,10 @@ export type {
   ArtboardId,
   ArtboardOctopusData,
   ArtboardSelector,
+  BlendingMode,
   ComponentId,
   FileLayerSelector,
+  LayerAttributesConfig,
   LayerId,
   LayerOctopusData,
   LayerSelector,
