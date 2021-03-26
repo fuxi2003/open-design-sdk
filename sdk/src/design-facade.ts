@@ -543,6 +543,8 @@ export class DesignFacade implements IDesignFacade {
    *
    * All visible layers from the artboard are included.
    *
+   * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
+   *
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
@@ -553,12 +555,20 @@ export class DesignFacade implements IDesignFacade {
     artboardId: ArtboardId,
     filePath: string
   ): Promise<void> {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
     }
 
     await this._loadRenderingDesignArtboard(artboardId)
+
+    const bitmapAssetDescs = await artboard.getBitmapAssets()
+    await this.downloadBitmapAssets(bitmapAssetDescs)
 
     return renderingDesign.renderArtboardToFile(artboardId, filePath)
   }
@@ -567,6 +577,8 @@ export class DesignFacade implements IDesignFacade {
    * Renders all artboards from the specified page as a single image file.
    *
    * All visible layers from the artboards are included.
+   *
+   * Uncached items (artboard contents and bitmap assets of rendered layers) are downloaded and cached.
    *
    * Offline services including the local rendering engine have to be configured when using this method.
    *
@@ -590,6 +602,8 @@ export class DesignFacade implements IDesignFacade {
    *
    * In case of group layers, all visible nested layers are also included.
    *
+   * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
+   *
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
@@ -602,12 +616,25 @@ export class DesignFacade implements IDesignFacade {
     layerId: LayerId,
     filePath: string
   ): Promise<void> {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
     }
 
+    const layer = await artboard.getLayerById(layerId)
+    if (!layer) {
+      throw new Error('No such layer')
+    }
+
     await this._loadRenderingDesignArtboard(artboardId)
+
+    const bitmapAssetDescs = layer.getBitmapAssets()
+    await this.downloadBitmapAssets(bitmapAssetDescs)
 
     const resolvedLayerIds = await this._resolveVisibleArtboardLayerSubtree(
       artboardId,
@@ -626,6 +653,8 @@ export class DesignFacade implements IDesignFacade {
    *
    * In case of group layers, all visible nested layers are also included.
    *
+   * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
+   *
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
@@ -638,6 +667,11 @@ export class DesignFacade implements IDesignFacade {
     layerIds: Array<LayerId>,
     filePath: string
   ): Promise<void> {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
@@ -651,6 +685,16 @@ export class DesignFacade implements IDesignFacade {
       })
     )
     const resolvedLayerIds = resolvedLayerSubtrees.flat(1)
+
+    const bitmapAssetDescs = (
+      await Promise.all(
+        layerIds.map(async (layerId) => {
+          const layer = await artboard.getLayerById(layerId)
+          return layer ? layer.getBitmapAssets() : []
+        })
+      )
+    ).flat(1)
+    await this.downloadBitmapAssets(bitmapAssetDescs)
 
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
@@ -759,6 +803,12 @@ export class DesignFacade implements IDesignFacade {
   async downloadBitmapAssets(
     bitmapAssetDescs: Array<LocalBitmapAssetDescriptor>
   ) {
+    await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
+      return this.downloadBitmapAsset(bitmapAssetDesc)
+    })
+  }
+
+  async downloadBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
     const apiDesign = this._apiDesign
     if (!apiDesign) {
       throw new Error(
@@ -771,15 +821,14 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('The design is not configured to be a local file')
     }
 
-    await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
-      const bitmapAssetStream = await apiDesign.getBitmapAssetStream(
-        bitmapAssetDesc.name
-      )
-      return localDesign.saveBitmapAssetStream(
-        bitmapAssetDesc,
-        bitmapAssetStream
-      )
-    })
+    if (await localDesign.hasBitmapAsset(bitmapAssetDesc)) {
+      return
+    }
+
+    const bitmapAssetStream = await apiDesign.getBitmapAssetStream(
+      bitmapAssetDesc.name
+    )
+    return localDesign.saveBitmapAssetStream(bitmapAssetDesc, bitmapAssetStream)
   }
 
   /**

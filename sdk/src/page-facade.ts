@@ -262,6 +262,8 @@ export class PageFacade implements IPageFacade {
    *
    * All visible layers from the artboards are included.
    *
+   * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
+   *
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering

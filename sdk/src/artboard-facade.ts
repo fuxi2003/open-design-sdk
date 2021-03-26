@@ -322,6 +322,8 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * All visible layers from the artboard are included.
    *
+   * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
+   *
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
@@ -335,6 +337,8 @@ export class ArtboardFacade implements IArtboardFacade {
    * Renders the specified layer from the artboard as an image file.
    *
    * In case of group layers, all visible nested layers are also included.
+   *
+   * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
    * Offline services including the local rendering engine have to be configured when using this method.
    *
@@ -354,6 +358,8 @@ export class ArtboardFacade implements IArtboardFacade {
    * Renders the specified layers from the artboard as a single image file.
    *
    * In case of group layers, all visible nested layers are also included.
+   *
+   * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
    * Offline services including the local rendering engine have to be configured when using this method.
    *

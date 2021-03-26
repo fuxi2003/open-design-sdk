@@ -381,6 +381,8 @@ export class LayerFacade implements ILayerFacade {
    *
    * In case the layer is a group layer, all visible nested layers are also included.
    *
+   * Uncached items (bitmap assets of rendered layers) are downloaded and cached.
+   *
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
