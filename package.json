@@ -6,7 +6,8 @@
       "api",
       "octopus-reader",
       "rendering",
-      "sdk"
+      "sdk",
+      "sdk-docs-typedoc"
     ],
     "nohoist": [
       "*"
@@ -18,7 +19,8 @@
     "build:api": "yarn workspace @opendesign/api run build",
     "build:rendering": "yarn workspace @opendesign/rendering run build",
     "build:sdk": "yarn workspace @opendesign/sdk run build",
-    "docs": "yarn run docs:octopus-reader",
+    "build:sdk-docs-typedoc": "./scripts/sdk-docs-typedoc.sh",
+    "docs": "yarn run docs:octopus-reader && yarn run docs:sdk",
     "docs:octopus-reader": "yarn workspace @opendesign/octopus-reader docs",
     "docs:sdk": "yarn workspace @opendesign/sdk run docs",
     "lint": "yarn run lint:prettier",

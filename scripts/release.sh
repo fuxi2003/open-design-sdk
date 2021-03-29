@@ -55,6 +55,7 @@ buildPackages() {
   yarn build:octopus-reader || return 1
   yarn build:api || return 1
   yarn build:sdk || return 1
+  yarn build:sdk-docs-typedoc || return 1
 }
 
 releasePackages() {
@@ -64,6 +65,7 @@ releasePackages() {
   yarn workspace @opendesign/api publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
   yarn workspace @opendesign/rendering publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
   yarn workspace @opendesign/sdk publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
+  yarn workspace @opendesign/sdk-docs-typedoc publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
 
   logSuccess "Packages successfully released (fake, nothing has been released)"
 }
