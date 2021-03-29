@@ -134,6 +134,15 @@ export class Sdk implements ISdk {
       sdk: this,
     })
 
+    const renderingEngine = this._renderingEngine
+    if (renderingEngine) {
+      const renderingDesign = await renderingEngine.createDesign(uuid(), {
+        bitmapAssetDirectoryPath: localDesign.getBitmapAssetDirectory(),
+        // fontDirectoryPath: localDesign.getFontDirectory(),
+      })
+      designFacade.setRenderingDesign(renderingDesign)
+    }
+
     return designFacade
   }
 
