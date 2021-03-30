@@ -5,7 +5,36 @@ export type LayerType =
   | 'textLayer'
   | 'adjustmentLayer'
 
-export type BlendingMode = string
+export type BlendingMode =
+  | 'NORMAL'
+  | 'BLEND_DIVIDE'
+  | 'BLEND_SUBTRACTION'
+  | 'COLOR'
+  | 'COLOR_BURN'
+  | 'COLOR_DODGE'
+  | 'DARKEN'
+  | 'DARKER_COLOR'
+  | 'DIFFERENCE'
+  | 'DISSOLVE'
+  | 'EXCLUSION'
+  | 'HARD_LIGHT'
+  | 'HARD_MIX'
+  | 'HUE'
+  | 'LIGHTEN'
+  | 'LIGHTER_COLOR'
+  | 'LIGHTEN_BURN'
+  | 'LIGHTEN_DODGE'
+  | 'LIGHTEN_LIGHT'
+  | 'LUMINOSITY'
+  | 'MULTIPLY'
+  | 'OVERLAY'
+  | 'PASS_THROUGH'
+  | 'PIN_LIGHT'
+  | 'SATURATION'
+  | 'SCREEN'
+  | 'SOFT_LIGHT'
+  | 'VIVID_LIGHT'
+
 export type ClippingMode = string
 
 export type LayerAttributes = {
