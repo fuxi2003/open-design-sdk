@@ -12,6 +12,7 @@ import type { DesignFacade } from './design-facade'
 import type { DesignFileManager } from './local/design-file-manager'
 import type { LocalDesignManager } from './local/local-design-manager'
 import type { ILocalDesign } from './types/local-design.iface'
+import type { ISystemFontManager } from './types/system-font-manager.iface'
 
 type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 
@@ -20,6 +21,7 @@ export class Sdk implements ISdk {
   private _designFileManager: DesignFileManager | null = null
   private _localDesignManager: LocalDesignManager | null = null
   private _renderingEngine: IRenderingEngine | null = null
+  private _systemFontManager: ISystemFontManager | null = null
 
   /** @internal */
   constructor() {}
@@ -306,6 +308,16 @@ export class Sdk implements ISdk {
   }
 
   /** @internal */
+  async getSystemFontPath(postscriptName: string): Promise<string | null> {
+    const systemFontManager = this._systemFontManager
+    if (!systemFontManager) {
+      return null
+    }
+
+    return systemFontManager.getSystemFontPath(postscriptName)
+  }
+
+  /** @internal */
   useDesignFileManager(designFileManager: DesignFileManager): void {
     this._designFileManager = designFileManager
   }
@@ -313,6 +325,11 @@ export class Sdk implements ISdk {
   /** @internal */
   useLocalDesignManager(localDesignManager: LocalDesignManager): void {
     this._localDesignManager = localDesignManager
+  }
+
+  /** @internal */
+  useSystemFontManager(systemFontManager: ISystemFontManager): void {
+    this._systemFontManager = systemFontManager
   }
 
   /** @internal */

@@ -2,6 +2,7 @@ import { OpenDesignApi } from '@opendesign/api'
 import { RenderingEngine } from '@opendesign/rendering'
 import { DesignFileManager } from './local/design-file-manager'
 import { LocalDesignManager } from './local/local-design-manager'
+import { SystemFontManager } from './local/system-font-manager'
 import { Sdk } from './sdk'
 
 import type { ISdk } from './types/sdk.iface'
@@ -105,6 +106,7 @@ function configureOfflineCacheServices(
   sdk: ISdk,
   params: { workingDirectory?: string | null }
 ): ISdk {
+  sdk.useSystemFontManager(new SystemFontManager())
   sdk.useLocalDesignManager(new LocalDesignManager())
   sdk.useRenderingEngine(new RenderingEngine())
   sdk.setWorkingDirectory(params.workingDirectory || null)

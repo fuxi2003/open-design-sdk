@@ -3,6 +3,7 @@ import type { IRenderingEngine } from '@opendesign/rendering'
 import type { IDesignFacade } from './design-facade.iface'
 import type { IDesignFileManager } from './design-file-manager.iface'
 import type { ILocalDesignManager } from './local-design-manager.iface'
+import type { ISystemFontManager } from './system-font-manager.iface'
 
 export interface ISdk {
   openDesignFile(filePath: string): Promise<IDesignFacade>
@@ -12,8 +13,11 @@ export interface ISdk {
 
   setWorkingDirectory(workingDirectory: string | null): void
 
+  getSystemFontPath(postscriptName: string): Promise<string | null>
+
   useLocalDesignManager(localDesignManager: ILocalDesignManager): void
   useRenderingEngine(renderingEngine: IRenderingEngine): void
   useDesignFileManager(designFileManager: IDesignFileManager): void
+  useSystemFontManager(systemFontManager: ISystemFontManager): void
   useOpenDesignApi(api: IOpenDesignApi): void
 }
