@@ -570,6 +570,9 @@ export class DesignFacade implements IDesignFacade {
     const bitmapAssetDescs = await artboard.getBitmapAssets()
     await this.downloadBitmapAssets(bitmapAssetDescs)
 
+    const fonts = await artboard.getFonts()
+    await this._loadSystemFontsToRendering(fonts)
+
     return renderingDesign.renderArtboardToFile(artboardId, filePath)
   }
 
@@ -636,6 +639,9 @@ export class DesignFacade implements IDesignFacade {
     const bitmapAssetDescs = layer.getBitmapAssets()
     await this.downloadBitmapAssets(bitmapAssetDescs)
 
+    const fonts = layer.getFonts()
+    await this._loadSystemFontsToRendering(fonts)
+
     const resolvedLayerIds = await this._resolveVisibleArtboardLayerSubtree(
       artboardId,
       layerId
@@ -695,6 +701,16 @@ export class DesignFacade implements IDesignFacade {
       )
     ).flat(1)
     await this.downloadBitmapAssets(bitmapAssetDescs)
+
+    const fonts = (
+      await Promise.all(
+        layerIds.map(async (layerId) => {
+          const layer = await artboard.getLayerById(layerId)
+          return layer ? layer.getFonts() : []
+        })
+      )
+    ).flat(1)
+    await this._loadSystemFontsToRendering(fonts)
 
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
@@ -992,6 +1008,9 @@ export class DesignFacade implements IDesignFacade {
       symbolId: artboard.componentId,
     })
 
+    const fonts = await artboard.getFonts()
+    await this._loadSystemFontsToRendering(fonts)
+
     // NOTE: This logic is more a future-proofing of the logic rather than a required step
     //   as the SDK works with "expanded" octopus documents only and there should thus not be
     //   any pending symbols.
@@ -1007,6 +1026,24 @@ export class DesignFacade implements IDesignFacade {
     if (!renderingDesign.isArtboardReady(artboardId)) {
       throw new Error('The artboard failed to be loaded to a ready state')
     }
+  }
+
+  private async _loadSystemFontsToRendering(
+    fonts: Array<{ fontPostScriptName: string }>
+  ) {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    await sequence(fonts, async ({ fontPostScriptName }) => {
+      const fontFilename = await this._sdk.getSystemFontPath(fontPostScriptName)
+      if (fontFilename) {
+        await renderingDesign.loadFont(fontPostScriptName, fontFilename)
+      } else {
+        console.warn(`Font not available: ${fontPostScriptName}`)
+      }
+    })
   }
 
   private _resolveVisibleArtboardLayerSubtree(
