@@ -651,6 +651,26 @@ export class DesignFacade implements IDesignFacade {
     )
   }
 
+  /**
+   * Returns various bounds of the specified layer.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Data
+   * @param artboardId The ID of the artboard from which to inspect the layer.
+   * @param layerId The ID of the layer to inspect.
+   */
+  async getArtboardLayerBounds(artboardId: ArtboardId, layerId: LayerId) {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    await this._loadRenderingDesignArtboard(artboardId)
+
+    return renderingDesign.getArtboardLayerBounds(artboardId, layerId)
+  }
+
   /** @internal */
   getArtboardLayerFacade(
     artboardId: ArtboardId,

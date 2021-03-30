@@ -10,6 +10,7 @@ import type {
   PageId,
   PageSelector,
 } from '@opendesign/octopus-reader'
+import type { LayerBounds } from '@opendesign/rendering'
 import type { IArtboardFacade } from './artboard-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
 import type { ILayerFacade } from './layer-facade.iface'
@@ -94,4 +95,9 @@ export interface IDesignFacade {
     layerIds: Array<LayerId>,
     filePath: string
   ): Promise<void>
+
+  getArtboardLayerBounds(
+    artboardId: ArtboardId,
+    layerId: LayerId
+  ): Promise<LayerBounds>
 }

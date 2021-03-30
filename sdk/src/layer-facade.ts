@@ -398,4 +398,20 @@ export class LayerFacade implements ILayerFacade {
       relPath
     )
   }
+
+  /**
+   * Returns various bounds the layer.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Data
+   */
+  async getBounds() {
+    const artboardId = this.artboardId
+    if (!artboardId) {
+      throw new Error('Detached layers cannot be rendered')
+    }
+
+    return this._designFacade.getArtboardLayerBounds(artboardId, this.id)
+  }
 }

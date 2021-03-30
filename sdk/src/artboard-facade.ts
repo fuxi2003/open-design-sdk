@@ -369,6 +369,18 @@ export class ArtboardFacade implements IArtboardFacade {
     )
   }
 
+  /**
+   * Returns various bounds of the specified layer.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Data
+   * @param layerId The ID of the artboard layer to inspect.
+   */
+  getLayerBounds(layerId: LayerId) {
+    return this._designFacade.getArtboardLayerBounds(this.id, layerId)
+  }
+
   /** @internal */
   async resolveVisibleLayerSubtree(layerId: LayerId): Promise<Array<LayerId>> {
     const layer = await this.getLayerById(layerId)
