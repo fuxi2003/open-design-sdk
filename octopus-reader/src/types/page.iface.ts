@@ -1,11 +1,9 @@
 import type { IArtboard } from './artboard.iface'
 import type { AggregatedFileBitmapAssetDescriptor } from './bitmap-assets.type'
-import type {
-  IFileLayerCollection,
-} from './file-layer-collection.iface'
 import type { AggregatedFileFontDescriptor } from './fonts.type'
 import type { ArtboardId, ComponentId, LayerId, PageId } from './ids.type'
 import type { ILayer } from './layer.iface'
+import type { ILayerCollection } from './layer-collection.iface'
 import type { ArtboardSelector, LayerSelector } from './selectors.type'
 
 export interface IPage {
@@ -32,7 +30,7 @@ export interface IPage {
     options?: Partial<{ depth: number }>
   ): Array<AggregatedFileFontDescriptor>
 
-  getFlattenedLayers(options?: Partial<{ depth: number }>): IFileLayerCollection
+  getFlattenedLayers(options?: Partial<{ depth: number }>): ILayerCollection
 
   findLayerById(
     layerId: LayerId,
@@ -41,7 +39,7 @@ export interface IPage {
   findLayersById(
     layerId: LayerId,
     options?: Partial<{ depth: number }>
-  ): IFileLayerCollection
+  ): ILayerCollection
   findLayer(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
@@ -49,5 +47,5 @@ export interface IPage {
   findLayers(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
-  ): IFileLayerCollection
+  ): ILayerCollection
 }

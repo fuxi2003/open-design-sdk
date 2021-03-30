@@ -1,6 +1,6 @@
 import type {
-  AggregatedBitmapAssetDescriptor,
-  AggregatedFontDescriptor,
+  AggregatedFileBitmapAssetDescriptor,
+  AggregatedFileFontDescriptor,
   ArtboardId,
   ArtboardManifestData,
   ArtboardOctopusData,
@@ -11,7 +11,7 @@ import type {
   RgbaColor,
 } from '@opendesign/octopus-reader'
 import type { IDesignFacade } from './design-facade.iface'
-import type { ILayerCollectionFacade } from './layer-collection-facade.iface'
+import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
 import type { ILayerFacade } from './layer-facade.iface'
 import type { IPageFacade } from './page-facade.iface'
 
@@ -36,17 +36,17 @@ export interface IArtboardFacade {
 
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
-  ): Promise<Array<AggregatedBitmapAssetDescriptor>>
+  ): Promise<Array<AggregatedFileBitmapAssetDescriptor>>
   getFonts(
     options?: Partial<{ depth: number }>
-  ): Promise<Array<AggregatedFontDescriptor>>
+  ): Promise<Array<AggregatedFileFontDescriptor>>
 
   getBackgroundColor(): Promise<RgbaColor | null>
 
-  getRootLayers(): Promise<ILayerCollectionFacade>
+  getRootLayers(): Promise<IDesignLayerCollectionFacade>
   getFlattenedLayers(
     options?: Partial<{ depth: number }>
-  ): Promise<ILayerCollectionFacade>
+  ): Promise<IDesignLayerCollectionFacade>
 
   getLayerById(layerId: LayerId): Promise<ILayerFacade | null>
   findLayer(
@@ -57,7 +57,7 @@ export interface IArtboardFacade {
   findLayers(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
-  ): Promise<ILayerCollectionFacade>
+  ): Promise<IDesignLayerCollectionFacade>
 
   getLayerDepth(layerId: LayerId): Promise<number | null>
 

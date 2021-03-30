@@ -1,10 +1,10 @@
-import { FileLayerCollection } from '../collections/file-layer-collection'
 import { IArtboard } from '../types/artboard.iface'
 import { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
 import { IFile } from '../types/file.iface'
 import { AggregatedFileFontDescriptor } from '../types/fonts.type'
 import { ArtboardId, ComponentId, LayerId, PageId } from '../types/ids.type'
 import { ILayer } from '../types/layer.iface'
+import { LayerCollection } from '../collections/layer-collection'
 import { IPage } from '../types/page.iface'
 import { ArtboardSelector, LayerSelector } from '../types/selectors.type'
 import {
@@ -144,20 +144,20 @@ export class Page implements IPage {
 
   getFlattenedLayers(
     options: Partial<{ depth: number }> = {}
-  ): FileLayerCollection {
+  ): LayerCollection {
     const layers = getFlattenedLayers(this.getArtboards(), options)
 
-    return new FileLayerCollection(layers, this._file)
+    return new LayerCollection(layers)
   }
 
   findLayerById(layerId: LayerId): ILayer | null {
     return findLayerById(this.getArtboards(), layerId)
   }
 
-  findLayersById(layerId: LayerId): FileLayerCollection {
+  findLayersById(layerId: LayerId): LayerCollection {
     const layers = findLayersById(this.getArtboards(), layerId)
 
-    return new FileLayerCollection(layers, this._file)
+    return new LayerCollection(layers)
   }
 
   findLayer(
@@ -170,9 +170,9 @@ export class Page implements IPage {
   findLayers(
     selector: LayerSelector,
     options: Partial<{ depth: number }> = {}
-  ): FileLayerCollection {
+  ): LayerCollection {
     const layers = findLayers(this.getArtboards(), selector, options)
 
-    return new FileLayerCollection(layers, this._file)
+    return new LayerCollection(layers)
   }
 }

@@ -1,11 +1,11 @@
-import { LayerCollectionFacade } from './layer-collection-facade'
+import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
 import type {
   ILayer,
   LayerOctopusData as LayerOctopusDataType,
   LayerSelector,
 } from '@opendesign/octopus-reader'
-import type { ArtboardFacade } from './artboard-facade'
+import type { DesignFacade } from './design-facade'
 import type { ILayerFacade } from './types/layer-facade.iface'
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
@@ -13,12 +13,12 @@ interface LayerOctopusData extends LayerOctopusDataType {}
 
 export class LayerFacade implements ILayerFacade {
   private _layerEntity: ILayer
-  private _artboardFacade: ArtboardFacade
+  private _designFacade: DesignFacade
 
   /** @internal */
-  constructor(layerEntity: ILayer, params: { artboardFacade: ArtboardFacade }) {
+  constructor(layerEntity: ILayer, params: { designFacade: DesignFacade }) {
     this._layerEntity = layerEntity
-    this._artboardFacade = params.artboardFacade
+    this._designFacade = params.designFacade
   }
 
   /**
@@ -69,7 +69,8 @@ export class LayerFacade implements ILayerFacade {
    * @category Reference
    */
   getArtboard() {
-    return this._artboardFacade
+    const artboardId = this.artboardId
+    return artboardId ? this._designFacade.getArtboardById(artboardId) : null
   }
 
   /** @internal */
@@ -102,7 +103,7 @@ export class LayerFacade implements ILayerFacade {
   getParentLayer() {
     const layerEntity = this._layerEntity.getParentLayer()
     return layerEntity
-      ? new LayerFacade(layerEntity, { artboardFacade: this._artboardFacade })
+      ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
       : null
   }
 
@@ -113,8 +114,8 @@ export class LayerFacade implements ILayerFacade {
    */
   getParentLayers() {
     const layerEntities = this._layerEntity.getParentLayers()
-    return new LayerCollectionFacade(layerEntities, {
-      artboardFacade: this._artboardFacade,
+    return new DesignLayerCollectionFacade(layerEntities, {
+      designFacade: this._designFacade,
     })
   }
 
@@ -135,7 +136,7 @@ export class LayerFacade implements ILayerFacade {
   findParentLayer(selector: LayerSelector) {
     const layerEntity = this._layerEntity.findParentLayer(selector)
     return layerEntity
-      ? new LayerFacade(layerEntity, { artboardFacade: this._artboardFacade })
+      ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
       : null
   }
 
@@ -146,8 +147,8 @@ export class LayerFacade implements ILayerFacade {
    */
   findParentLayers(selector: LayerSelector) {
     const layerEntities = this._layerEntity.findParentLayers(selector)
-    return new LayerCollectionFacade(layerEntities, {
-      artboardFacade: this._artboardFacade,
+    return new DesignLayerCollectionFacade(layerEntities, {
+      designFacade: this._designFacade,
     })
   }
 
@@ -172,8 +173,8 @@ export class LayerFacade implements ILayerFacade {
    */
   getNestedLayers(options: { depth?: number } = {}) {
     const layerEntities = this._layerEntity.getNestedLayers(options)
-    return new LayerCollectionFacade(layerEntities, {
-      artboardFacade: this._artboardFacade,
+    return new DesignLayerCollectionFacade(layerEntities, {
+      designFacade: this._designFacade,
     })
   }
 
@@ -189,7 +190,7 @@ export class LayerFacade implements ILayerFacade {
   findNestedLayer(selector: LayerSelector, options: { depth?: number } = {}) {
     const layerEntity = this._layerEntity.findNestedLayer(selector, options)
     return layerEntity
-      ? new LayerFacade(layerEntity, { artboardFacade: this._artboardFacade })
+      ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
       : null
   }
 
@@ -204,8 +205,8 @@ export class LayerFacade implements ILayerFacade {
    */
   findNestedLayers(selector: LayerSelector, options: { depth?: number } = {}) {
     const layerEntities = this._layerEntity.findNestedLayers(selector, options)
-    return new LayerCollectionFacade(layerEntities, {
-      artboardFacade: this._artboardFacade,
+    return new DesignLayerCollectionFacade(layerEntities, {
+      designFacade: this._designFacade,
     })
   }
 
@@ -226,7 +227,7 @@ export class LayerFacade implements ILayerFacade {
   getMaskLayer() {
     const layerEntity = this._layerEntity.getMaskLayer()
     return layerEntity
-      ? new LayerFacade(layerEntity, { artboardFacade: this._artboardFacade })
+      ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
       : null
   }
 
@@ -280,9 +281,7 @@ export class LayerFacade implements ILayerFacade {
   getComponentArtboard() {
     const componentArtboardEntity = this._layerEntity.getComponentArtboard()
     return componentArtboardEntity
-      ? this._artboardFacade
-          .getDesign()
-          .getArtboardById(componentArtboardEntity.id)
+      ? this._designFacade.getArtboardById(componentArtboardEntity.id)
       : null
   }
 
@@ -388,6 +387,15 @@ export class LayerFacade implements ILayerFacade {
    * @param relPath The target location of the produced image file.
    */
   async renderToFile(relPath: string): Promise<void> {
-    return this._artboardFacade.renderLayerToFile(this.id, relPath)
+    const artboardId = this.artboardId
+    if (!artboardId) {
+      throw new Error('Detached layers cannot be rendered')
+    }
+
+    return this._designFacade.renderArtboardLayerToFile(
+      artboardId,
+      this.id,
+      relPath
+    )
   }
 }

@@ -16,10 +16,7 @@ export function getBitmapAssets(
 ): Array<AggregatedFileBitmapAssetDescriptor> {
   return keepUniqueFileBitmapAssetDescriptors(
     artboards.flatMap((artboard) => {
-      return artboard.getBitmapAssets(options).map((assetDesc) => {
-        const { layerIds, ...data } = assetDesc
-        return { ...data, artboardLayerIds: { [artboard.id]: layerIds } }
-      })
+      return artboard.getBitmapAssets(options)
     })
   )
 }
@@ -30,10 +27,7 @@ export function getFonts(
 ): Array<AggregatedFileFontDescriptor> {
   return keepUniqueFileFontDescriptors(
     artboards.flatMap((artboard) => {
-      return artboard.getFonts(options).map((assetDesc) => {
-        const { layerIds, ...data } = assetDesc
-        return { ...data, artboardLayerIds: { [artboard.id]: layerIds } }
-      })
+      return artboard.getFonts(options)
     })
   )
 }

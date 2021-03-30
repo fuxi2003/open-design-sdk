@@ -1,5 +1,5 @@
+import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { LayerFacade } from './layer-facade'
-import { LayerCollectionFacade } from './layer-collection-facade'
 
 import type {
   ArtboardManifestData,
@@ -207,7 +207,9 @@ export class ArtboardFacade implements IArtboardFacade {
     await this.load()
 
     const layerCollection = this._artboardEntity.getRootLayers()
-    return new LayerCollectionFacade(layerCollection, { artboardFacade: this })
+    return new DesignLayerCollectionFacade(layerCollection, {
+      designFacade: this._designFacade,
+    })
   }
 
   /**
@@ -224,7 +226,9 @@ export class ArtboardFacade implements IArtboardFacade {
     await this.load()
 
     const layerCollection = this._artboardEntity.getFlattenedLayers(options)
-    return new LayerCollectionFacade(layerCollection, { artboardFacade: this })
+    return new DesignLayerCollectionFacade(layerCollection, {
+      designFacade: this._designFacade,
+    })
   }
 
   /**
@@ -286,7 +290,9 @@ export class ArtboardFacade implements IArtboardFacade {
     await this.load()
 
     const layerCollection = this._artboardEntity.findLayers(selector, options)
-    return new LayerCollectionFacade(layerCollection, { artboardFacade: this })
+    return new DesignLayerCollectionFacade(layerCollection, {
+      designFacade: this._designFacade,
+    })
   }
 
   /**
@@ -384,7 +390,7 @@ export class ArtboardFacade implements IArtboardFacade {
       : null
 
     return layerEntity
-      ? new LayerFacade(layerEntity, { artboardFacade: this })
+      ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
       : null
   }
 }

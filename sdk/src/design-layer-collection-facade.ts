@@ -2,7 +2,7 @@ import { memoize } from './utils/memoize'
 
 import {
   AggregatedFileBitmapAssetDescriptor,
-  IFileLayerCollection,
+  ILayerCollection,
   AggregatedFileFontDescriptor,
   FileLayerSelector,
   ArtboardId,
@@ -15,13 +15,15 @@ import type { IDesignLayerCollectionFacade } from './types/design-layer-collecti
 
 export class DesignLayerCollectionFacade
   implements IDesignLayerCollectionFacade {
-  private _layerCollection: IFileLayerCollection
+  private _layerCollection: ILayerCollection
   private _designFacade: DesignFacade
 
   /** @internal */
   constructor(
-    layerCollection: IFileLayerCollection,
-    params: { designFacade: DesignFacade }
+    layerCollection: ILayerCollection,
+    params: {
+      designFacade: DesignFacade
+    }
   ) {
     this._layerCollection = layerCollection
     this._designFacade = params.designFacade
@@ -277,58 +279,26 @@ export class DesignLayerCollectionFacade
   }
 
   /**
-   * Renders the specified layer from the specified artboard as an image file.
+   * Renders all layers in the collection as a single image file.
    *
    * In case of group layers, all visible nested layers are also included.
    *
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
-   * @param artboardId The ID of the artboard from which to render the layer.
-   * @param layerId The ID of the artboard layer to render.
    * @param relPath The target location of the produced image file.
    */
-  async renderArtboardLayerToFile(
-    artboardId: ArtboardId,
-    layerId: LayerId,
-    relPath: string
-  ): Promise<void> {
-    const layer = this._getLayersMemoized().find((layer) => {
-      return layer.artboardId === artboardId && layer.id === layerId
+  async renderToFile(relPath: string): Promise<void> {
+    const layerIds = this.getLayers().map((layer) => {
+      return layer.id
     })
-    if (!layer) {
-      throw new Error('No such layer in the collection')
-    }
 
-    return this._designFacade.renderArtboardLayerToFile(
-      artboardId,
-      layerId,
-      relPath
-    )
-  }
-
-  /**
-   * Renders the specified layer from the specified artboard as an image file.
-   *
-   * In case of group layers, all visible nested layers are also included.
-   *
-   * Offline services including the local rendering engine have to be configured when using this method.
-   *
-   * @category Rendering
-   * @param artboardId The ID of the artboard from which to render the layer.
-   * @param layerIds The IDs of the artboard layers to render.
-   * @param relPath The target location of the produced image file.
-   */
-  async renderArtboardLayersToFile(
-    artboardId: ArtboardId,
-    layerIds: Array<LayerId>,
-    relPath: string
-  ): Promise<void> {
-    const layers = this._getLayersMemoized().filter((layer) => {
-      return layer.artboardId === artboardId && layerIds.includes(layer.id)
-    })
-    if (layers.length !== layerIds.length) {
-      throw new Error('Some of the layers are not in the collection')
+    const artboardIds = [...new Set(this.getLayers().map((layer) => layer.id))]
+    const artboardId = artboardIds.length === 1 ? artboardIds[0] : null
+    if (!artboardId) {
+      throw new Error(
+        'The number of artboards from which to render layers must be exactly 1'
+      )
     }
 
     return this._designFacade.renderArtboardLayersToFile(

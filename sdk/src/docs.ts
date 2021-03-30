@@ -13,11 +13,7 @@ import type {
 
 import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
-import type {
-  DesignLayerCollectionFacade,
-  DesignLayerDescriptor,
-} from './design-layer-collection-facade'
-import type { LayerCollectionFacade } from './layer-collection-facade'
+import type { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import type { LayerFacade } from './layer-facade'
 import type { PageFacade } from './page-facade'
 import type { Sdk } from './sdk'
@@ -48,8 +44,6 @@ export type {
   ArtboardFacade,
   DesignFacade,
   DesignLayerCollectionFacade,
-  DesignLayerDescriptor,
-  LayerCollectionFacade,
   LayerFacade,
   PageFacade,
   Sdk,

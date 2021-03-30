@@ -1,6 +1,6 @@
-import type { AggregatedBitmapAssetDescriptor } from './bitmap-assets.type'
+import type { AggregatedFileBitmapAssetDescriptor } from './bitmap-assets.type'
 import type { IFile } from './file.iface'
-import type { AggregatedFontDescriptor } from './fonts.type'
+import type { AggregatedFileFontDescriptor } from './fonts.type'
 import type { ArtboardId, ComponentId, LayerId, PageId } from './ids.type'
 import type { ILayerCollection } from './layer-collection.iface'
 import type { ILayer } from './layer.iface'
@@ -30,10 +30,10 @@ export interface IArtboard {
 
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
-  ): Array<AggregatedBitmapAssetDescriptor>
+  ): Array<AggregatedFileBitmapAssetDescriptor>
   getFonts(
     options?: Partial<{ depth: number }>
-  ): Array<AggregatedFontDescriptor>
+  ): Array<AggregatedFileFontDescriptor>
 
   getBackgroundColor(): RgbaColor | null
 

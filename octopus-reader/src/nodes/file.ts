@@ -1,5 +1,6 @@
 import { Artboard } from './artboard'
 import { FileData } from '../data/file-data'
+import { LayerCollection } from '../collections/layer-collection'
 
 import {
   findLayer,
@@ -30,7 +31,6 @@ import type {
 } from '../types/selectors.type'
 import type { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
 import type { AggregatedFileFontDescriptor } from '../types/fonts.type'
-import type { FileLayerDescriptor } from '../types/file-layer-collection.iface'
 import type { ArtboardManifestData, ManifestData } from '../types/manifest.type'
 import type { IPage } from '../types/page.iface'
 
@@ -201,20 +201,20 @@ export class File implements IFile {
 
   getFlattenedLayers(
     options: Partial<{ depth: number }> = {}
-  ): FileLayerCollection {
+  ): LayerCollection {
     const layers = getFlattenedLayers(this.getArtboards(), options)
 
-    return new FileLayerCollection(layers, this)
+    return new LayerCollection(layers)
   }
 
   findLayerById(layerId: LayerId): ILayer | null {
     return findLayerById(this.getArtboards(), layerId)
   }
 
-  findLayersById(layerId: LayerId): FileLayerCollection {
+  findLayersById(layerId: LayerId): LayerCollection {
     const layers = findLayersById(this.getArtboards(), layerId)
 
-    return new FileLayerCollection(layers, this)
+    return new LayerCollection(layers)
   }
 
   findLayer(
@@ -227,9 +227,9 @@ export class File implements IFile {
   findLayers(
     selector: FileLayerSelector,
     options: Partial<{ depth: number }> = {}
-  ): FileLayerCollection {
+  ): LayerCollection {
     const layers = findLayers(this.getArtboards(), selector, options)
 
-    return new FileLayerCollection(layers, this)
+    return new LayerCollection(layers)
   }
 }

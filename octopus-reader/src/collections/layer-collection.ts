@@ -1,6 +1,6 @@
 import {
-  keepUniqueBitmapAssetDescriptors,
-  keepUniqueFontDescriptors,
+  keepUniqueFileBitmapAssetDescriptors,
+  keepUniqueFileFontDescriptors,
 } from '../utils/assets'
 import { createLayerMap } from '../utils/layer-factories'
 import { findLayerInLayers, findLayersInLayers } from '../utils/layer-lookup'
@@ -9,8 +9,8 @@ import type { ILayerCollection } from '../types/layer-collection.iface'
 import type { LayerId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
 import type { LayerSelector } from '../types/selectors.type'
-import type { AggregatedBitmapAssetDescriptor } from '../types/bitmap-assets.type'
-import type { AggregatedFontDescriptor } from '../types/fonts.type'
+import type { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
+import type { AggregatedFileFontDescriptor } from '../types/fonts.type'
 
 export class LayerCollection implements ILayerCollection {
   readonly length: number
@@ -110,20 +110,36 @@ export class LayerCollection implements ILayerCollection {
 
   getBitmapAssets(
     options: Partial<{ depth: number; includePrerendered: boolean }> = {}
-  ): Array<AggregatedBitmapAssetDescriptor> {
-    return keepUniqueBitmapAssetDescriptors(
+  ): Array<AggregatedFileBitmapAssetDescriptor> {
+    return keepUniqueFileBitmapAssetDescriptors(
       this.getLayers().flatMap((layer) => {
-        return layer.getBitmapAssets(options)
+        return layer.getBitmapAssets(options).flatMap((bitmapAssetDesc) => {
+          const artboardId = layer.artboardId
+          if (!artboardId) {
+            return []
+          }
+
+          const { layerIds, ...desc } = bitmapAssetDesc
+          return [{ ...desc, artboardLayerIds: { [artboardId]: layerIds } }]
+        })
       })
     )
   }
 
   getFonts(
     options: Partial<{ depth: number }> = {}
-  ): Array<AggregatedFontDescriptor> {
-    return keepUniqueFontDescriptors(
+  ): Array<AggregatedFileFontDescriptor> {
+    return keepUniqueFileFontDescriptors(
       this.getLayers().flatMap((layer) => {
-        return layer.getFonts(options)
+        return layer.getFonts(options).flatMap((fontDesc) => {
+          const artboardId = layer.artboardId
+          if (!artboardId) {
+            return []
+          }
+
+          const { layerIds, ...desc } = fontDesc
+          return [{ ...desc, artboardLayerIds: { [artboardId]: layerIds } }]
+        })
       })
     )
   }

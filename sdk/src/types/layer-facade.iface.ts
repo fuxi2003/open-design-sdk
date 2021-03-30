@@ -11,7 +11,7 @@ import type {
   LayerSelector,
 } from '@opendesign/octopus-reader'
 import type { IArtboardFacade } from './artboard-facade.iface'
-import type { ILayerCollectionFacade } from './layer-collection-facade.iface'
+import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
 
 export interface ILayerFacade {
   readonly id: LayerId
@@ -27,13 +27,15 @@ export interface ILayerFacade {
   getDepth(): number
 
   getParentLayer(): ILayerFacade | null
-  getParentLayers(): ILayerCollectionFacade
+  getParentLayers(): IDesignLayerCollectionFacade
   getParentLayerIds(): Array<LayerId>
   findParentLayer(selector: LayerSelector): ILayerFacade | null
-  findParentLayers(selector: LayerSelector): ILayerCollectionFacade
+  findParentLayers(selector: LayerSelector): IDesignLayerCollectionFacade
 
   hasNestedLayers(): boolean
-  getNestedLayers(options?: Partial<{ depth: number }>): ILayerCollectionFacade
+  getNestedLayers(
+    options?: Partial<{ depth: number }>
+  ): IDesignLayerCollectionFacade
   findNestedLayer(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
@@ -41,7 +43,7 @@ export interface ILayerFacade {
   findNestedLayers(
     selector: LayerSelector,
     options?: Partial<{ depth: number }>
-  ): ILayerCollectionFacade
+  ): IDesignLayerCollectionFacade
 
   isMasked(): boolean
   getMaskLayer(): ILayerFacade | null
