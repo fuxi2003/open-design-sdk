@@ -800,6 +800,70 @@ export class DesignFacade implements IDesignFacade {
     return renderingDesign.getArtboardLayerBounds(artboardId, layerId)
   }
 
+  /**
+   * Returns the top-most layer located at the specified coordinates within the specified artboard.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Layer Lookup
+   * @param artboardId The ID of the artboard from which to render the layer.
+   * @param x The X coordinate in the coordinate system of the artboard where to look for a layer.
+   * @param y The Y coordinate in the coordinate system of the artboard where to look for a layer.
+   */
+  async getArtboardLayerAtPosition(
+    artboardId: ArtboardId,
+    x: number,
+    y: number
+  ): Promise<LayerFacade | null> {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    await this._loadRenderingDesignArtboard(artboardId)
+
+    const layerId = await renderingDesign.getArtboardLayerAtPosition(
+      artboardId,
+      x,
+      y
+    )
+    return layerId ? this.getArtboardLayerFacade(artboardId, layerId) : null
+  }
+
+  /**
+   * Returns all layers located within the specified area of the the specified artboard.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Layer Lookup
+   * @param artboardId The ID of the artboard from which to render the layer.
+   * @param bounds The area in the corrdinate system of the artboard where to look for layers.
+   * @param options.partialOverlap Whether to also return layers which are only partially contained within the specified area.
+   */
+  async getArtboardLayersInArea(
+    artboardId: ArtboardId,
+    bounds: Bounds,
+    options: { partialOverlap?: boolean } = {}
+  ): Promise<Array<LayerFacade>> {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error('The rendering engine is not configured')
+    }
+
+    await this._loadRenderingDesignArtboard(artboardId)
+
+    const layerIds = await renderingDesign.getArtboardLayersInArea(
+      artboardId,
+      bounds,
+      options
+    )
+
+    return layerIds.flatMap((layerId) => {
+      const layerFacade = this.getArtboardLayerFacade(artboardId, layerId)
+      return layerFacade ? [layerFacade] : []
+    })
+  }
+
   /** @internal */
   getArtboardLayerFacade(
     artboardId: ArtboardId,

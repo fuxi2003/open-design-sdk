@@ -90,4 +90,11 @@ export interface IArtboardFacade {
   ): Promise<void>
 
   getLayerBounds(layerId: LayerId): Promise<LayerBounds>
+
+  getLayerAtPosition(x: number, y: number): Promise<ILayerFacade | null>
+
+  getLayersInArea(
+    bounds: Bounds,
+    options?: { partialOverlap?: boolean }
+  ): Promise<Array<ILayerFacade>>
 }

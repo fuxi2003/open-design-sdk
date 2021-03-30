@@ -57,4 +57,16 @@ export interface IRenderingDesign {
     artboardId: string,
     layerId: string
   ): Promise<LayerBounds>
+
+  getArtboardLayerAtPosition(
+    artboardId: string,
+    x: number,
+    y: number
+  ): Promise<string | null>
+
+  getArtboardLayersInArea(
+    artboardId: string,
+    bounds: Bounds,
+    options?: { partialOverlap?: boolean }
+  ): Promise<Array<string>>
 }

@@ -173,4 +173,30 @@ export class RenderingDesign implements IRenderingDesign {
 
     return artboard.getLayerBounds(layerId)
   }
+
+  async getArtboardLayerAtPosition(
+    artboardId: string,
+    x: number,
+    y: number
+  ): Promise<string | null> {
+    const artboard = this._artboards.get(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    return artboard.getLayerAtPosition(x, y)
+  }
+
+  async getArtboardLayersInArea(
+    artboardId: string,
+    bounds: Bounds,
+    options?: { partialOverlap?: boolean }
+  ): Promise<Array<string>> {
+    const artboard = this._artboards.get(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    return artboard.getLayersInArea(bounds, options)
+  }
 }

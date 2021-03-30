@@ -233,6 +233,46 @@ export class RenderingArtboard implements IRenderingArtboard {
     }
   }
 
+  async getLayerAtPosition(x: number, y: number): Promise<string | null> {
+    if (!this.ready) {
+      throw new Error('The artboard is not ready')
+    }
+
+    const result = await this._renderingProcess.execCommand('identify-layer', {
+      'design': this._designId,
+      'artboard': this.id,
+      'position': [x, y],
+    })
+    if (!result['ok']) {
+      console.error('RenderingDesign#getLayerBounds() get-layer:', result)
+      throw new Error('Failed to retrieve artboard layer info')
+    }
+
+    return result['layer'] || null
+  }
+
+  async getLayersInArea(
+    bounds: Bounds,
+    options: { partialOverlap?: boolean } = {}
+  ): Promise<Array<string>> {
+    if (!this.ready) {
+      throw new Error('The artboard is not ready')
+    }
+
+    const result = await this._renderingProcess.execCommand('identify-layers', {
+      'design': this._designId,
+      'artboard': this.id,
+      'bounds': serializeBounds(bounds),
+      'policy': options.partialOverlap ? 'partial' : 'partial-external',
+    })
+    if (!result['ok']) {
+      console.error('RenderingDesign#getLayerBounds() get-layer:', result)
+      throw new Error('Failed to retrieve artboard layer info')
+    }
+
+    return result['layers']
+  }
+
   async _getLayerRenderBounds(
     layerId: string,
     layerAttributes: LayerAttributesConfig

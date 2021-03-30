@@ -47,4 +47,11 @@ export interface IRenderingArtboard {
   ): Promise<void>
 
   getLayerBounds(layerId: string): Promise<LayerBounds>
+
+  getLayerAtPosition(x: number, y: number): Promise<string | null>
+
+  getLayersInArea(
+    bounds: Bounds,
+    options?: { partialOverlap?: boolean }
+  ): Promise<Array<string>>
 }

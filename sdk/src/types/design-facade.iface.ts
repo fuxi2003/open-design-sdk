@@ -114,4 +114,16 @@ export interface IDesignFacade {
     artboardId: ArtboardId,
     layerId: LayerId
   ): Promise<LayerBounds>
+
+  getArtboardLayerAtPosition(
+    artboardId: ArtboardId,
+    x: number,
+    y: number
+  ): Promise<ILayerFacade | null>
+
+  getArtboardLayersInArea(
+    artboardId: ArtboardId,
+    bounds: Bounds,
+    options?: { partialOverlap?: boolean }
+  ): Promise<Array<ILayerFacade>>
 }

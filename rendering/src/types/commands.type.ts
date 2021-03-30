@@ -285,4 +285,16 @@ export type CommandResults = {
         'fill-opacity': number
       })
     | ErrorResult
+
+  'identify-layer':
+    | (SuccessResult & {
+        'layer': string | null
+      })
+    | ErrorResult
+
+  'identify-layers':
+    | (SuccessResult & {
+        'layers': Array<string>
+      })
+    | ErrorResult
 }

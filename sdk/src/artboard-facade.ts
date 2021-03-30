@@ -12,7 +12,7 @@ import type {
   PageId,
   RgbaColor,
 } from '@opendesign/octopus-reader'
-import type { BlendingMode } from '@opendesign/rendering'
+import type { BlendingMode, Bounds } from '@opendesign/rendering'
 import type { DesignFacade } from './design-facade'
 import type { IArtboardFacade } from './types/artboard-facade.iface'
 
@@ -457,6 +457,32 @@ export class ArtboardFacade implements IArtboardFacade {
    */
   getLayerBounds(layerId: LayerId) {
     return this._designFacade.getArtboardLayerBounds(this.id, layerId)
+  }
+
+  /**
+   * Returns the top-most layer located at the specified coordinates within the specified artboard.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Layer Lookup
+   * @param x The X coordinate in the coordinate system of the artboard where to look for a layer.
+   * @param y The Y coordinate in the coordinate system of the artboard where to look for a layer.
+   */
+  getLayerAtPosition(x: number, y: number) {
+    return this._designFacade.getArtboardLayerAtPosition(this.id, x, y)
+  }
+
+  /**
+   * Returns all layers located within the specified area of the the specified artboard.
+   *
+   * Offline services including the local rendering engine have to be configured when using this method.
+   *
+   * @category Layer Lookup
+   * @param bounds The area in the corrdinate system of the artboard where to look for layers.
+   * @param options.partialOverlap Whether to also return layers which are only partially contained within the specified area.
+   */
+  getLayersInArea(bounds: Bounds, options: { partialOverlap?: boolean } = {}) {
+    return this._designFacade.getArtboardLayersInArea(this.id, bounds, options)
   }
 
   /** @internal */
