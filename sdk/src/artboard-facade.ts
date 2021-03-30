@@ -325,10 +325,10 @@ export class ArtboardFacade implements IArtboardFacade {
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
-  renderToFile(relPath: string): Promise<void> {
-    return this._designFacade.renderArtboardToFile(this.id, relPath)
+  renderToFile(filePath: string): Promise<void> {
+    return this._designFacade.renderArtboardToFile(this.id, filePath)
   }
 
   /**
@@ -340,13 +340,13 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * @category Rendering
    * @param layerId The ID of the artboard layer to render.
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
-  renderLayerToFile(layerId: LayerId, relPath: string): Promise<void> {
+  renderLayerToFile(layerId: LayerId, filePath: string): Promise<void> {
     return this._designFacade.renderArtboardLayerToFile(
       this.id,
       layerId,
-      relPath
+      filePath
     )
   }
 
@@ -359,13 +359,16 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * @category Rendering
    * @param layerIds The IDs of the artboard layers to render.
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
-  renderLayersToFile(layerIds: Array<LayerId>, relPath: string): Promise<void> {
+  renderLayersToFile(
+    layerIds: Array<LayerId>,
+    filePath: string
+  ): Promise<void> {
     return this._designFacade.renderArtboardLayersToFile(
       this.id,
       layerIds,
-      relPath
+      filePath
     )
   }
 

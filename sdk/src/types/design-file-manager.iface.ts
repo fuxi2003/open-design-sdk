@@ -1,8 +1,8 @@
 export interface IDesignFileManager {
-  readDesignFileStream(relPath: string): Promise<NodeJS.ReadableStream>
+  readDesignFileStream(filePath: string): Promise<NodeJS.ReadableStream>
 
   saveDesignFileStream(
-    relPath: string,
+    filePath: string,
     designFileStream: NodeJS.ReadableStream
   ): Promise<void>
 }

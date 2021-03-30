@@ -13,7 +13,7 @@ export async function createTempLocation() {
   return location
 }
 
-export async function createTempFileTarget(relPath: string) {
+export async function createTempFileTarget(filePath: string) {
   const tempDirname = await createTempLocation()
-  return join(tempDirname, relPath)
+  return join(tempDirname, filePath)
 }

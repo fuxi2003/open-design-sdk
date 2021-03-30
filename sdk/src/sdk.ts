@@ -53,16 +53,16 @@ export class Sdk implements ISdk {
    * In case the file references a server-side design and online services is configured, the API can be used for fetching missing data of partially downloaded files.
    *
    * @category Local Design File Usage
-   * @param relPath An absolute `.octopus` file path or a path relative to the current working directory.
+   * @param filePath An absolute `.octopus` file path or a path relative to the current working directory.
    * @returns A design object which can be used for retrieving data from the local `.octopus` file or a referenced server-side design (see above).
    */
-  async openOctopusFile(relPath: string): Promise<DesignFacade> {
+  async openOctopusFile(filePath: string): Promise<DesignFacade> {
     const localDesignManager = this._localDesignManager
     if (!localDesignManager) {
       throw new Error('Local design manager is not configured.')
     }
 
-    const localDesign = await localDesignManager.openOctopusFile(relPath, {
+    const localDesign = await localDesignManager.openOctopusFile(filePath, {
       apiDesignInfo: this._getCommonApiDesignInfo(),
     })
     const designFacade = await createDesignFromLocalDesign(localDesign, {
@@ -86,16 +86,16 @@ export class Sdk implements ISdk {
    *
    * @internal
    * @category Local Design File Usage
-   * @param relPath An absolute `.octopus` file path or a path relative to the current working directory.
+   * @param filePath An absolute `.octopus` file path or a path relative to the current working directory.
    * @returns A design object which can be used for creating `.octopus` file content.
    */
-  async createOctopusFile(relPath: string): Promise<DesignFacade> {
+  async createOctopusFile(filePath: string): Promise<DesignFacade> {
     const localDesignManager = this._localDesignManager
     if (!localDesignManager) {
       throw new Error('Local design manager is not configured.')
     }
 
-    const localDesign = await localDesignManager.createOctopusFile(relPath)
+    const localDesign = await localDesignManager.createOctopusFile(filePath)
     const designFacade = await createDesignFromLocalDesign(localDesign, {
       sdk: this,
     })
@@ -111,10 +111,10 @@ export class Sdk implements ISdk {
    * The design is automatically uploaded to the API and local caching is established.
    *
    * @category Local Design File Usage
-   * @param relPath An absolute design file path or a path relative to the current working directory.
+   * @param filePath An absolute design file path or a path relative to the current working directory.
    * @returns A design object which can be used for retrieving data from the local design file using the API.
    */
-  async openDesignFile(relPath: string): Promise<DesignFacade> {
+  async openDesignFile(filePath: string): Promise<DesignFacade> {
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
       throw new Error('Open Design API is not configured.')
@@ -126,7 +126,7 @@ export class Sdk implements ISdk {
     }
 
     const designFileStream = await designFileManager.readDesignFileStream(
-      relPath
+      filePath
     )
     const apiDesign = await openDesignApi.importDesignFile(designFileStream)
 
@@ -141,7 +141,7 @@ export class Sdk implements ISdk {
    * The design file is not downloaded to the local environment but rather imported via the API directly. Once imported via the API, the design behaves exactly like a design fetched via {@link Sdk.fetchDesignById}.
    *
    * @category Local Design File Usage
-   * @param relPath An absolute design file path or a path relative to the current working directory.
+   * @param filePath An absolute design file path or a path relative to the current working directory.
    * @returns A design object which can be used for retrieving data from the local design file using the API.
    */
   async openDesignLink(
@@ -283,7 +283,7 @@ export class Sdk implements ISdk {
 
   /** @internal */
   async saveDesignFileStream(
-    relPath: string,
+    filePath: string,
     designFileStream: NodeJS.ReadableStream
   ) {
     const designFileManager = this._designFileManager
@@ -291,7 +291,7 @@ export class Sdk implements ISdk {
       throw new Error('Design file manager is not configured.')
     }
 
-    return designFileManager.saveDesignFileStream(relPath, designFileStream)
+    return designFileManager.saveDesignFileStream(filePath, designFileStream)
   }
 
   /** @internal */

@@ -20,7 +20,7 @@ export interface IDesignFacade {
   readonly id: string | null
   readonly filename: string | null
 
-  saveOctopusFile(relPath?: string | null): Promise<void>
+  saveOctopusFile(filePath?: string | null): Promise<void>
 
   getManifest(): ManifestData
   // setManifest(nextManifest: ManifestData): void
@@ -80,14 +80,14 @@ export interface IDesignFacade {
     options?: Partial<{ depth: number }>
   ): Promise<Array<AggregatedFileFontDescriptor>>
 
-  renderArtboardToFile(artboardId: ArtboardId, relPath: string): Promise<void>
+  renderArtboardToFile(artboardId: ArtboardId, filePath: string): Promise<void>
 
-  renderPageToFile(pageId: ArtboardId, relPath: string): Promise<void>
+  renderPageToFile(pageId: ArtboardId, filePath: string): Promise<void>
 
   renderArtboardLayerToFile(
     artboardId: ArtboardId,
     layerId: LayerId,
-    relPath: string
+    filePath: string
   ): Promise<void>
 
   renderArtboardLayersToFile(

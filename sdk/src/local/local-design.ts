@@ -66,15 +66,15 @@ export class LocalDesign implements ILocalDesign {
     return this._filename
   }
 
-  async saveAs(nextRelPath: string) {
-    const nextFilename = this._localDesignManager.resolvePath(nextRelPath)
+  async saveAs(nextFilePath: string) {
+    const nextFilename = this._localDesignManager.resolvePath(nextFilePath)
     const prevFilename = this._filename
     await copyDirectory(prevFilename, nextFilename)
     this._filename = nextFilename
   }
 
-  async move(nextRelPath: string) {
-    const nextFilename = this._localDesignManager.resolvePath(nextRelPath)
+  async move(nextFilePath: string) {
+    const nextFilename = this._localDesignManager.resolvePath(nextFilePath)
     const prevFilename = this._filename
     await moveDirectory(prevFilename, nextFilename)
     this._filename = nextFilename

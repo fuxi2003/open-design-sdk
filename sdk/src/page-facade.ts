@@ -265,9 +265,9 @@ export class PageFacade implements IPageFacade {
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
-  renderToFile(relPath: string) {
-    return this._designFacade.renderPageToFile(this.id, relPath)
+  renderToFile(filePath: string) {
+    return this._designFacade.renderPageToFile(this.id, filePath)
   }
 }

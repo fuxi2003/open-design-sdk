@@ -384,9 +384,9 @@ export class LayerFacade implements ILayerFacade {
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
-  async renderToFile(relPath: string): Promise<void> {
+  async renderToFile(filePath: string): Promise<void> {
     const artboardId = this.artboardId
     if (!artboardId) {
       throw new Error('Detached layers cannot be rendered')
@@ -395,7 +395,7 @@ export class LayerFacade implements ILayerFacade {
     return this._designFacade.renderArtboardLayerToFile(
       artboardId,
       this.id,
-      relPath
+      filePath
     )
   }
 

@@ -26,11 +26,11 @@ export interface IRenderingArtboard {
     fontDirectoryPath?: string | null
   }): Promise<void>
 
-  renderToFile(relPath: string): Promise<void>
+  renderToFile(filePath: string): Promise<void>
 
-  renderLayerToFile(layerId: string, relPath: string): Promise<void>
+  renderLayerToFile(layerId: string, filePath: string): Promise<void>
 
-  renderLayersToFile(layerIds: Array<string>, relPath: string): Promise<void>
+  renderLayersToFile(layerIds: Array<string>, filePath: string): Promise<void>
 
   getLayerBounds(layerId: string): Promise<LayerBounds>
 }

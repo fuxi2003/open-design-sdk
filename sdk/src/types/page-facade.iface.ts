@@ -50,5 +50,5 @@ export interface IPageFacade {
     options?: Partial<{ depth: number }>
   ): Promise<IDesignLayerCollectionFacade>
 
-  renderToFile(relPath: string): Promise<void>
+  renderToFile(filePath: string): Promise<void>
 }

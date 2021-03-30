@@ -539,11 +539,11 @@ export class DesignFacade implements IDesignFacade {
    *
    * @category Rendering
    * @param artboardId The ID of the artboard to render.
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
   async renderArtboardToFile(
     artboardId: ArtboardId,
-    relPath: string
+    filePath: string
   ): Promise<void> {
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
@@ -552,7 +552,7 @@ export class DesignFacade implements IDesignFacade {
 
     await this._loadRenderingDesignArtboard(artboardId)
 
-    return renderingDesign.renderArtboardToFile(artboardId, relPath)
+    return renderingDesign.renderArtboardToFile(artboardId, filePath)
   }
 
   /**
@@ -564,9 +564,9 @@ export class DesignFacade implements IDesignFacade {
    *
    * @category Rendering
    * @param pageId The ID of the page to render.
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
-  async renderPageToFile(pageId: PageId, relPath: string): Promise<void> {
+  async renderPageToFile(pageId: PageId, filePath: string): Promise<void> {
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
@@ -574,7 +574,7 @@ export class DesignFacade implements IDesignFacade {
 
     await this._loadRenderingDesignPage(pageId)
 
-    return renderingDesign.renderPageToFile(pageId, relPath)
+    return renderingDesign.renderPageToFile(pageId, filePath)
   }
 
   /**
@@ -587,12 +587,12 @@ export class DesignFacade implements IDesignFacade {
    * @category Rendering
    * @param artboardId The ID of the artboard from which to render the layer.
    * @param layerId The ID of the artboard layer to render.
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
   async renderArtboardLayerToFile(
     artboardId: ArtboardId,
     layerId: LayerId,
-    relPath: string
+    filePath: string
   ): Promise<void> {
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
@@ -609,7 +609,7 @@ export class DesignFacade implements IDesignFacade {
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
       resolvedLayerIds,
-      relPath
+      filePath
     )
   }
 
@@ -623,12 +623,12 @@ export class DesignFacade implements IDesignFacade {
    * @category Rendering
    * @param artboardId The ID of the artboard from which to render the layer.
    * @param layerIds The IDs of the artboard layers to render.
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
   async renderArtboardLayersToFile(
     artboardId: ArtboardId,
     layerIds: Array<LayerId>,
-    relPath: string
+    filePath: string
   ): Promise<void> {
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
@@ -647,7 +647,7 @@ export class DesignFacade implements IDesignFacade {
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
       resolvedLayerIds,
-      relPath
+      filePath
     )
   }
 
@@ -784,10 +784,10 @@ export class DesignFacade implements IDesignFacade {
    * The design object switches to using the new location as the local `.octopus` file and considers the file a local cache.
    *
    * @category Serialization
-   * @param relPath An absolute path of the target `.octopus` file or a path relative to the current working directory. When omitted, the open `.octopus` file location is used instead. Online services have to be configured in case there are uncached items.
+   * @param filePath An absolute path of the target `.octopus` file or a path relative to the current working directory. When omitted, the open `.octopus` file location is used instead. Online services have to be configured in case there are uncached items.
    */
-  async saveOctopusFile(relPath: string | null = null) {
-    const localDesign = await this._getLocalDesign(relPath)
+  async saveOctopusFile(filePath: string | null = null) {
+    const localDesign = await this._getLocalDesign(filePath)
     const apiDesign = this._apiDesign
 
     const manifest = this.getManifest()
@@ -840,10 +840,10 @@ export class DesignFacade implements IDesignFacade {
    * In case no such conversion has been done for the design yet, a new conversion is initiated and the resulting design file is downloaded.
    *
    * @category Serialization
-   * @param relPath An absolute path to which to save the design file or a path relative to the current working directory.
+   * @param filePath An absolute path to which to save the design file or a path relative to the current working directory.
    */
-  async saveDesignFile(relPath: string) {
-    const format = getDesignFormatByFileName(relPath)
+  async saveDesignFile(filePath: string) {
+    const format = getDesignFormatByFileName(filePath)
     if (!format) {
       throw new Error('Unknown target design file format')
     }
@@ -853,15 +853,17 @@ export class DesignFacade implements IDesignFacade {
 
     const conversion = await this._getConversionToFormat(format)
     return this._sdk.saveDesignFileStream(
-      relPath,
+      filePath,
       await conversion.getResultStream()
     )
   }
 
-  private async _getLocalDesign(relPath: string | null): Promise<ILocalDesign> {
+  private async _getLocalDesign(
+    filePath: string | null
+  ): Promise<ILocalDesign> {
     const localDesign = this._localDesign
 
-    if (!relPath) {
+    if (!filePath) {
       if (!localDesign) {
         throw new Error('The design is not configured to be a local file')
       }
@@ -870,11 +872,11 @@ export class DesignFacade implements IDesignFacade {
     }
 
     if (localDesign) {
-      await localDesign.saveAs(relPath)
+      await localDesign.saveAs(filePath)
       return localDesign
     }
 
-    const targetDesignFacade = await this._sdk.openOctopusFile(relPath)
+    const targetDesignFacade = await this._sdk.openOctopusFile(filePath)
     const targetLocalDesign = targetDesignFacade.getLocalDesign()
     if (!targetLocalDesign) {
       throw new Error('Target location is not available')

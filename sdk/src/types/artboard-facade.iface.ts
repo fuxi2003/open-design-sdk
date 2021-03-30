@@ -64,7 +64,7 @@ export interface IArtboardFacade {
 
   isComponent(): boolean
 
-  renderToFile(relPath: string): Promise<void>
+  renderToFile(filePath: string): Promise<void>
 
   renderLayerToFile(layerId: LayerId, filePath: string): Promise<void>
 

@@ -24,17 +24,17 @@ export class LocalDesignManager implements ILocalDesignManager {
       : null
   }
 
-  resolvePath(relPath: string) {
-    return resolvePath(this._workingDirectory || '.', `${relPath}`)
+  resolvePath(filePath: string) {
+    return resolvePath(this._workingDirectory || '.', `${filePath}`)
   }
 
   async openOctopusFile(
-    relPath: string,
+    filePath: string,
     options: Partial<{
       apiDesignInfo: ApiDesignInfo | null
     }> = {}
   ): Promise<LocalDesign> {
-    const filename = this.resolvePath(relPath)
+    const filename = this.resolvePath(filePath)
     this._checkOctopusFileName(filename)
 
     const fileStatus = await this._checkOctopusFileStatus(filename)
@@ -59,8 +59,8 @@ export class LocalDesignManager implements ILocalDesignManager {
     return localDesign
   }
 
-  async createOctopusFile(relPath: string): Promise<LocalDesign> {
-    const filename = this.resolvePath(relPath)
+  async createOctopusFile(filePath: string): Promise<LocalDesign> {
+    const filename = this.resolvePath(filePath)
     this._checkOctopusFileName(filename)
 
     await this._createDirectory(filename)

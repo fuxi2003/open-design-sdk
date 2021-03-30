@@ -13,8 +13,8 @@ import { basename, dirname } from 'path'
 
 const writeFile = promisify(fs.writeFile)
 
-export async function createOctopusFile(relPath: string) {
-  const filename = await createTempFileTarget(relPath)
+export async function createOctopusFile(filePath: string) {
+  const filename = await createTempFileTarget(filePath)
   await mkdirp(filename)
 
   const manifest: ManifestData = {

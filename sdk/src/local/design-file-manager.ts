@@ -4,8 +4,8 @@ import { resolve as resolvePath } from 'path'
 import type { IDesignFileManager } from '../types/design-file-manager.iface'
 
 export class DesignFileManager implements IDesignFileManager {
-  async readDesignFileStream(relPath: string): Promise<NodeJS.ReadableStream> {
-    const filename = resolvePath(relPath)
+  async readDesignFileStream(filePath: string): Promise<NodeJS.ReadableStream> {
+    const filename = resolvePath(filePath)
     const stream = createReadStream(filename)
 
     return new Promise((resolve, reject) => {
@@ -19,10 +19,10 @@ export class DesignFileManager implements IDesignFileManager {
   }
 
   async saveDesignFileStream(
-    relPath: string,
+    filePath: string,
     designFileStream: NodeJS.ReadableStream
   ): Promise<void> {
-    const filename = resolvePath(relPath)
+    const filename = resolvePath(filePath)
     const writeStream = createWriteStream(filename)
 
     return new Promise((resolve, reject) => {

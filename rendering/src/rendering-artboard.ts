@@ -95,7 +95,7 @@ export class RenderingArtboard implements IRenderingArtboard {
     return dependencyResult['symbols'] || []
   }
 
-  async renderToFile(relPath: string): Promise<void> {
+  async renderToFile(filePath: string): Promise<void> {
     if (!this.ready) {
       throw new Error('The artboard is not ready')
     }
@@ -103,7 +103,7 @@ export class RenderingArtboard implements IRenderingArtboard {
     const result = await this._renderingProcess.execCommand('render-artboard', {
       'design': this._designId,
       'artboard': this.id,
-      'file': relPath,
+      'file': filePath,
     })
     if (!result['ok']) {
       console.error(
@@ -114,7 +114,7 @@ export class RenderingArtboard implements IRenderingArtboard {
     }
   }
 
-  async renderLayerToFile(layerId: string, relPath: string): Promise<void> {
+  async renderLayerToFile(layerId: string, filePath: string): Promise<void> {
     if (!this.ready) {
       throw new Error('The artboard is not ready')
     }
@@ -123,7 +123,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       'design': this._designId,
       'artboard': this.id,
       'layer': layerId,
-      'file': relPath,
+      'file': filePath,
     })
     if (!result['ok']) {
       console.error(
@@ -136,7 +136,7 @@ export class RenderingArtboard implements IRenderingArtboard {
 
   async renderLayersToFile(
     layerIds: Array<string>,
-    relPath: string
+    filePath: string
   ): Promise<void> {
     if (!this.ready) {
       throw new Error('The artboard is not ready')
@@ -157,7 +157,7 @@ export class RenderingArtboard implements IRenderingArtboard {
             }
           }
         ),
-        'file': relPath,
+        'file': filePath,
       }
     )
     if (!result['ok']) {

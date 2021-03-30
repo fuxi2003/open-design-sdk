@@ -67,21 +67,21 @@ export class RenderingDesign implements IRenderingDesign {
 
   async renderArtboardToFile(
     artboardId: string,
-    relPath: string
+    filePath: string
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
     if (!artboard) {
       throw new Error('No such artboard')
     }
 
-    return artboard.renderToFile(relPath)
+    return artboard.renderToFile(filePath)
   }
 
-  async renderPageToFile(pageId: string, relPath: string): Promise<void> {
+  async renderPageToFile(pageId: string, filePath: string): Promise<void> {
     const result = await this._renderingProcess.execCommand('render-page', {
       'design': this.id,
       'page': pageId,
-      'file': relPath,
+      'file': filePath,
     })
     if (!result['ok']) {
       console.error('RenderingDesign#renderPageToFile() render-page:', result)
@@ -92,27 +92,27 @@ export class RenderingDesign implements IRenderingDesign {
   async renderArtboardLayerToFile(
     artboardId: string,
     layerId: string,
-    relPath: string
+    filePath: string
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
     if (!artboard) {
       throw new Error('No such artboard')
     }
 
-    return artboard.renderLayerToFile(layerId, relPath)
+    return artboard.renderLayerToFile(layerId, filePath)
   }
 
   async renderArtboardLayersToFile(
     artboardId: string,
     layerIds: Array<string>,
-    relPath: string
+    filePath: string
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
     if (!artboard) {
       throw new Error('No such artboard')
     }
 
-    return artboard.renderLayersToFile(layerIds, relPath)
+    return artboard.renderLayersToFile(layerIds, filePath)
   }
 
   async getArtboardLayerBounds(artboardId: string, layerId: string) {

@@ -286,9 +286,9 @@ export class DesignLayerCollectionFacade
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
-   * @param relPath The target location of the produced image file.
+   * @param filePath The target location of the produced image file.
    */
-  async renderToFile(relPath: string): Promise<void> {
+  async renderToFile(filePath: string): Promise<void> {
     const layerIds = this.getLayers().map((layer) => {
       return layer.id
     })
@@ -304,7 +304,7 @@ export class DesignLayerCollectionFacade
     return this._designFacade.renderArtboardLayersToFile(
       artboardId,
       layerIds,
-      relPath
+      filePath
     )
   }
 }
