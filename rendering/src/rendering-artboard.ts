@@ -1,12 +1,12 @@
 import { sequence } from './utils/async'
+import { mergeBounds, parseBounds, serializeBounds } from './utils/bounds-utils'
+import { serializeLayerAttributes } from './utils/layer-attributes-utils'
 
 import type { RenderingProcess } from './rendering-process'
+import type { Bounds } from './types/bounds.type'
 import type { LayerAttributes } from './types/commands.type'
-import type {
-  Bounds,
-  IRenderingArtboard,
-  LayerAttributesConfig,
-} from './types/rendering-artboard.iface'
+import type { IRenderingArtboard } from './types/rendering-artboard.iface'
+import type { LayerAttributesConfig } from './types/layer-attributes.type'
 
 export class RenderingArtboard implements IRenderingArtboard {
   readonly id: string
@@ -244,59 +244,5 @@ export class RenderingArtboard implements IRenderingArtboard {
     return layerBoundsList.reduce((compoundBounds, partialBounds) => {
       return mergeBounds(compoundBounds, partialBounds)
     })
-  }
-}
-
-function parseBounds(
-  coordinates: [number, number, number, number]
-): { left: number; top: number; width: number; height: number } {
-  return {
-    left: coordinates[0],
-    top: coordinates[1],
-    width: coordinates[2] - coordinates[0],
-    height: coordinates[3] - coordinates[1],
-  }
-}
-
-function serializeBounds(bounds: Bounds): [number, number, number, number] {
-  return [
-    bounds.left,
-    bounds.top,
-    bounds.left + bounds.width,
-    bounds.top + bounds.height,
-  ]
-}
-
-function serializeLayerAttributes(layerAttributes: LayerAttributesConfig) {
-  return {
-    'draw-effects': layerAttributes.includeEffects !== false,
-    'enable-clipping': layerAttributes.clip !== false,
-    'draw-background': Boolean(layerAttributes.includeArtboardBackground),
-    ...(typeof layerAttributes.blendingMode === 'undefined'
-      ? {}
-      : { 'blend-mode': layerAttributes.blendingMode }),
-    ...(typeof layerAttributes.opacity === 'undefined'
-      ? {}
-      : { 'opacity': layerAttributes.opacity }),
-  }
-}
-
-function mergeBounds(prevBounds: Bounds, nextBounds: Bounds): Bounds {
-  const left = Math.min(prevBounds.left, nextBounds.left)
-  const top = Math.min(prevBounds.top, nextBounds.top)
-  const right = Math.max(
-    prevBounds.left + prevBounds.width,
-    nextBounds.left + nextBounds.width
-  )
-  const bottom = Math.max(
-    prevBounds.top + prevBounds.height,
-    nextBounds.top + nextBounds.height
-  )
-
-  return {
-    left,
-    top,
-    width: right - left,
-    height: bottom - top,
   }
 }

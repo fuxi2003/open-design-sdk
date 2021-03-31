@@ -1,7 +1,7 @@
 import { RenderingArtboard } from './rendering-artboard'
 
 import type { RenderingProcess } from './rendering-process'
-import type { LayerAttributesConfig } from './types/rendering-artboard.iface'
+import type { LayerAttributesConfig } from './types/layer-attributes.type'
 import type { IRenderingDesign } from './types/rendering-design.iface'
 
 export class RenderingDesign implements IRenderingDesign {

@@ -1,7 +1,7 @@
 import { RenderingEngine } from './rendering-engine'
 
+import type { LayerAttributesConfig } from './types/layer-attributes.type'
 import type {
-  LayerAttributesConfig,
   LayerBounds,
   IRenderingArtboard,
 } from './types/rendering-artboard.iface'

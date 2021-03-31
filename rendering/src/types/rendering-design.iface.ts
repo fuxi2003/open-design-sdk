@@ -1,7 +1,5 @@
-import type {
-  LayerAttributesConfig,
-  LayerBounds,
-} from './rendering-artboard.iface'
+import type { LayerAttributesConfig } from './layer-attributes.type'
+import type { LayerBounds } from './rendering-artboard.iface'
 
 export interface IRenderingDesign {
   readonly id: string

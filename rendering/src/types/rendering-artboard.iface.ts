@@ -1,11 +1,5 @@
-import { BlendingMode } from './commands.type'
-
-export type Bounds = {
-  left: number
-  top: number
-  width: number
-  height: number
-}
+import type { Bounds } from './bounds.type'
+import type { LayerAttributesConfig } from './layer-attributes.type'
 
 export type LayerBounds = {
   bounds: Bounds
@@ -13,14 +7,6 @@ export type LayerBounds = {
   affectedBounds: Bounds
   logicalBounds: Bounds
   untransformedBounds: Bounds
-}
-
-export type LayerAttributesConfig = {
-  includeEffects?: boolean
-  clip?: boolean
-  includeArtboardBackground?: boolean
-  blendingMode?: BlendingMode
-  opacity?: number
 }
 
 export interface IRenderingArtboard {
