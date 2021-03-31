@@ -76,7 +76,6 @@ export class ApiDesign implements IApiDesign {
           'preview_url': null,
           'is_symbol': false,
           'symbol_id': null,
-          'frame': { 'x': 0, 'y': 0 },
           ...(artboardData['page_id']
             ? {
                 'page_original_id': artboardData['page_id'],

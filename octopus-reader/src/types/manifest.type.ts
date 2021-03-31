@@ -9,11 +9,6 @@ export type ArtboardManifestData = {
   'is_symbol': boolean
   'symbol_id'?: string | null
 
-  'frame': {
-    'x': number
-    'y': number
-  }
-
   'page_name'?: string | null
   'page_original_id'?: string | null
 }

@@ -25,7 +25,6 @@ export async function createOctopusFile(filePath: string) {
         'failed': false,
         'url': 'https://example.com/octopus-a.json',
         'preview_url': null,
-        'frame': { 'x': 0, 'y': 10 },
         'is_symbol': false,
       },
     ],
