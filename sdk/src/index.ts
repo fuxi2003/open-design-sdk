@@ -5,119 +5,64 @@ import { LocalDesignManager } from './local/local-design-manager'
 import { SystemFontManager } from './local/system-font-manager'
 import { Sdk } from './sdk'
 
-import type { ISdk } from './types/sdk.iface'
-
 /**
- * Creates an SDK instance with both online and offline services configured.
+ * Creates an SDK instance
  *
- * Such an SDK instance is able to upload design files to the Open Design API, download data from the API, query the designs for various content (layers, bitmap assets, font usage, …), produce rendered image files, and save data to a local file system cache as well as generate and read `.octopus` files.
+ * Based on the provided configuration, various services are made available:
+ *
+ * - When Open Design API credentials (a token) is provided, online services (the API) is configured and available for uploading and downloading designs.
+ * - A local rendering engine is available by default.
+ * - Local system fonts can be used for rendering design by default.
+ * - A local cache is available by default.
+ * - Local `.octopus` files can be opened by default.
  *
  * @category Primary Entry Point
- * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication).
+ * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication). When no token is provided, online services (the API) is not configured.
  * @param params.apiRoot The URL base for Open Design API calls. By default, production Avocode Open Design API servers are used.
- * @param params.workingDirectory An absolute path to the directory where the SDK should look for its cache directory.
+ * @param params.workingDirectory An absolute path to the directory against which should the SDK resolve relative file paths and where should it look for its cache directory.
+ * @param params.cached Whether to use a local (file system) cache in the form for `.octopus` files. This is enabled by default.
+ * @param params.rendering Whether to use a local rendering engine for rendering designs. This is enabled by default.
+ * @param params.systemFonts Whether to use local system fonts for rendering designs via the rendering engine. This is enabled by default.
  */
 export function createSdk(params: {
-  token: string
-  apiRoot?: string | null
+  token?: string
+  apiRoot?: string
   workingDirectory?: string | null
-}): ISdk {
+  cached: boolean
+  rendering: boolean
+  systemFonts: boolean
+}) {
+  if (params.cached === false && params.rendering === false) {
+    throw new Error('Cannot configure the rendering engine without cache')
+  }
+
   const sdk = new Sdk()
-  configureOfflineServices(sdk, {
-    workingDirectory: params.workingDirectory || null,
-  })
-  configureOnlineServices(sdk, {
-    token: params.token,
-    apiRoot: params.apiRoot || null,
-  })
-  return sdk
-}
 
-/**
- * Creates an SDK instance with online services and some offline services configured.
- *
- * Such an SDK instance is able to upload design files to the Open Design API, download data from the API, query the designs for various content (layers, bitmap assets, font usage, …), produce rendered image files, but cannot save data to a local file system cache nor can it generate or read `.octopus` files.
- *
- * @category Primary Entry Point
- * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication).
- * @param params.apiRoot The URL base for Open Design API calls. By default, production Avocode Open Design API servers are used.
- */
-export function createUncachedSdk(params: {
-  token: string
-  apiRoot?: string | null
-}): ISdk {
-  const sdk = new Sdk()
-  configureOfflineUncachedServices(sdk)
-  configureOnlineServices(sdk, params)
-  return sdk
-}
-
-/**
- * Creates an SDK instance with offline services configured.
- *
- * Such an SDK instance is not connected to the Open Design API and can only work with local `.octopus` files. It can query the designs for various content (layers, bitmap assets, font usage, …) and produce rendered image files.
- *
- * @category Experimental Entry Point
- * @param params.workingDirectory An absolute path to the directory where the SDK should look for its cache directory.
- */
-export function createOfflineSdk(
-  params: {
-    workingDirectory?: string | null
-  } = {}
-): ISdk {
-  const sdk = new Sdk()
-  configureOfflineServices(sdk, params)
-  return sdk
-}
-
-/**
- * Creates an SDK instance with online services configured.
- *
- * Such an SDK instance is not able to upload design files to the Open Design API but can download data from the API and query the designs for various content (layers, bitmap assets, font usage, …). It also cannot produce rendered image files.
- *
- * @category Experimental Entry Point
- * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication).
- * @param params.apiRoot The URL base for Open Design API calls. By default, production Avocode Open Design API servers are used.
- */
-export function createOnlineSdk(params: {
-  token: string
-  apiRoot?: string | null
-}): ISdk {
-  const sdk = new Sdk()
-  configureOnlineServices(sdk, params)
-  return sdk
-}
-
-function configureOfflineServices(
-  sdk: ISdk,
-  params: { workingDirectory?: string | null }
-): ISdk {
-  configureOfflineUncachedServices(sdk)
-  configureOfflineCacheServices(sdk, params)
-  return sdk
-}
-
-function configureOfflineUncachedServices(sdk: ISdk): ISdk {
   sdk.useDesignFileManager(new DesignFileManager())
-  return sdk
-}
 
-function configureOfflineCacheServices(
-  sdk: ISdk,
-  params: { workingDirectory?: string | null }
-): ISdk {
-  sdk.useSystemFontManager(new SystemFontManager())
-  sdk.useLocalDesignManager(new LocalDesignManager())
-  sdk.useRenderingEngine(new RenderingEngine())
+  if (params.token) {
+    sdk.useOpenDesignApi(
+      createOpenDesignApi({
+        token: params.token,
+        apiRoot: params.apiRoot || null,
+      })
+    )
+  }
+
+  if (params.systemFonts !== false) {
+    sdk.useSystemFontManager(new SystemFontManager())
+  }
+
+  if (params.cached !== false) {
+    sdk.useLocalDesignManager(new LocalDesignManager())
+
+    if (params.rendering !== false) {
+      sdk.useRenderingEngine(new RenderingEngine())
+    }
+  }
+
   sdk.setWorkingDirectory(params.workingDirectory || null)
-  return sdk
-}
 
-function configureOnlineServices(
-  sdk: ISdk,
-  params: { token: string; apiRoot?: string | null }
-): ISdk {
-  sdk.useOpenDesignApi(createOpenDesignApi(params))
   return sdk
 }
 

@@ -12,7 +12,7 @@ import type { ISdk } from './types/sdk.iface'
  * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication).
  * @param params.apiRoot The URL base for Open Design API calls. By default, production Avocode Open Design API servers are used.
  */
-export function createOnlineSdk(params: {
+export function createSdk(params: {
   token: string
   apiRoot?: string | null
 }): ISdk {

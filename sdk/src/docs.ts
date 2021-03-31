@@ -20,14 +20,9 @@ import type { LayerFacade } from './layer-facade'
 import type { PageFacade } from './page-facade'
 import type { Sdk } from './sdk'
 
-import type {
-  createSdk,
-  createOfflineSdk,
-  createOnlineSdk,
-  createUncachedSdk,
-} from './index'
+import type { createSdk } from './index'
 
-export type { createSdk, createOfflineSdk, createOnlineSdk, createUncachedSdk }
+export type { createSdk }
 
 export type {
   ArtboardId,
