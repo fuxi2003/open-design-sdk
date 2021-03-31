@@ -22,12 +22,18 @@ export interface IRenderingArtboard {
     fontDirectoryPath?: string | null
   }): Promise<void>
 
-  renderToFile(filePath: string): Promise<void>
+  renderToFile(
+    filePath: string,
+    options?: { scale?: number; bounds?: Bounds }
+  ): Promise<void>
 
   renderLayerToFile(
     layerId: string,
     filePath: string,
-    options?: LayerAttributesConfig
+    options?: LayerAttributesConfig & {
+      scale?: number
+      bounds?: Bounds
+    }
   ): Promise<void>
 
   renderLayersToFile(
@@ -35,6 +41,8 @@ export interface IRenderingArtboard {
     filePath: string,
     options?: {
       layerAttributes?: Record<string, LayerAttributesConfig>
+      scale?: number
+      bounds?: Bounds
     }
   ): Promise<void>
 

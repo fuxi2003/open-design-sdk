@@ -1,6 +1,9 @@
 import { RenderingArtboard } from './rendering-artboard'
 
+import { serializeBounds } from './utils/bounds-utils'
+
 import type { RenderingProcess } from './rendering-process'
+import type { Bounds } from './types/bounds.type'
 import type { LayerAttributesConfig } from './types/layer-attributes.type'
 import type { IRenderingDesign } from './types/rendering-design.iface'
 
@@ -98,21 +101,28 @@ export class RenderingDesign implements IRenderingDesign {
 
   async renderArtboardToFile(
     artboardId: string,
-    filePath: string
+    filePath: string,
+    options: { scale?: number; bounds?: Bounds } = {}
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
     if (!artboard) {
       throw new Error('No such artboard')
     }
 
-    return artboard.renderToFile(filePath)
+    return artboard.renderToFile(filePath, options)
   }
 
-  async renderPageToFile(pageId: string, filePath: string): Promise<void> {
+  async renderPageToFile(
+    pageId: string,
+    filePath: string,
+    options: { scale?: number; bounds?: Bounds } = {}
+  ): Promise<void> {
     const result = await this._renderingProcess.execCommand('render-page', {
       'design': this.id,
       'page': pageId,
       'file': filePath,
+      'scale': options.scale || 1,
+      ...(options.bounds ? { 'bounds': serializeBounds(options.bounds) } : {}),
     })
     if (!result['ok']) {
       console.error('RenderingDesign#renderPageToFile() render-page:', result)
@@ -124,7 +134,10 @@ export class RenderingDesign implements IRenderingDesign {
     artboardId: string,
     layerId: string,
     filePath: string,
-    options: LayerAttributesConfig = {}
+    options: LayerAttributesConfig & {
+      scale?: number
+      bounds?: Bounds
+    } = {}
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)
     if (!artboard) {
@@ -140,6 +153,8 @@ export class RenderingDesign implements IRenderingDesign {
     filePath: string,
     options: {
       layerAttributes?: Record<string, LayerAttributesConfig>
+      scale?: number
+      bounds?: Bounds
     } = {}
   ): Promise<void> {
     const artboard = this._artboards.get(artboardId)

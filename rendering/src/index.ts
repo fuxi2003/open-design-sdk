@@ -1,5 +1,6 @@
 import { RenderingEngine } from './rendering-engine'
 
+import type { Bounds } from './types/bounds.type'
 import type { LayerAttributesConfig } from './types/layer-attributes.type'
 import type {
   LayerBounds,
@@ -11,6 +12,7 @@ import type { IRenderingEngine } from './types/rendering-engine.iface'
 export { RenderingEngine }
 
 export type {
+  Bounds,
   LayerAttributesConfig,
   LayerBounds,
   IRenderingArtboard,

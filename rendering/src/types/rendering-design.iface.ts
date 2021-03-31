@@ -1,3 +1,4 @@
+import type { Bounds } from './bounds.type'
 import type { LayerAttributesConfig } from './layer-attributes.type'
 import type { LayerBounds } from './rendering-artboard.iface'
 
@@ -19,15 +20,26 @@ export interface IRenderingDesign {
 
   loadFont(postscriptName: string, filename: string): Promise<void>
 
-  renderArtboardToFile(artboardId: string, filePath: string): Promise<void>
+  renderArtboardToFile(
+    artboardId: string,
+    filePath: string,
+    options?: { scale?: number; bounds?: Bounds }
+  ): Promise<void>
 
-  renderPageToFile(pageId: string, filePath: string): Promise<void>
+  renderPageToFile(
+    pageId: string,
+    filePath: string,
+    options?: { scale?: number; bounds?: Bounds }
+  ): Promise<void>
 
   renderArtboardLayerToFile(
     artboardId: string,
     layerId: string,
     filePath: string,
-    options?: LayerAttributesConfig
+    options?: LayerAttributesConfig & {
+      scale?: number
+      bounds?: Bounds
+    }
   ): Promise<void>
 
   renderArtboardLayersToFile(
@@ -36,6 +48,8 @@ export interface IRenderingDesign {
     filePath: string,
     options?: {
       layerAttributes?: Record<string, LayerAttributesConfig>
+      scale?: number
+      bounds?: Bounds
     }
   ): Promise<void>
 

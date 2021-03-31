@@ -101,7 +101,10 @@ export class RenderingArtboard implements IRenderingArtboard {
     return dependencyResult['symbols'] || []
   }
 
-  async renderToFile(filePath: string): Promise<void> {
+  async renderToFile(
+    filePath: string,
+    options: { scale?: number; bounds?: Bounds } = {}
+  ): Promise<void> {
     if (!this.ready) {
       throw new Error('The artboard is not ready')
     }
@@ -110,6 +113,8 @@ export class RenderingArtboard implements IRenderingArtboard {
       'design': this._designId,
       'artboard': this.id,
       'file': filePath,
+      'scale': options.scale || 1,
+      ...(options.bounds ? { 'bounds': serializeBounds(options.bounds) } : {}),
     })
     if (!result['ok']) {
       console.error(
@@ -123,14 +128,20 @@ export class RenderingArtboard implements IRenderingArtboard {
   async renderLayerToFile(
     layerId: string,
     filePath: string,
-    options: LayerAttributesConfig = {}
+    options: LayerAttributesConfig & {
+      scale?: number
+      bounds?: Bounds
+    } = {}
   ): Promise<void> {
     if (!this.ready) {
       throw new Error('The artboard is not ready')
     }
 
-    const layerAttributes = options
-    const bounds = await this._getLayerRenderBounds(layerId, layerAttributes)
+    const { bounds: boundsOverride, scale = 1, ...layerAttributes } = options
+
+    const bounds =
+      boundsOverride ||
+      (await this._getLayerRenderBounds(layerId, layerAttributes))
 
     const result = await this._renderingProcess.execCommand('render-layer', {
       'design': this._designId,
@@ -138,6 +149,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       'layer': layerId,
       'file': filePath,
       'bounds': serializeBounds(bounds),
+      'scale': scale,
       ...serializeLayerAttributes(options),
     })
     if (!result['ok']) {
@@ -154,6 +166,8 @@ export class RenderingArtboard implements IRenderingArtboard {
     filePath: string,
     options: {
       layerAttributes?: Record<string, LayerAttributesConfig>
+      scale?: number
+      bounds?: Bounds
     } = {}
   ): Promise<void> {
     if (!this.ready) {
@@ -161,10 +175,9 @@ export class RenderingArtboard implements IRenderingArtboard {
     }
 
     const layerAttributes = options.layerAttributes || {}
-    const bounds = await this._getCompoundLayerRenderBounds(
-      layerIds,
-      layerAttributes
-    )
+    const bounds =
+      options.bounds ||
+      (await this._getCompoundLayerRenderBounds(layerIds, layerAttributes))
 
     const result = await this._renderingProcess.execCommand(
       'render-artboard-composition',
@@ -172,6 +185,7 @@ export class RenderingArtboard implements IRenderingArtboard {
         'design': this._designId,
         'artboard': this.id,
         'bounds': serializeBounds(bounds),
+        'scale': options.scale || 1,
         'background': { 'enable': false },
         'draw-shown-only': true,
         'layer-attributes': layerIds.map(

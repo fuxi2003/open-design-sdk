@@ -12,6 +12,7 @@ import type {
 } from '@opendesign/octopus-reader'
 import type {
   BlendingMode,
+  Bounds,
   LayerAttributesConfig,
   LayerBounds,
 } from '@opendesign/rendering'
@@ -74,7 +75,13 @@ export interface ILayerFacade {
 
   getEffects(): IEffects
 
-  renderToFile(filePath: string, options?: LayerAttributesConfig): Promise<void>
+  renderToFile(
+    filePath: string,
+    options?: LayerAttributesConfig & {
+      bounds?: Bounds
+      scale?: number
+    }
+  ): Promise<void>
 
   getBounds(): Promise<LayerBounds>
 }

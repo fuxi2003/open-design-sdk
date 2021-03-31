@@ -23,7 +23,11 @@ import { memoize } from './utils/memoize'
 import { getDesignFormatByFileName } from './utils/design-format-utils'
 
 import type { IApiDesign, IApiDesignConversion } from '@opendesign/api'
-import type { IRenderingDesign, BlendingMode } from '@opendesign/rendering'
+import type {
+  Bounds,
+  IRenderingDesign,
+  BlendingMode,
+} from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
 import type { Sdk } from './sdk'
 import type {
@@ -574,7 +578,8 @@ export class DesignFacade implements IDesignFacade {
    */
   async renderArtboardToFile(
     artboardId: ArtboardId,
-    filePath: string
+    filePath: string,
+    options: { scale?: number } = {}
   ): Promise<void> {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {
@@ -594,7 +599,7 @@ export class DesignFacade implements IDesignFacade {
     const fonts = await artboard.getFonts()
     await this._loadSystemFontsToRendering(fonts)
 
-    return renderingDesign.renderArtboardToFile(artboardId, filePath)
+    return renderingDesign.renderArtboardToFile(artboardId, filePath, options)
   }
 
   /**
@@ -610,7 +615,11 @@ export class DesignFacade implements IDesignFacade {
    * @param pageId The ID of the page to render.
    * @param filePath The target location of the produced image file.
    */
-  async renderPageToFile(pageId: PageId, filePath: string): Promise<void> {
+  async renderPageToFile(
+    pageId: PageId,
+    filePath: string,
+    options: { scale?: number } = {}
+  ): Promise<void> {
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
@@ -618,7 +627,7 @@ export class DesignFacade implements IDesignFacade {
 
     await this._loadRenderingDesignPage(pageId)
 
-    return renderingDesign.renderPageToFile(pageId, filePath)
+    return renderingDesign.renderPageToFile(pageId, filePath, options)
   }
 
   /**
@@ -639,6 +648,8 @@ export class DesignFacade implements IDesignFacade {
    * @param options.includeArtboardBackground Whether to render the artboard background below the layer. By default, the background is not included.
    * @param options.includeEffects Whether to apply layer effects of the layer. Rendering of effects of nested layers is not affected. By defaults, effects of the layer are applied.
    * @param options.opacity The opacity to use for the layer instead of its default opacity.
+   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
+   * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    */
   async renderArtboardLayerToFile(
     artboardId: ArtboardId,
@@ -650,6 +661,8 @@ export class DesignFacade implements IDesignFacade {
       includeArtboardBackground?: boolean
       blendingMode?: BlendingMode
       opacity?: number
+      bounds?: Bounds
+      scale?: number
     } = {}
   ): Promise<void> {
     const artboard = this.getArtboardById(artboardId)
@@ -675,6 +688,7 @@ export class DesignFacade implements IDesignFacade {
     const fonts = layer.getFonts()
     await this._loadSystemFontsToRendering(fonts)
 
+    const { bounds, scale, ...layerAttributes } = options
     const resolvedLayerIds = await this._resolveVisibleArtboardLayerSubtree(
       artboardId,
       layerId
@@ -685,7 +699,9 @@ export class DesignFacade implements IDesignFacade {
       resolvedLayerIds,
       filePath,
       {
-        layerAttributes: { [layerId]: options },
+        ...(bounds ? { bounds } : {}),
+        scale: scale || 1,
+        layerAttributes: { [layerId]: layerAttributes },
       }
     )
   }
@@ -703,6 +719,8 @@ export class DesignFacade implements IDesignFacade {
    * @param artboardId The ID of the artboard from which to render the layer.
    * @param layerIds The IDs of the artboard layers to render.
    * @param filePath The target location of the produced image file.
+   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
+   * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    */
   async renderArtboardLayersToFile(
@@ -711,6 +729,8 @@ export class DesignFacade implements IDesignFacade {
     filePath: string,
     options: {
       layerAttributes?: Record<string, LayerAttributesConfig>
+      scale?: number
+      bounds?: Bounds
     } = {}
   ): Promise<void> {
     const artboard = this.getArtboardById(artboardId)

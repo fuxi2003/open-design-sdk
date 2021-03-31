@@ -69,6 +69,8 @@ export interface IDesignLayerCollectionFacade {
     filePath: string,
     options: {
       layerAttributes?: Record<string, LayerAttributesConfig>
+      scale?: number
+      bounds?: Bounds
     }
   ): Promise<void>
 }

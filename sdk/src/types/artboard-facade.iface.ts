@@ -11,7 +11,7 @@ import type {
   RgbaColor,
 } from '@opendesign/octopus-reader'
 import type {
-  BlendingMode,
+  Bounds,
   LayerAttributesConfig,
   LayerBounds,
 } from '@opendesign/rendering'
@@ -73,7 +73,10 @@ export interface IArtboardFacade {
   renderLayerToFile(
     layerId: LayerId,
     filePath: string,
-    options?: LayerAttributesConfig
+    options?: LayerAttributesConfig & {
+      bounds?: Bounds
+      scale?: number
+    }
   ): Promise<void>
 
   renderLayersToFile(
@@ -81,6 +84,8 @@ export interface IArtboardFacade {
     filePath: string,
     options?: {
       layerAttributes?: Record<string, LayerAttributesConfig>
+      scale?: number
+      bounds?: Bounds
     }
   ): Promise<void>
 

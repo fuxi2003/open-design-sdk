@@ -366,8 +366,11 @@ export class ArtboardFacade implements IArtboardFacade {
    * @category Rendering
    * @param filePath The target location of the produced image file.
    */
-  renderToFile(filePath: string): Promise<void> {
-    return this._designFacade.renderArtboardToFile(this.id, filePath)
+  renderToFile(
+    filePath: string,
+    options: { scale?: number } = {}
+  ): Promise<void> {
+    return this._designFacade.renderArtboardToFile(this.id, filePath, options)
   }
 
   /**
@@ -387,6 +390,8 @@ export class ArtboardFacade implements IArtboardFacade {
    * @param options.includeArtboardBackground Whether to render the artboard background below the layer. By default, the background is not included.
    * @param options.includeEffects Whether to apply layer effects of the layer. Rendering of effects of nested layers is not affected. By defaults, effects of the layer are applied.
    * @param options.opacity The opacity to use for the layer instead of its default opacity.
+   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
+   * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    */
   renderLayerToFile(
     layerId: LayerId,
@@ -397,6 +402,8 @@ export class ArtboardFacade implements IArtboardFacade {
       includeArtboardBackground?: boolean
       blendingMode?: BlendingMode
       opacity?: number
+      bounds?: Bounds
+      scale?: number
     } = {}
   ): Promise<void> {
     return this._designFacade.renderArtboardLayerToFile(
@@ -419,6 +426,8 @@ export class ArtboardFacade implements IArtboardFacade {
    * @category Rendering
    * @param layerIds The IDs of the artboard layers to render.
    * @param filePath The target location of the produced image file.
+   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
+   * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    */
   renderLayersToFile(
@@ -426,6 +435,8 @@ export class ArtboardFacade implements IArtboardFacade {
     filePath: string,
     options: {
       layerAttributes?: Record<string, LayerAttributesConfig>
+      scale?: number
+      bounds?: Bounds
     } = {}
   ): Promise<void> {
     return this._designFacade.renderArtboardLayersToFile(

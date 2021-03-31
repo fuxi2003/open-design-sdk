@@ -12,6 +12,7 @@ import type { LayerAttributesConfig } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
 import type { LayerFacade } from './layer-facade'
 import type { IDesignLayerCollectionFacade } from './types/design-layer-collection-facade.iface'
+import type { Bounds } from '@opendesign/rendering/dist'
 
 export class DesignLayerCollectionFacade
   implements IDesignLayerCollectionFacade {
@@ -305,12 +306,16 @@ export class DesignLayerCollectionFacade
    *
    * @category Rendering
    * @param filePath The target location of the produced image file.
+   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
+   * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    */
   async renderToFile(
     filePath: string,
     options?: {
       layerAttributes?: Record<string, LayerAttributesConfig>
+      scale?: number
+      bounds?: Bounds
     }
   ): Promise<void> {
     const layerIds = this.getLayers().map((layer) => {
