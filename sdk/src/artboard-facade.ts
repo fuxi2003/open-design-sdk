@@ -190,6 +190,21 @@ export class ArtboardFacade implements IArtboardFacade {
   }
 
   /**
+   * Returns the dimensions of the artboard and its position within the coordinate system of the design/page.
+   * @category Data
+   */
+  async getBounds(): Promise<Bounds> {
+    await this.load()
+
+    const bounds = this._artboardEntity.getBounds()
+    if (!bounds) {
+      throw new Error('Artboard bounds are not available')
+    }
+
+    return bounds
+  }
+
+  /**
    * Returns a list of bitmap assets used by layers in the artboard (optionally down to a specific nesting level).
    *
    * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.

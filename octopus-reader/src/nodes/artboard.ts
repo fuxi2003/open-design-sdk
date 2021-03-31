@@ -3,7 +3,7 @@ import { LayerCollection } from '../collections/layer-collection'
 import { createFlattenedLayers, createLayers } from '../utils/layer-factories'
 import { memoize } from '../utils/memoize'
 
-import type { IArtboard } from '../types/artboard.iface'
+import type { ArtboardBounds, IArtboard } from '../types/artboard.iface'
 import type { AggregatedFileBitmapAssetDescriptor } from '../types/bitmap-assets.type'
 import type { IFile } from '../types/file.iface'
 import type { AggregatedFileFontDescriptor } from '../types/fonts.type'
@@ -13,6 +13,7 @@ import type { ILayerCollection } from '../types/layer-collection.iface'
 import type { ArtboardManifestData } from '../types/manifest.type'
 import type {
   ArtboardOctopusData,
+  Bounds,
   ComponentId,
   RgbaColor,
 } from '../types/octopus.type'
@@ -126,6 +127,20 @@ export class Artboard implements IArtboard {
       id: this.id,
       pageId: null,
     })
+  }
+
+  getBounds(): ArtboardBounds | null {
+    const bounds = this._octopus?.['bounds']
+    const frame = this._octopus?.['frame']
+
+    return bounds && frame
+      ? {
+          'left': frame['x'],
+          'top': frame['y'],
+          'width': bounds['width'] || 0,
+          'height': bounds['height'] || 0,
+        }
+      : null
   }
 
   getRootLayers = memoize(

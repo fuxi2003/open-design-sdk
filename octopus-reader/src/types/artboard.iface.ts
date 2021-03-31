@@ -9,6 +9,13 @@ import type { ArtboardOctopusData, RgbaColor } from './octopus.type'
 import type { IPage } from './page.iface'
 import type { LayerSelector } from './selectors.type'
 
+export type ArtboardBounds = {
+  'left': number
+  'top': number
+  'width': number
+  'height': number
+}
+
 export interface IArtboard {
   readonly id: ArtboardId
   readonly pageId: PageId | null
@@ -27,6 +34,8 @@ export interface IArtboard {
   getPage(): IPage | null
   setPage(nextPageId: PageId | null): void
   unassignFromPage(): void
+
+  getBounds(): ArtboardBounds | null
 
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
