@@ -17,7 +17,9 @@ import type { Bounds } from '@opendesign/rendering/dist'
 export class DesignLayerCollectionFacade
   implements IDesignLayerCollectionFacade {
   private _layerCollection: ILayerCollection
-  private _designFacade: DesignFacade
+  private _designFacade: DesignFacade;
+
+  [index: number]: LayerFacade
 
   /** @internal */
   constructor(
@@ -28,6 +30,20 @@ export class DesignLayerCollectionFacade
   ) {
     this._layerCollection = layerCollection
     this._designFacade = params.designFacade
+
+    this._registerArrayIndexes()
+  }
+
+  private _registerArrayIndexes() {
+    for (let i = 0; i < this._layerCollection.length; i += 1) {
+      Object.defineProperty(this, i, {
+        get() {
+          const layers = this.getLayers()
+          return layers[i]
+        },
+        enumerable: true,
+      })
+    }
   }
 
   /** @internal */
