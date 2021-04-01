@@ -787,12 +787,25 @@ export class DesignFacade implements IDesignFacade {
    * @param layerId The ID of the layer to inspect.
    */
   async getArtboardLayerBounds(artboardId: ArtboardId, layerId: LayerId) {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
     }
 
+    const layer = await artboard.getLayerById(layerId)
+    if (!layer) {
+      throw new Error('No such layer')
+    }
+
     await this._loadRenderingDesignArtboard(artboardId, { loadAssets: false })
+
+    const fonts = layer.getFonts()
+    await this._loadSystemFontsToRendering(fonts)
 
     return renderingDesign.getArtboardLayerBounds(artboardId, layerId)
   }
