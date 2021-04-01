@@ -754,7 +754,6 @@ export class DesignFacade implements IDesignFacade {
         })
       )
     ).flat(1)
-    await this.downloadBitmapAssets(bitmapAssetDescs)
 
     const fonts = (
       await Promise.all(
@@ -764,7 +763,11 @@ export class DesignFacade implements IDesignFacade {
         })
       )
     ).flat(1)
-    await this._loadSystemFontsToRendering(fonts)
+
+    await Promise.all([
+      this.downloadBitmapAssets(bitmapAssetDescs),
+      this._loadSystemFontsToRendering(fonts),
+    ])
 
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
