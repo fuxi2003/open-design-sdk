@@ -11,6 +11,7 @@ import type { components } from 'open-design-api-types'
 import type { ISdk } from './types/sdk.iface'
 import type { DesignFacade } from './design-facade'
 import type { DesignFileManager } from './local/design-file-manager'
+import type { LocalDesignCache } from './local/local-design-cache'
 import type { LocalDesignManager } from './local/local-design-manager'
 import type { ILocalDesign } from './types/local-design.iface'
 import type { ISystemFontManager } from './types/system-font-manager.iface'
@@ -20,6 +21,7 @@ type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionT
 export class Sdk implements ISdk {
   private _openDesignApi: IOpenDesignApi | null = null
   private _designFileManager: DesignFileManager | null = null
+  private _localDesignCache: LocalDesignCache | null = null
   private _localDesignManager: LocalDesignManager | null = null
   private _renderingEngine: IRenderingEngine | null = null
   private _systemFontManager: ISystemFontManager | null = null
@@ -82,6 +84,7 @@ export class Sdk implements ISdk {
    */
   getWorkingDirectory(): string | null {
     return (
+      this._localDesignCache?.getWorkingDirectory() ||
       this._localDesignManager?.getWorkingDirectory() ||
       this._designFileManager?.getWorkingDirectory() ||
       null
@@ -99,15 +102,17 @@ export class Sdk implements ISdk {
    * @param workingDirectory An absolute path to the directory or a path relative to the process working directory (`process.cwd()` in node.js). When `null` is provided, the working directory is reset to the process working directory.
    */
   setWorkingDirectory(workingDirectory: string | null) {
+    const localDesignCache = this._localDesignCache
     const localDesignManager = this._localDesignManager
     const designFileManager = this._designFileManager
 
-    if (!localDesignManager && !designFileManager) {
+    if (!localDesignCache && !localDesignManager && !designFileManager) {
       throw new Error(
         'Offline services are not configured. Cannot set the working directory.'
       )
     }
 
+    localDesignCache?.setWorkingDirectory(workingDirectory)
     localDesignManager?.setWorkingDirectory(workingDirectory)
     designFileManager?.setWorkingDirectory(workingDirectory)
   }
@@ -369,16 +374,35 @@ export class Sdk implements ISdk {
 
     const localDesignManager = this._localDesignManager
     if (localDesignManager) {
-      const localDesign = await localDesignManager.createOctopusFileFromManifest(
-        designFacade.getManifest(),
-        {
-          name: apiDesign.name,
-          apiDesignInfo: {
-            apiRoot: apiDesign.getApiRoot(),
-            designId: apiDesign.id,
-          },
-        }
-      )
+      const localDesignCache = this._localDesignCache
+      const cachedOctopusFilename = localDesignCache
+        ? await localDesignCache.getDesignOctopusFilename(designId)
+        : null
+
+      const apiDesignInfo = {
+        apiRoot: apiDesign.getApiRoot(),
+        designId: apiDesign.id,
+      }
+
+      const localDesign = cachedOctopusFilename
+        ? await localDesignManager.openOctopusFile(cachedOctopusFilename, {
+            apiDesignInfo,
+          })
+        : await localDesignManager.createOctopusFileFromManifest(
+            designFacade.getManifest(),
+            {
+              name: apiDesign.name,
+              apiDesignInfo,
+            }
+          )
+
+      if (localDesignCache && !cachedOctopusFilename) {
+        localDesignCache.setDesignOctopusFilename(
+          designId,
+          localDesign.filename
+        )
+      }
+
       await designFacade.setLocalDesign(localDesign)
 
       const renderingEngine = this._renderingEngine
@@ -425,6 +449,11 @@ export class Sdk implements ISdk {
   /** @internal */
   useLocalDesignManager(localDesignManager: LocalDesignManager): void {
     this._localDesignManager = localDesignManager
+  }
+
+  /** @internal */
+  useLocalDesignCache(localDesignCache: LocalDesignCache): void {
+    this._localDesignCache = localDesignCache
   }
 
   /** @internal */

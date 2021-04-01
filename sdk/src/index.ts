@@ -1,6 +1,7 @@
 import { OpenDesignApi } from '@opendesign/api'
 import { RenderingEngine } from '@opendesign/rendering'
 import { DesignFileManager } from './local/design-file-manager'
+import { LocalDesignCache } from './local/local-design-cache'
 import { LocalDesignManager } from './local/local-design-manager'
 import { SystemFontManager } from './local/system-font-manager'
 import { Sdk } from './sdk'
@@ -32,13 +33,10 @@ export function createSdk(params: {
   rendering: boolean
   systemFonts: boolean
 }) {
-  if (params.cached === false && params.rendering === false) {
-    throw new Error('Cannot configure the rendering engine without cache')
-  }
-
   const sdk = new Sdk()
 
   sdk.useDesignFileManager(new DesignFileManager())
+  sdk.useLocalDesignManager(new LocalDesignManager())
 
   if (params.token) {
     sdk.useOpenDesignApi(
@@ -54,11 +52,11 @@ export function createSdk(params: {
   }
 
   if (params.cached !== false) {
-    sdk.useLocalDesignManager(new LocalDesignManager())
+    sdk.useLocalDesignCache(new LocalDesignCache())
+  }
 
-    if (params.rendering !== false) {
-      sdk.useRenderingEngine(new RenderingEngine())
-    }
+  if (params.rendering !== false) {
+    sdk.useRenderingEngine(new RenderingEngine())
   }
 
   sdk.setWorkingDirectory(params.workingDirectory || null)
