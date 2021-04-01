@@ -16,6 +16,14 @@ export class RenderingEngine implements IRenderingEngine {
     this._renderingProcess = renderingProcess
   }
 
+  isDestroyed() {
+    return this._renderingProcess.isDestroyed()
+  }
+
+  destroy() {
+    return this._renderingProcess.destroy()
+  }
+
   async createDesign(
     designId: string,
     params: {

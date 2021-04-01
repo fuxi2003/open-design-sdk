@@ -6,6 +6,9 @@ import type { ILocalDesignManager } from './local-design-manager.iface'
 import type { ISystemFontManager } from './system-font-manager.iface'
 
 export interface ISdk {
+  isDestroyed(): boolean
+  destroy(): Promise<void>
+
   openDesignFile(filePath: string): Promise<IDesignFacade>
   openDesignLink(url: string): Promise<IDesignFacade>
   openOctopusFile(filePath: string): Promise<IDesignFacade>

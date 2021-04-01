@@ -24,6 +24,8 @@ export class Sdk implements ISdk {
   private _renderingEngine: IRenderingEngine | null = null
   private _systemFontManager: ISystemFontManager | null = null
 
+  private _destroyed: boolean = false
+
   /** @internal */
   constructor() {}
 
@@ -41,6 +43,30 @@ export class Sdk implements ISdk {
   toJSON() {
     return {
       workingDirectory: this.getWorkingDirectory(),
+    }
+  }
+
+  /**
+   * Returns whether the SDK has been destroyed.
+   *
+   * @category Status
+   */
+  isDestroyed() {
+    return this._destroyed
+  }
+
+  /**
+   * Destroys the SDK instance.
+   *
+   * The local rendering engine process is terminated if it has been configured.
+   *
+   * @category Status
+   */
+  async destroy() {
+    this._destroyed = true
+
+    if (this._renderingEngine && !this._renderingEngine.isDestroyed()) {
+      await this._renderingEngine.destroy()
     }
   }
 
@@ -91,6 +117,10 @@ export class Sdk implements ISdk {
    * @returns A design object which can be used for retrieving data from the local `.octopus` file or a referenced server-side design (see above).
    */
   async openOctopusFile(filePath: string): Promise<DesignFacade> {
+    if (this.isDestroyed()) {
+      throw new Error('The SDK has been destroyed.')
+    }
+
     const localDesignManager = this._localDesignManager
     if (!localDesignManager) {
       throw new Error('Local design manager is not configured.')
@@ -124,6 +154,10 @@ export class Sdk implements ISdk {
    * @returns A design object which can be used for creating `.octopus` file content.
    */
   async createOctopusFile(filePath: string): Promise<DesignFacade> {
+    if (this.isDestroyed()) {
+      throw new Error('The SDK has been destroyed.')
+    }
+
     const localDesignManager = this._localDesignManager
     if (!localDesignManager) {
       throw new Error('Local design manager is not configured.')
@@ -158,6 +192,10 @@ export class Sdk implements ISdk {
    * @returns A design object which can be used for retrieving data from the local design file using the API.
    */
   async openDesignFile(filePath: string): Promise<DesignFacade> {
+    if (this.isDestroyed()) {
+      throw new Error('The SDK has been destroyed.')
+    }
+
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
       throw new Error('Open Design API is not configured.')
@@ -193,6 +231,10 @@ export class Sdk implements ISdk {
     url: string,
     options: { format?: DesignImportFormatEnum } = {}
   ): Promise<DesignFacade> {
+    if (this.isDestroyed()) {
+      throw new Error('The SDK has been destroyed.')
+    }
+
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
       throw new Error('Open Design API is not configured.')
@@ -224,6 +266,10 @@ export class Sdk implements ISdk {
     figmaIds?: Array<string>
     designName?: string | null
   }): Promise<DesignFacade> {
+    if (this.isDestroyed()) {
+      throw new Error('The SDK has been destroyed.')
+    }
+
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
       throw new Error('Open Design API is not configured.')
@@ -257,6 +303,10 @@ export class Sdk implements ISdk {
     designName?: string | null
     conversions: Array<{ format: DesignConversionTargetFormatEnum }>
   }): Promise<DesignFacade> {
+    if (this.isDestroyed()) {
+      throw new Error('The SDK has been destroyed.')
+    }
+
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
       throw new Error('Open Design API is not configured.')
@@ -295,6 +345,10 @@ export class Sdk implements ISdk {
     designId: string,
     params: { sourceFilename?: string | null }
   ): Promise<DesignFacade> {
+    if (this.isDestroyed()) {
+      throw new Error('The SDK has been destroyed.')
+    }
+
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
       throw new Error('Open Design API is not configured.')

@@ -5,6 +5,9 @@ import type {
 } from './commands.type'
 
 export interface IRenderingProcess {
+  isDestroyed(): boolean
+  destroy(): Promise<void>
+
   execCommand<
     CmdName extends RenderingCommand['cmd'],
     Cmd extends Extract<RenderingCommand, { 'cmd': CmdName }>

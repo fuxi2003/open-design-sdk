@@ -11,12 +11,26 @@ import type {
 
 export class RenderingProcess implements IRenderingProcess {
   private _process: ChildProcess | null = null
+  private _destroyed: boolean = false
+
+  isDestroyed() {
+    return this._destroyed
+  }
+
+  async destroy() {
+    const quitPromise = this._execCommand('quit', {})
+    this._destroyed = true
+    await quitPromise
+  }
 
   init() {
     this._process = spawnMonroeCli()
 
     this._process.on('error', (err) => {
       console.log('RenderingProcess error:', err)
+    })
+    this._process.on('close', () => {
+      this._process = null
     })
 
     this._process.stdout?.on('data', (data) => {
@@ -50,6 +64,10 @@ export class RenderingProcess implements IRenderingProcess {
       ? CommandResults[CmdName]
       : CommonResult
   > {
+    if (this.isDestroyed()) {
+      throw new Error('The rendering process has been destroyed.')
+    }
+
     const renderingProcess = this._process
     if (!renderingProcess) {
       throw new Error('Rendering process not initialized')
