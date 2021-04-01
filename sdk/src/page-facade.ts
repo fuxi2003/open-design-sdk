@@ -221,6 +221,16 @@ export class PageFacade implements IPageFacade {
     return this._pageEntity.getFonts(options)
   }
 
+  /**
+   * Returns a collection of all layers from all artboards within the page (optionally down to a specific nesting level).
+   *
+   * The produced collection can be queried further for narrowing down the search.
+   *
+   * This method internally triggers loading of all artboards within the page. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param options.depth The maximum nesting level of layers within the artboards to include in the collection. By default, all levels are included.
+   */
   async getFlattenedLayers(options: { depth?: number } = {}) {
     await this.load()
 
@@ -230,6 +240,17 @@ export class PageFacade implements IPageFacade {
     })
   }
 
+  /**
+   * Returns the first layer object which has the specified ID within the artboards of the page.
+   *
+   * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes. This is the reason the method is not prefixed with "get".
+   *
+   * This method internally triggers loading of all the artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param layerId A layer ID.
+   * @param options.depth The maximum nesting level within artboard layers to search. By default, all levels are searched.
+   */
   async findLayerById(layerId: LayerId, options: { depth?: number } = {}) {
     await this.load()
 
@@ -245,6 +266,17 @@ export class PageFacade implements IPageFacade {
     return layerFacade
   }
 
+  /**
+   * Returns a collection of all layer objects which have the specified ID within the artboards of the page.
+   *
+   * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes.
+   *
+   * This method internally triggers loading of all the artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param layerId A layer ID.
+   * @param options.depth The maximum nesting level within artboard layers to search. By default, all levels are searched.
+   */
   async findLayersById(layerId: LayerId, options: { depth?: number } = {}) {
     await this.load()
 
@@ -254,6 +286,15 @@ export class PageFacade implements IPageFacade {
     })
   }
 
+  /**
+   * Returns the first layer object from any artboard within the page (optionally down to a specific nesting level) matching the specified criteria.
+   *
+   * This method internally triggers loading of all the artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param selector A design-wide layer selector. All specified fields must be matched by the result.
+   * @param options.depth The maximum nesting level within the artboard layers to search. By default, all levels are searched.
+   */
   async findLayer(selector: LayerSelector, options: { depth?: number } = {}) {
     await this.load()
 
@@ -269,6 +310,15 @@ export class PageFacade implements IPageFacade {
     return layerFacade
   }
 
+  /**
+   * Returns a collection of all layer objects from all artboards within the page (optionally down to a specific nesting level) matching the specified criteria.
+   *
+   * This method internally triggers loading of all the artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   *
+   * @category Layer Lookup
+   * @param selector A design-wide layer selector. All specified fields must be matched by the result.
+   * @param options.depth The maximum nesting level within the artboard layers to search. By default, all levels are searched.
+   */
   async findLayers(selector: LayerSelector, options: { depth?: number } = {}) {
     await this.load()
 
