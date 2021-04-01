@@ -312,7 +312,7 @@ export class DesignLayerCollectionFacade
   }
 
   /**
-   * Renders all layers in the collection as a single image file.
+   * Renders all layers in the collection as a single PNG image file.
    *
    * In case of group layers, all visible nested layers are also included.
    *
@@ -321,7 +321,7 @@ export class DesignLayerCollectionFacade
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
-   * @param filePath The target location of the produced image file.
+   * @param filePath The target location of the produced PNG image file.
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.

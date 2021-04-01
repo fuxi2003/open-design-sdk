@@ -395,7 +395,7 @@ export class LayerFacade implements ILayerFacade {
   }
 
   /**
-   * Renders the layer as an image file.
+   * Renders the layer as an PNG image file.
    *
    * In case the layer is a group layer, all visible nested layers are also included.
    *
@@ -404,7 +404,7 @@ export class LayerFacade implements ILayerFacade {
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
-   * @param filePath The target location of the produced image file.
+   * @param filePath The target location of the produced PNG image file.
    * @param options.blendingMode The blending mode to use for rendering the layer instead of its default blending mode. Note that this configuration has no effect when the artboard background is not included via `includeArtboardBackground=true`.
    * @param options.clip Whether to apply clipping by a mask layer if any such mask is set for the layer (see {@link LayerFacade.isMasked}). Clipping is disabled by default. Setting this flag for layers which do not have a mask layer set has no effect on the results.
    * @param options.includeArtboardBackground Whether to render the artboard background below the layer. By default, the background is not included.

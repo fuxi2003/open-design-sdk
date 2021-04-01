@@ -370,7 +370,7 @@ export class ArtboardFacade implements IArtboardFacade {
   }
 
   /**
-   * Renders the artboard as an image file.
+   * Renders the artboard as an PNG image file.
    *
    * All visible layers from the artboard are included.
    *
@@ -379,7 +379,7 @@ export class ArtboardFacade implements IArtboardFacade {
    * Offline services including the local rendering engine have to be configured when using this method.
    *
    * @category Rendering
-   * @param filePath The target location of the produced image file.
+   * @param filePath The target location of the produced PNG image file.
    */
   renderToFile(
     filePath: string,
@@ -389,7 +389,7 @@ export class ArtboardFacade implements IArtboardFacade {
   }
 
   /**
-   * Renders the specified layer from the artboard as an image file.
+   * Renders the specified layer from the artboard as an PNG image file.
    *
    * In case of group layers, all visible nested layers are also included.
    *
@@ -399,7 +399,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * @category Rendering
    * @param layerId The ID of the artboard layer to render.
-   * @param filePath The target location of the produced image file.
+   * @param filePath The target location of the produced PNG image file.
    * @param options.blendingMode The blending mode to use for rendering the layer instead of its default blending mode. Note that this configuration has no effect when the artboard background is not included via `includeArtboardBackground=true`.
    * @param options.clip Whether to apply clipping by a mask layer if any such mask is set for the layer (see {@link LayerFacade.isMasked}). Clipping is disabled by default. Setting this flag for layers which do not have a mask layer set has no effect on the results.
    * @param options.includeArtboardBackground Whether to render the artboard background below the layer. By default, the background is not included.
@@ -430,7 +430,7 @@ export class ArtboardFacade implements IArtboardFacade {
   }
 
   /**
-   * Renders the specified layers from the artboard as a single image file.
+   * Renders the specified layers from the artboard as a single PNG image file.
    *
    * In case of group layers, all visible nested layers are also included.
    *
@@ -440,7 +440,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * @category Rendering
    * @param layerIds The IDs of the artboard layers to render.
-   * @param filePath The target location of the produced image file.
+   * @param filePath The target location of the produced PNG image file.
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
