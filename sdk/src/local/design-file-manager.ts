@@ -4,8 +4,20 @@ import { resolve as resolvePath } from 'path'
 import type { IDesignFileManager } from '../types/design-file-manager.iface'
 
 export class DesignFileManager implements IDesignFileManager {
+  private _workingDirectory: string | null = null
+
+  getWorkingDirectory() {
+    return this._workingDirectory || resolvePath('.')
+  }
+
+  setWorkingDirectory(workingDirectory: string | null) {
+    this._workingDirectory = workingDirectory
+      ? resolvePath(workingDirectory)
+      : null
+  }
+
   async readDesignFileStream(filePath: string): Promise<ReadStream> {
-    const filename = resolvePath(filePath)
+    const filename = this._resolvePath(filePath)
     const stream = createReadStream(filename)
 
     return new Promise((resolve, reject) => {
@@ -22,7 +34,7 @@ export class DesignFileManager implements IDesignFileManager {
     filePath: string,
     designFileStream: NodeJS.ReadableStream
   ): Promise<void> {
-    const filename = resolvePath(filePath)
+    const filename = this._resolvePath(filePath)
     const writeStream = createWriteStream(filename)
 
     return new Promise((resolve, reject) => {
@@ -32,5 +44,9 @@ export class DesignFileManager implements IDesignFileManager {
 
       designFileStream.pipe(writeStream)
     })
+  }
+
+  _resolvePath(filePath: string) {
+    return resolvePath(this._workingDirectory || '.', `${filePath}`)
   }
 }

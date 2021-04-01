@@ -81,7 +81,11 @@ export class Sdk implements ISdk {
    * @returns An absolute path to the working directory. Defaults to the current process working directory (`process.cwd()` in node.js) when the workspace directory is not configured via {@link Sdk.setWorkingDirectory}.
    */
   getWorkingDirectory(): string | null {
-    return this._localDesignManager?.getWorkingDirectory() || null
+    return (
+      this._localDesignManager?.getWorkingDirectory() ||
+      this._designFileManager?.getWorkingDirectory() ||
+      null
+    )
   }
 
   /**
@@ -96,13 +100,16 @@ export class Sdk implements ISdk {
    */
   setWorkingDirectory(workingDirectory: string | null) {
     const localDesignManager = this._localDesignManager
-    if (!localDesignManager) {
+    const designFileManager = this._designFileManager
+
+    if (!localDesignManager && !designFileManager) {
       throw new Error(
         'Offline services are not configured. Cannot set the working directory.'
       )
     }
 
-    localDesignManager.setWorkingDirectory(workingDirectory)
+    localDesignManager?.setWorkingDirectory(workingDirectory)
+    designFileManager?.setWorkingDirectory(workingDirectory)
   }
 
   /**
