@@ -1,12 +1,27 @@
 export function createQueue<Args extends Array<unknown>, Result>(
   fn: (...args: Args) => Promise<Result>
 ): (...args: Args) => Promise<Result> {
-  let lastResultPromise: Promise<Result> | null = null
+  let prevQueue: Promise<Result> | null = null
 
-  return async (...args) => {
-    await lastResultPromise
-    const nextResultPromise = fn(...args)
-    lastResultPromise = nextResultPromise
-    return nextResultPromise
+  return (...args) => {
+    const nextQueue = extendQueue(prevQueue, () => fn(...args))
+    prevQueue = nextQueue
+    return nextQueue
   }
+}
+
+async function extendQueue<Result>(
+  prevQueue: Promise<Result> | null,
+  fn: () => Promise<Result>
+): Promise<Result> {
+  try {
+    await prevQueue
+  } catch (err) {
+    console.warn(
+      'RenderingProcess#execCommand(): previous command resulted in an error',
+      err
+    )
+  }
+
+  return fn()
 }
