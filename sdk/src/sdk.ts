@@ -371,15 +371,13 @@ export class Sdk implements ISdk {
     if (localDesignManager) {
       const localDesign = await localDesignManager.createOctopusFileFromManifest(
         designFacade.getManifest(),
-        apiDesign
-          ? {
-              name: apiDesign.name,
-              apiDesignInfo: {
-                apiRoot: apiDesign.getApiRoot(),
-                designId: apiDesign.id,
-              },
-            }
-          : {}
+        {
+          name: apiDesign.name,
+          apiDesignInfo: {
+            apiRoot: apiDesign.getApiRoot(),
+            designId: apiDesign.id,
+          },
+        }
       )
       await designFacade.setLocalDesign(localDesign)
 
