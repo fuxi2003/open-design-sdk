@@ -591,13 +591,7 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId)
-
-    const bitmapAssetDescs = await artboard.getBitmapAssets()
-    await this.downloadBitmapAssets(bitmapAssetDescs)
-
-    const fonts = await artboard.getFonts()
-    await this._loadSystemFontsToRendering(fonts)
+    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: true })
 
     return renderingDesign.renderArtboardToFile(artboardId, filePath, options)
   }
@@ -625,7 +619,7 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignPage(pageId)
+    await this._loadRenderingDesignPage(pageId, { loadAssets: true })
 
     return renderingDesign.renderPageToFile(pageId, filePath, options)
   }
@@ -680,7 +674,7 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('No such layer')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId)
+    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: false })
 
     const bitmapAssetDescs = layer.getBitmapAssets()
     await this.downloadBitmapAssets(bitmapAssetDescs)
@@ -743,7 +737,7 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId)
+    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: false })
 
     const resolvedLayerSubtrees = await Promise.all(
       layerIds.map((layerId) => {
@@ -795,7 +789,7 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId)
+    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: false })
 
     return renderingDesign.getArtboardLayerBounds(artboardId, layerId)
   }
@@ -820,7 +814,7 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId)
+    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: true })
 
     const layerId = await renderingDesign.getArtboardLayerAtPosition(
       artboardId,
@@ -850,7 +844,7 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId)
+    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: true })
 
     const layerIds = await renderingDesign.getArtboardLayersInArea(
       artboardId,
@@ -1091,15 +1085,25 @@ export class DesignFacade implements IDesignFacade {
     return conversion
   }
 
-  private async _loadRenderingDesignPage(pageId: string) {
+  private async _loadRenderingDesignPage(
+    pageId: string,
+    params: {
+      loadAssets: boolean
+    }
+  ) {
     const pageArtboards = this.getPageArtboards(pageId)
 
     await sequence(pageArtboards, (artboard) => {
-      return this._loadRenderingDesignArtboard(artboard.id)
+      return this._loadRenderingDesignArtboard(artboard.id, params)
     })
   }
 
-  private async _loadRenderingDesignArtboard(artboardId: string) {
+  private async _loadRenderingDesignArtboard(
+    artboardId: string,
+    params: {
+      loadAssets: boolean
+    }
+  ) {
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
@@ -1133,9 +1137,6 @@ export class DesignFacade implements IDesignFacade {
       symbolId: artboard.componentId,
     })
 
-    const fonts = await artboard.getFonts()
-    await this._loadSystemFontsToRendering(fonts)
-
     // NOTE: This logic is more a future-proofing of the logic rather than a required step
     //   as the SDK works with "expanded" octopus documents only and there should thus not be
     //   any pending symbols.
@@ -1145,11 +1146,21 @@ export class DesignFacade implements IDesignFacade {
         throw new Error('A dependency component artboard is not available')
       }
 
-      return this._loadRenderingDesignArtboard(componentArtboard.id)
+      return this._loadRenderingDesignArtboard(componentArtboard.id, params)
     })
 
     if (!renderingDesign.isArtboardReady(artboardId)) {
       throw new Error('The artboard failed to be loaded to a ready state')
+    }
+
+    if (params.loadAssets) {
+      const bitmapAssetDescs = await artboard.getBitmapAssets()
+      const fonts = await artboard.getFonts()
+
+      await Promise.all([
+        this.downloadBitmapAssets(bitmapAssetDescs),
+        this._loadSystemFontsToRendering(fonts),
+      ])
     }
   }
 
