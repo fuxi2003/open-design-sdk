@@ -1234,10 +1234,6 @@ export class DesignFacade implements IDesignFacade {
       return this._loadRenderingDesignArtboard(componentArtboard.id, params)
     })
 
-    if (!renderingDesign.isArtboardReady(artboardId)) {
-      throw new Error('The artboard failed to be loaded to a ready state')
-    }
-
     if (params.loadAssets) {
       const bitmapAssetDescs = await artboard.getBitmapAssets()
       const fonts = await artboard.getFonts()
@@ -1246,6 +1242,12 @@ export class DesignFacade implements IDesignFacade {
         this.downloadBitmapAssets(bitmapAssetDescs),
         this._loadSystemFontsToRendering(fonts),
       ])
+    }
+
+    await renderingDesign.markArtboardAsReady(artboardId)
+
+    if (!renderingDesign.isArtboardReady(artboardId)) {
+      throw new Error('The artboard failed to be loaded to a ready state')
     }
   }
 

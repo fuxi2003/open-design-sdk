@@ -100,6 +100,15 @@ export class RenderingDesign implements IRenderingDesign {
     this._loadedBitmaps.add(bitmapKey)
   }
 
+  async markArtboardAsReady(artboardId: string): Promise<void> {
+    const artboard = this._artboards.get(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    return artboard.markAsReady()
+  }
+
   async renderArtboardToFile(
     artboardId: string,
     filePath: string,

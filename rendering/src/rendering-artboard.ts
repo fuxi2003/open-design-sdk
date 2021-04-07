@@ -83,7 +83,6 @@ export class RenderingArtboard implements IRenderingArtboard {
 
     const pendingSymbolIds = await this._getPendingArtboardDependencies()
     this._pendingSymbolIds = pendingSymbolIds
-    this._ready = pendingSymbolIds.length === 0
   }
 
   async _getPendingArtboardDependencies(): Promise<Array<string>> {
@@ -99,6 +98,21 @@ export class RenderingArtboard implements IRenderingArtboard {
     }
 
     return dependencyResult['symbols'] || []
+  }
+
+  async markAsReady(): Promise<void> {
+    const finalizeResult = await this._renderingProcess.execCommand(
+      'finalize-artboard',
+      {
+        'design': this._designId,
+        'artboard': this.id,
+      }
+    )
+    if (!finalizeResult['ok']) {
+      throw new Error('The artboard cannot be marked as ready')
+    }
+
+    this._ready = true
   }
 
   async renderToFile(

@@ -16,6 +16,8 @@ export interface IRenderingDesign {
     }
   ): Promise<{ ready: boolean; pendingSymbolIds: Array<string> }>
 
+  markArtboardAsReady(artboardId: string): Promise<void>
+
   unloadArtboard(artboardId: string): Promise<void>
   unloadArtboards(): Promise<void>
 
