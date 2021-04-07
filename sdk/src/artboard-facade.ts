@@ -154,7 +154,7 @@ export class ArtboardFacade implements IArtboardFacade {
   }
 
   /**
-   * Returns whether the artboard content is loaded in memory from the API, a local `.octopus` file or a local cache.
+   * Returns whether the artboard content is loaded in memory from the API or a local cache.
    * @category Status
    */
   isLoaded() {

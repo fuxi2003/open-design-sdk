@@ -81,7 +81,8 @@ export class DesignFacade implements IDesignFacade {
   }
 
   /**
-   * The absolute path of the open local `.octopus` design or the local cache. This is not available when online services are not configured for the SDK.
+   * The absolute path of the local cache. This is not available when online services are not configured for the SDK.
+   * @internal
    * @category Identification
    */
   get octopusFilename() {
@@ -1011,7 +1012,7 @@ export class DesignFacade implements IDesignFacade {
   }
 
   /**
-   * Downloads the specified bitmap assets to the local `.octopus` file or the local cache.
+   * Downloads the specified bitmap assets to the local cache.
    *
    * Both online and offline services have to be configured when using this method.
    *
@@ -1058,6 +1059,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * The design object switches to using the new location as the local `.octopus` file and considers the file a local cache.
    *
+   * @internal
    * @category Serialization
    * @param filePath An absolute path of the target `.octopus` file or a path relative to the current working directory. When omitted, the open `.octopus` file location is used instead. Online services have to be configured in case there are uncached items.
    */

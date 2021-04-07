@@ -126,6 +126,7 @@ export class Sdk implements ISdk {
    *
    * In case the file references a server-side design and online services is configured, the API can be used for fetching missing data of partially downloaded files.
    *
+   * @internal
    * @category Local Design File Usage
    * @param filePath An absolute `.octopus` file path or a path relative to the current working directory.
    * @returns A design object which can be used for retrieving data from the local `.octopus` file or a referenced server-side design (see above).

@@ -15,7 +15,6 @@ import { Sdk } from './sdk'
  * - A local rendering engine is available by default.
  * - Local system fonts can be used for rendering design by default.
  * - A local cache is available by default.
- * - Local `.octopus` files can be opened by default.
  *
  * @category Primary Entry Point
  * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication). When no token is provided, online services (the API) is not configured.
