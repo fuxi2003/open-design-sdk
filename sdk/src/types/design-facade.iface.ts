@@ -85,6 +85,8 @@ export interface IDesignFacade {
     options?: Partial<{ depth: number }>
   ): Promise<Array<AggregatedFileFontDescriptor>>
 
+  setFallbackFonts(fallbackFontPostscriptNames: Array<string>): void
+
   renderArtboardToFile(artboardId: ArtboardId, filePath: string): Promise<void>
 
   renderPageToFile(pageId: ArtboardId, filePath: string): Promise<void>

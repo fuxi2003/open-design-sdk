@@ -23,6 +23,7 @@ export interface ISdk {
   setWorkingDirectory(workingDirectory: string | null): void
 
   getSystemFont(postscriptName: string): Promise<FontMatchDescriptor | null>
+  setFallbackFonts(fallbackFontPostscriptNames: Array<string>): void
 
   useLocalDesignManager(localDesignManager: ILocalDesignManager): void
   useRenderingEngine(renderingEngine: IRenderingEngine): void

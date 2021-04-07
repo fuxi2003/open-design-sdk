@@ -3,7 +3,6 @@ import {
   createDesignFromOpenDesignApiDesign,
 } from './utils/design-factories'
 import { mapFind } from './utils/async'
-import { extname } from 'path'
 import { inspect } from 'util'
 import { v4 as uuid } from 'uuid'
 
@@ -20,8 +19,6 @@ import type { ISystemFontManager } from './types/system-font-manager.iface'
 
 type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 
-const fallbackPostscriptNames = ['Roboto', 'Helvetica', 'Arial', 'Courier']
-
 export class Sdk implements ISdk {
   private _openDesignApi: IOpenDesignApi | null = null
   private _designFileManager: DesignFileManager | null = null
@@ -31,6 +28,13 @@ export class Sdk implements ISdk {
   private _systemFontManager: ISystemFontManager | null = null
 
   private _destroyed: boolean = false
+
+  private _fallbackFontPostscriptNames: Array<string> = [
+    'Roboto',
+    'Helvetica',
+    'Arial',
+    'Courier',
+  ]
 
   /** @internal */
   constructor() {}
@@ -121,6 +125,20 @@ export class Sdk implements ISdk {
     localDesignCache?.setWorkingDirectory(workingDirectory)
     localDesignManager?.setWorkingDirectory(workingDirectory)
     designFileManager?.setWorkingDirectory(workingDirectory)
+  }
+
+  /**
+   * Sets the fonts which should be used as a fallback in case the actual fonts needed for rendering text layers are not available.
+   *
+   * The first font from this list which is available in the system is used for all text layers with missing actual fonts. If none of the fonts are available, the text layers are not rendered.
+   *
+   * This configuration can be overriden/extended for each individual design via {@link DesignFacade.setFallbackFonts}. Fonts provided to an individual design are preferred over fonts specified here.
+   *
+   * @category Configuration
+   * @param fallbackFontPostscriptNames An ordered list of font postscript names.
+   */
+  setFallbackFonts(fallbackFontPostscriptNames: Array<string>) {
+    this._fallbackFontPostscriptNames = fallbackFontPostscriptNames
   }
 
   /**
@@ -440,11 +458,14 @@ export class Sdk implements ISdk {
 
   /** @internal */
   async getSystemFont(
-    postscriptName: string
+    postscriptName: string,
+    options: {
+      fallbacks?: Array<string>
+    } = {}
   ): Promise<FontMatchDescriptor | null> {
     const match =
       (await this._getMatchingSystemFont(postscriptName)) ||
-      (await this._getFallbackFont())
+      (await this._getFallbackFont(options.fallbacks || []))
     return match
   }
 
@@ -465,15 +486,15 @@ export class Sdk implements ISdk {
       : null
   }
 
-  private async _getFallbackFont(): Promise<FontMatchDescriptor | null> {
-    return mapFind(fallbackPostscriptNames, async (postscriptName: string) => {
-      const match = await this._getMatchingSystemFont(postscriptName)
-      if (!match || extname(match.fontFilename).toLowerCase() === '.ttc') {
-        return null
+  private async _getFallbackFont(
+    fallbackFontPostscriptNames: Array<string>
+  ): Promise<FontMatchDescriptor | null> {
+    return mapFind(
+      fallbackFontPostscriptNames.concat(this._fallbackFontPostscriptNames),
+      (postscriptName: string) => {
+        return this._getMatchingSystemFont(postscriptName)
       }
-
-      return match
-    })
+    )
   }
 
   /** @internal */

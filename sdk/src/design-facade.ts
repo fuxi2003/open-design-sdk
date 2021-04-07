@@ -64,6 +64,8 @@ export class DesignFacade implements IDesignFacade {
     IApiDesignConversion
   > = new Map()
 
+  private _fallbackFontPostscriptNames: Array<string> = []
+
   /** @internal */
   constructor(params: { sdk: Sdk; sourceFilename?: string | null }) {
     this.sourceFilename = params.sourceFilename || null
@@ -562,6 +564,20 @@ export class DesignFacade implements IDesignFacade {
 
     const entity = this._getDesignEntity()
     return entity.getFonts(options)
+  }
+
+  /**
+   * Sets the fonts which should be used as a fallback in case the actual fonts needed for rendering text layers are not available.
+   *
+   * The first font from this list which is available in the system is used for all text layers with missing actual fonts. If none of the fonts are available, the text layers are not rendered.
+   *
+   * This configuration overrides/extends the global configuration set via {@link Sdk.setFallbackFonts}. Fonts specified here are preferred over the global config.
+   *
+   * @category Configuration
+   * @param fallbackFontPostscriptNames An ordered list of font postscript names.
+   */
+  setFallbackFonts(fallbackFontPostscriptNames: Array<string>) {
+    this._fallbackFontPostscriptNames = fallbackFontPostscriptNames
   }
 
   /**
@@ -1260,7 +1276,9 @@ export class DesignFacade implements IDesignFacade {
     }
 
     await sequence(fonts, async ({ fontPostScriptName }) => {
-      const fontMatch = await this._sdk.getSystemFont(fontPostScriptName)
+      const fontMatch = await this._sdk.getSystemFont(fontPostScriptName, {
+        fallbacks: this._fallbackFontPostscriptNames,
+      })
       if (fontMatch) {
         await renderingDesign.loadFont(
           fontPostScriptName,
