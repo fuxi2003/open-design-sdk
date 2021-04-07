@@ -2,13 +2,15 @@ import {
   createDesignFromLocalDesign,
   createDesignFromOpenDesignApiDesign,
 } from './utils/design-factories'
+import { mapFind } from './utils/async'
+import { extname } from 'path'
 import { inspect } from 'util'
 import { v4 as uuid } from 'uuid'
 
 import type { DesignImportFormatEnum, IOpenDesignApi } from '@opendesign/api'
 import type { IRenderingEngine } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
-import type { ISdk } from './types/sdk.iface'
+import type { FontMatchDescriptor, ISdk } from './types/sdk.iface'
 import type { DesignFacade } from './design-facade'
 import type { DesignFileManager } from './local/design-file-manager'
 import type { LocalDesignCache } from './local/local-design-cache'
@@ -17,6 +19,8 @@ import type { ILocalDesign } from './types/local-design.iface'
 import type { ISystemFontManager } from './types/system-font-manager.iface'
 
 type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
+
+const fallbackPostscriptNames = ['Roboto', 'Helvetica', 'Arial', 'Courier']
 
 export class Sdk implements ISdk {
   private _openDesignApi: IOpenDesignApi | null = null
@@ -435,13 +439,41 @@ export class Sdk implements ISdk {
   }
 
   /** @internal */
-  async getSystemFontPath(postscriptName: string): Promise<string | null> {
+  async getSystemFont(
+    postscriptName: string
+  ): Promise<FontMatchDescriptor | null> {
+    const match =
+      (await this._getMatchingSystemFont(postscriptName)) ||
+      (await this._getFallbackFont())
+    return match
+  }
+
+  private async _getMatchingSystemFont(
+    postscriptName: string
+  ): Promise<FontMatchDescriptor | null> {
     const systemFontManager = this._systemFontManager
     if (!systemFontManager) {
       return null
     }
 
-    return systemFontManager.getSystemFontPath(postscriptName)
+    const fontFilename = await systemFontManager.getSystemFontPath(
+      postscriptName
+    )
+
+    return fontFilename
+      ? { fontFilename, fontPostscriptName: postscriptName, fallback: false }
+      : null
+  }
+
+  private async _getFallbackFont(): Promise<FontMatchDescriptor | null> {
+    return mapFind(fallbackPostscriptNames, async (postscriptName: string) => {
+      const match = await this._getMatchingSystemFont(postscriptName)
+      if (!match || extname(match.fontFilename).toLowerCase() === '.ttc') {
+        return null
+      }
+
+      return match
+    })
   }
 
   /** @internal */

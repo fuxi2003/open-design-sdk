@@ -5,6 +5,12 @@ import type { IDesignFileManager } from './design-file-manager.iface'
 import type { ILocalDesignManager } from './local-design-manager.iface'
 import type { ISystemFontManager } from './system-font-manager.iface'
 
+export type FontMatchDescriptor = {
+  fontFilename: string
+  fontPostscriptName: string
+  fallback: boolean
+}
+
 export interface ISdk {
   isDestroyed(): boolean
   destroy(): Promise<void>
@@ -16,7 +22,7 @@ export interface ISdk {
 
   setWorkingDirectory(workingDirectory: string | null): void
 
-  getSystemFontPath(postscriptName: string): Promise<string | null>
+  getSystemFont(postscriptName: string): Promise<FontMatchDescriptor | null>
 
   useLocalDesignManager(localDesignManager: ILocalDesignManager): void
   useRenderingEngine(renderingEngine: IRenderingEngine): void

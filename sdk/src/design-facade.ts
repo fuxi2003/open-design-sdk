@@ -1260,9 +1260,12 @@ export class DesignFacade implements IDesignFacade {
     }
 
     await sequence(fonts, async ({ fontPostScriptName }) => {
-      const fontFilename = await this._sdk.getSystemFontPath(fontPostScriptName)
-      if (fontFilename) {
-        await renderingDesign.loadFont(fontPostScriptName, fontFilename)
+      const fontMatch = await this._sdk.getSystemFont(fontPostScriptName)
+      if (fontMatch) {
+        await renderingDesign.loadFont(
+          fontPostScriptName,
+          fontMatch.fontFilename
+        )
       } else {
         console.warn(`Font not available: ${fontPostScriptName}`)
       }

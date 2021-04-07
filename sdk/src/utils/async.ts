@@ -9,3 +9,17 @@ export async function sequence<Item, Result>(
     Promise.resolve([])
   )
 }
+
+export async function mapFind<Item, Result>(
+  items: Array<Item>,
+  mapItem: (item: Item) => Promise<Result | null>
+): Promise<Result | null> {
+  for (const item of items) {
+    const result = await mapItem(item)
+    if (result != null) {
+      return result
+    }
+  }
+
+  return null
+}
