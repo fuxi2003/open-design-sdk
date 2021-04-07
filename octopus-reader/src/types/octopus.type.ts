@@ -15,6 +15,7 @@ export type ComponentId = string
 /**
  * Artboard content (an octopus document)
  * @category Data
+ * @octopusschema OctopusDocument
  */
 export type ArtboardOctopusData = components['schemas']['OctopusDocument']
 // type ArtboardOctopusData = {
@@ -84,6 +85,7 @@ export type BorderEffectOctopusData =
 /**
  * Layer data (layer octopus)
  * @category Data
+ * @octopusschema Layer
  */
 export type LayerOctopusData = NonNullable<
   components['schemas']['OctopusDocument']['layers']
