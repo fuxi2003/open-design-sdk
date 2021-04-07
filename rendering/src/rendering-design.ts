@@ -77,13 +77,13 @@ export class RenderingDesign implements IRenderingDesign {
       return
     }
 
+    this._loadedFonts.add(postscriptName)
+
     await this._renderingProcess.execCommand('load-font', {
       'design': this.id,
       'key': postscriptName,
       'file': filename,
     })
-
-    this._loadedFonts.add(postscriptName)
   }
 
   async loadImage(bitmapKey: string, filename: string): Promise<void> {
