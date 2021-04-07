@@ -39,6 +39,12 @@ export class Page implements IPage {
     this._name = nextName
   }
 
+  unloadArtboards() {
+    this.getArtboards().forEach((artboard) => {
+      artboard.unload()
+    })
+  }
+
   addArtboard(artboardId: ArtboardId): void {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {

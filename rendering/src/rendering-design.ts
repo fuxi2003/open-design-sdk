@@ -6,6 +6,7 @@ import type { RenderingProcess } from './rendering-process'
 import type { Bounds } from './types/bounds.type'
 import type { LayerAttributesConfig } from './types/layer-attributes.type'
 import type { IRenderingDesign } from './types/rendering-design.iface'
+import { sequence } from './utils/async'
 
 export class RenderingDesign implements IRenderingDesign {
   readonly id: string
@@ -198,5 +199,33 @@ export class RenderingDesign implements IRenderingDesign {
     }
 
     return artboard.getLayersInArea(bounds, options)
+  }
+
+  async unloadArtboards() {
+    await sequence([...this._artboards.entries()], async ([artboardId]) => {
+      return this.unloadArtboard(artboardId)
+    })
+  }
+
+  async unloadArtboard(artboardId: string) {
+    const artboard = this._artboards.get(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    await artboard.unload()
+
+    this._artboards.delete(artboardId)
+  }
+
+  async destroy() {
+    const result = await this._renderingProcess.execCommand('unload-design', {
+      'design': this.id,
+    })
+
+    if (!result['ok']) {
+      console.error('RenderingDesign#destroy() unload-design:', result)
+      throw new Error('Failed to destroy design')
+    }
   }
 }

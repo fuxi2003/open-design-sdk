@@ -22,6 +22,8 @@ export interface ILocalDesign {
   saveAs(nextFilename: string): Promise<void>
   move(nextFilename: string): Promise<void>
 
+  unload(): void
+
   getManifest(): Promise<ManifestData>
   saveManifest(manifest: ManifestData): Promise<void>
 

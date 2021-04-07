@@ -41,6 +41,27 @@ export class File implements IFile {
     return this._fileData.isLoaded()
   }
 
+  unloadPage(pageId: PageId) {
+    const page = this.getPageById(pageId)
+    if (page) {
+      page.unloadArtboards()
+    }
+  }
+
+  unloadArtboards() {
+    const artboards = this.getArtboards()
+    artboards.forEach((artboard) => {
+      artboard.unload()
+    })
+  }
+
+  unloadArtboard(artboardId: ArtboardId) {
+    const artboard = this.getArtboardById(artboardId)
+    if (artboard) {
+      artboard.unload()
+    }
+  }
+
   getManifest(): ManifestData {
     return this._fileData.getManifest()
   }

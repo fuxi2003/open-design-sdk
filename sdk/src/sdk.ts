@@ -62,6 +62,8 @@ export class Sdk implements ISdk {
    *
    * The local rendering engine process is terminated if it has been configured.
    *
+   * Any design objects created by the SDK are no longer usable and the user should dispose any references to such objects to prevent memory leaks.
+   *
    * @category Status
    */
   async destroy() {

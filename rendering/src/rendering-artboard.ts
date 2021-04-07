@@ -273,6 +273,27 @@ export class RenderingArtboard implements IRenderingArtboard {
     return result['layers']
   }
 
+  async unload() {
+    if (!this.ready) {
+      throw new Error('The artboard is not ready')
+    }
+
+    this._ready = false
+
+    const result = await this._renderingProcess.execCommand('unload-artboard', {
+      'design': this._designId,
+      'artboard': this.id,
+    })
+
+    if (!result['ok']) {
+      console.error(
+        'RenderingDesign#destroyArtboard() unload-artboard:',
+        result
+      )
+      throw new Error('Failed to unload artboard')
+    }
+  }
+
   async _getLayerRenderBounds(
     layerId: string,
     layerAttributes: LayerAttributesConfig

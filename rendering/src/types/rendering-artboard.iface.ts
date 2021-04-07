@@ -22,6 +22,8 @@ export interface IRenderingArtboard {
     fontDirectoryPath?: string | null
   }): Promise<void>
 
+  unload(): Promise<void>
+
   renderToFile(
     filePath: string,
     options?: { scale?: number; bounds?: Bounds }

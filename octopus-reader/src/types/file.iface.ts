@@ -15,6 +15,9 @@ import type {
 
 export interface IFile {
   isLoaded(): boolean
+  unloadArtboards(): void
+  unloadArtboard(artboardId: ArtboardId): void
+  unloadPage(pageId: PageId): void
 
   /** @category Octopus File Manifest */
   getManifest(): ManifestData

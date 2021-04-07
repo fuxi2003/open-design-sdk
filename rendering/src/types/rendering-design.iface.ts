@@ -16,6 +16,11 @@ export interface IRenderingDesign {
     }
   ): Promise<{ ready: boolean; pendingSymbolIds: Array<string> }>
 
+  unloadArtboard(artboardId: string): Promise<void>
+  unloadArtboards(): Promise<void>
+
+  destroy(): Promise<void>
+
   loadImage(bitmapKey: string, filename: string): Promise<void>
 
   loadFont(postscriptName: string, filename: string): Promise<void>

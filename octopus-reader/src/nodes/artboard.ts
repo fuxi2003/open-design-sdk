@@ -82,6 +82,10 @@ export class Artboard implements IArtboard {
     return Boolean(this._octopus)
   }
 
+  unload() {
+    this._octopus = null
+  }
+
   getOctopus() {
     return this._octopus
   }

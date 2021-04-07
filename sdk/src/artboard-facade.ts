@@ -171,6 +171,14 @@ export class ArtboardFacade implements IArtboardFacade {
   }
 
   /**
+   * Releases data related to the artboard from memory.
+   * @category Status
+   */
+  unload() {
+    return this._designFacade.unloadArtboard(this.id)
+  }
+
+  /**
    * Returns the page object associated with the artboard object.
    * @category Reference
    */

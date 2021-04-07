@@ -10,6 +10,8 @@ export interface IPage {
   readonly id: PageId
   name: string | null
 
+  unloadArtboards(): void
+
   addArtboard(artboardId: ArtboardId): void
   removeArtboard(
     artboardId: ArtboardId,

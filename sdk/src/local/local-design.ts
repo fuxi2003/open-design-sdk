@@ -285,6 +285,14 @@ export class LocalDesign implements ILocalDesign {
     )) as BitmapMapping
   }
 
+  unload() {
+    this._unloadBitmapMapping()
+  }
+
+  _unloadBitmapMapping() {
+    this._bitmapMapping = null
+  }
+
   async saveBitmapMapping(bitmapMapping: BitmapMapping): Promise<void> {
     this._bitmapMapping = bitmapMapping
 

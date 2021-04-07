@@ -249,6 +249,15 @@ export type RenderingCommand =
       'image': string
       'file': string
     }
+  | {
+      'cmd': 'unload-design'
+      'design': string
+    }
+  | {
+      'cmd': 'unload-artboard'
+      'design': string
+      'artboard': string
+    }
 
 export type SuccessResult = { 'ok': true }
 export type ErrorResult = { 'ok': false; 'error': string; 'message': string }

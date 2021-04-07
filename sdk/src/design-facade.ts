@@ -910,6 +910,73 @@ export class DesignFacade implements IDesignFacade {
     return artboard
   }
 
+  /**
+   * Releases all loaded data of the design from memory. The design object is no longer usable after this.
+   *
+   * If it is only desired to clean loaded data from memory while keeping the object usable, call {@link DesignFacade.unload} instead.
+   *
+   * @category Status
+   */
+  async destroy() {
+    const localDesign = this._localDesign
+    if (localDesign) {
+      localDesign.unload()
+    }
+
+    const renderingDesign = this._renderingDesign
+    if (renderingDesign) {
+      renderingDesign.destroy()
+    }
+
+    this._designEntity = null
+    this._getDesignEntity.clear()
+  }
+
+  /**
+   * Releases all loaded data of the design from memory. The design object can be used for loading the data again later.
+   *
+   * @category Status
+   */
+  async unload() {
+    const localDesign = this._localDesign
+    if (localDesign) {
+      localDesign.unload()
+    }
+
+    const renderingDesign = this._renderingDesign
+    if (renderingDesign) {
+      await renderingDesign.unloadArtboards()
+    }
+
+    const designEntity = this._getDesignEntity()
+    designEntity.unloadArtboards()
+  }
+
+  /**
+   * Releases data related to the specified artboard from memory.
+   *
+   * @category Status
+   */
+  async unloadArtboard(artboardId: ArtboardId) {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    if (!artboard.isLoaded()) {
+      console.warn('Trying to unload an artboard which has not been loaded.')
+      return
+    }
+
+    const renderingDesign = this._renderingDesign
+    if (renderingDesign) {
+      renderingDesign.unloadArtboard(artboardId)
+    }
+
+    const artboardEntity = artboard.getArtboardEntity()
+    artboardEntity.unload()
+  }
+
   private async _loadArtboardContent(
     artboardId: ArtboardId
   ): Promise<ArtboardOctopusData> {

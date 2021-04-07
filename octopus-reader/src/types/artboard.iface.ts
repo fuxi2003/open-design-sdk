@@ -26,6 +26,7 @@ export interface IArtboard {
   setManifest(nextManifest: ArtboardManifestData): void
 
   isLoaded(): boolean
+  unload(): void
   getOctopus(): ArtboardOctopusData | null
   setOctopus(nextOctopus: ArtboardOctopusData): void
 
