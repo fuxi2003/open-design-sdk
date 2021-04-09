@@ -65,7 +65,7 @@ export class DesignLayerCollectionFacade
   /**
    * Returns an iterator which iterates over the collection layers.
    *
-   * Nested layers not explicitly included in the collection are not iterated over.
+   * The layers explicitly included in the collection are iterated over, but layers nested in them are not.
    *
    * @category Iteration
    */
@@ -92,7 +92,7 @@ export class DesignLayerCollectionFacade
   /**
    * Returns the collection layers as a native `Array`.
    *
-   * Nested layers not explicitly included in the collection are not iterated over.
+   * The layers explicitly included in the collection are iterated over, but layers nested in them are not.
    *
    * @category Layer Lookup
    */
@@ -153,7 +153,7 @@ export class DesignLayerCollectionFacade
   /**
    * Returns a new layer collection which only includes layers for which the filter returns `true`.
    *
-   * Layers nested in the layers explicitly included in the collection are not iterated over.
+   * The layers explicitly included in the collection are iterated over, but layers nested in them are not.
    *
    * @category Iteration
    * @param filter The filter to apply to the layers in the collection.
@@ -176,7 +176,7 @@ export class DesignLayerCollectionFacade
   /**
    * Iterates over the the layers in the collection and invokes the provided function with each one of them.
    *
-   * Layers nested in the layers explicitly included in the collection are not iterated over.
+   * The layers explicitly included in the collection are iterated over, but layers nested in them are not.
    *
    * @category Iteration
    * @param fn The function to apply to the layers in the collection.
@@ -190,7 +190,7 @@ export class DesignLayerCollectionFacade
   /**
    * Returns a native `Array` which returns mapper function results for each of the layers from the collection.
    *
-   * Layers nested in the layers explicitly included in the collection are not iterated over.
+   * The layers explicitly included in the collection are iterated over, but layers nested in them are not.
    *
    * @category Iteration
    * @param mapper The mapper function to apply to the layers in the collection.
@@ -204,7 +204,7 @@ export class DesignLayerCollectionFacade
   /**
    * Returns a native `Array` which returns mapper function results for all of the layers from the collection. The arrays produced by the mapper function are concatenated (flattened).
    *
-   * Layers nested in the layers explicitly included in the collection are not iterated over.
+   * The layers explicitly included in the collection are iterated over, but layers nested in them are not.
    *
    * @category Iteration
    * @param mapper The mapper function to apply to the layers in the collection.
@@ -222,7 +222,7 @@ export class DesignLayerCollectionFacade
   /**
    * Returns a reduction of all layers from the collection.
    *
-   * Layers nested in the layers explicitly included in the collection are not iterated over.
+   * The layers explicitly included in the collection are iterated over, but layers nested in them are not.
    *
    * @category Iteration
    * @param reducer The reducer function to apply to the layers in the collection.
