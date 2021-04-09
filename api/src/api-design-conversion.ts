@@ -41,7 +41,7 @@ export class ApiDesignConversion implements IApiDesignConversion {
   }
 
   async refresh() {
-    this._openDesignApi.getDesignConversionById
+    return this._openDesignApi.getDesignConversionById(this.designId, this.id)
   }
 
   async getResultStream(): Promise<NodeJS.ReadableStream> {
