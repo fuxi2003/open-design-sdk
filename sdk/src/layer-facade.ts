@@ -401,7 +401,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * Uncached items (bitmap assets of rendered layers) are downloaded and cached.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Rendering
    * @param filePath The target location of the produced PNG image file.
@@ -441,7 +441,7 @@ export class LayerFacade implements ILayerFacade {
   /**
    * Returns various bounds the layer.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Data
    */

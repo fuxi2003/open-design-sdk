@@ -193,7 +193,7 @@ export class PageFacade implements IPageFacade {
   /**
    * Returns a list of bitmap assets used by layers in all artboards the page contains (optionally down to a specific nesting level).
    *
-   * This method internally triggers loading of all artboards the page contains. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all artboards the page contains. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Asset Aggregation
    * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched.
@@ -210,7 +210,7 @@ export class PageFacade implements IPageFacade {
   /**
    * Returns a list of fonts used by layers in all artboards the page contains (optionally down to a specific nesting level).
    *
-   * This method internally triggers loading of all artboards the page contains. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all artboards the page contains. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Asset Aggregation
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched.
@@ -226,7 +226,7 @@ export class PageFacade implements IPageFacade {
    *
    * The produced collection can be queried further for narrowing down the search.
    *
-   * This method internally triggers loading of all artboards within the page. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all artboards within the page. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within the artboards to include in the collection. By default, all levels are included.
@@ -245,7 +245,7 @@ export class PageFacade implements IPageFacade {
    *
    * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes. This is the reason the method is not prefixed with "get".
    *
-   * This method internally triggers loading of all the artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all the artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param layerId A layer ID.
@@ -271,7 +271,7 @@ export class PageFacade implements IPageFacade {
    *
    * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes.
    *
-   * This method internally triggers loading of all the artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all the artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param layerId A layer ID.
@@ -289,7 +289,7 @@ export class PageFacade implements IPageFacade {
   /**
    * Returns the first layer object from any artboard within the page (optionally down to a specific nesting level) matching the specified criteria.
    *
-   * This method internally triggers loading of all the artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all the artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
@@ -313,7 +313,7 @@ export class PageFacade implements IPageFacade {
   /**
    * Returns a collection of all layer objects from all artboards within the page (optionally down to a specific nesting level) matching the specified criteria.
    *
-   * This method internally triggers loading of all the artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all the artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
@@ -335,7 +335,7 @@ export class PageFacade implements IPageFacade {
    *
    * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Rendering
    * @param filePath The target location of the produced PNG image file.

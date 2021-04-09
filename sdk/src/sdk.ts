@@ -144,9 +144,9 @@ export class Sdk implements ISdk {
   /**
    * Opens a local `.octopus` file.
    *
-   * Offline services have to be configured when using this method.
+   * The local cache has to be configured when using this method.
    *
-   * In case the file references a server-side design and online services is configured, the API can be used for fetching missing data of partially downloaded files.
+   * In case the file references a server-side design and the API is configured, missing data of partially downloaded files can be fetched from the server.
    *
    * @internal
    * @category Local Design File Usage
@@ -183,7 +183,7 @@ export class Sdk implements ISdk {
    *
    * This method expects a path value previously obtained from {@link DesignFacade.filename}.
    *
-   * Offline services have to be configured when using this method.
+   * The local cache has to be configured when using this method.
    *
    * @internal
    * @category Local Design File Usage
@@ -220,7 +220,7 @@ export class Sdk implements ISdk {
   /**
    * Opens a local design file.
    *
-   * Both online and offline services have to be configured when using this method.
+   * The API has to be configured when using this method. This is also requires a file system (i.e. it is not available in the browser).
    *
    * The design is automatically uploaded to the API and local caching is established.
    *
@@ -256,7 +256,7 @@ export class Sdk implements ISdk {
   /**
    * Opens a design file located at the specified URL.
    *
-   * Online services have to be configured when using this method.
+   * The API has to be configured when using this method.
    *
    * The design file is not downloaded to the local environment but rather imported via the API directly. Once imported via the API, the design behaves exactly like a design fetched via {@link Sdk.fetchDesignById}.
    *
@@ -285,7 +285,7 @@ export class Sdk implements ISdk {
   /**
    * Opens a Figma design.
    *
-   * Online services have to be configured when using this method.
+   * The API has to be configured when using this method.
    *
    * The design is automatically imported by the API and local caching is established.
    *
@@ -320,9 +320,9 @@ export class Sdk implements ISdk {
   /**
    * Opens a Figma design while initiating a conversion to another design file format (currently only Sketch is available).
    *
-   * Online services have to be configured when using this method. Offline services have to be configured for downloading the converted design file from the API but downloading the result is not a required step as it can be done later from another client.
+   * The API has to be configured when using this method. A file system has to be available for downloading the converted design file from the API but downloading the result is not a required step as it can be done later from another client.
    *
-   * The design is automatically imported by the API and local caching is established in case offline services are configured.
+   * The design is automatically imported by the API and local caching is established in case the local cache is configured.
    *
    * @category Figma Design Usage
    * @param params Info about the Figma design
@@ -366,9 +366,9 @@ export class Sdk implements ISdk {
   /**
    * Opens a server-side design file.
    *
-   * Online services have to be configured when using this method.
+   * The API has to be configured when using this method.
    *
-   * The design is automatically uploaded to the API and when offline services are also configured, local caching is established and the designs can be saved as `.octopus` files.
+   * The design is automatically uploaded to the API and local caching is established in case the local cache is configured.
    *
    * @category Server Side Design File Usage
    * @param designId An ID of a server-side design assigned during import (via `openDesignFile()`, `openFigmaDesign()` or `convertFigmaDesign()`).

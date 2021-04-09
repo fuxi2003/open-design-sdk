@@ -74,7 +74,7 @@ export class DesignFacade implements IDesignFacade {
   }
 
   /**
-   * The ID of the referenced server-side design. This is not available when online services are not configured for the SDK.
+   * The ID of the referenced server-side design. This is not available when the API is not configured for the SDK.
    * @category Identification
    */
   get id() {
@@ -83,7 +83,7 @@ export class DesignFacade implements IDesignFacade {
   }
 
   /**
-   * The absolute path of the local cache. This is not available when online services are not configured for the SDK.
+   * The absolute path of the local cache. This is not available when the local cache is not configured for the SDK.
    * @internal
    * @category Identification
    */
@@ -425,7 +425,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * The produced collection can be queried further for narrowing down the search.
    *
-   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within pages and artboards to include in the collection. By default, all levels are included.
@@ -446,7 +446,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes. This is the reason the method is not prefixed with "get".
    *
-   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param layerId A layer ID.
@@ -469,7 +469,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes.
    *
-   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param layerId A layer ID.
@@ -488,7 +488,7 @@ export class DesignFacade implements IDesignFacade {
   /**
    * Returns the first layer object from any page or artboard (optionally down to a specific nesting level) matching the specified criteria.
    *
-   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
@@ -513,7 +513,7 @@ export class DesignFacade implements IDesignFacade {
   /**
    * Returns a collection of all layer objects from all pages and artboards (optionally down to a specific nesting level) matching the specified criteria.
    *
-   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
@@ -536,7 +536,7 @@ export class DesignFacade implements IDesignFacade {
   /**
    * Returns a list of bitmap assets used by layers in all pages and artboards (optionally down to a specific nesting level).
    *
-   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Asset Aggregation
    * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched.
@@ -554,7 +554,7 @@ export class DesignFacade implements IDesignFacade {
   /**
    * Returns a list of fonts used by layers in all pages and artboards (optionally down to a specific nesting level).
    *
-   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when online services are configured (and cached when offline services are configured).
+   * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Asset Aggregation
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched.
@@ -587,7 +587,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Rendering
    * @param artboardId The ID of the artboard to render.
@@ -620,7 +620,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * Uncached items (artboard contents and bitmap assets of rendered layers) are downloaded and cached.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Rendering
    * @param pageId The ID of the page to render.
@@ -648,7 +648,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Rendering
    * @param artboardId The ID of the artboard from which to render the layer.
@@ -724,7 +724,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Rendering
    * @param artboardId The ID of the artboard from which to render the layer.
@@ -797,7 +797,7 @@ export class DesignFacade implements IDesignFacade {
   /**
    * Returns various bounds of the specified layer.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Data
    * @param artboardId The ID of the artboard from which to inspect the layer.
@@ -830,7 +830,7 @@ export class DesignFacade implements IDesignFacade {
   /**
    * Returns the top-most layer located at the specified coordinates within the specified artboard.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Layer Lookup
    * @param artboardId The ID of the artboard from which to render the layer.
@@ -860,7 +860,7 @@ export class DesignFacade implements IDesignFacade {
   /**
    * Returns all layers located within the specified area of the the specified artboard.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Layer Lookup
    * @param artboardId The ID of the artboard from which to render the layer.
@@ -1030,7 +1030,7 @@ export class DesignFacade implements IDesignFacade {
   /**
    * Downloads the specified bitmap assets to the local cache.
    *
-   * Both online and offline services have to be configured when using this method.
+   * The API and the local cache have to be configured when using this method.
    *
    * @category Asset Aggregation
    * @param bitmapAssetDescs A list of bitmap assets to download.
@@ -1043,6 +1043,14 @@ export class DesignFacade implements IDesignFacade {
     })
   }
 
+  /**
+   * Downloads the specified bitmap asset to the local cache.
+   *
+   * The API and the local cache have to be configured when using this method.
+   *
+   * @category Asset Aggregation
+   * @param bitmapAssetDescs A list of bitmap assets to download.
+   */
   async downloadBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
     const apiDesign = this._apiDesign
     if (!apiDesign) {
@@ -1077,7 +1085,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * @internal
    * @category Serialization
-   * @param filePath An absolute path of the target `.octopus` file or a path relative to the current working directory. When omitted, the open `.octopus` file location is used instead. Online services have to be configured in case there are uncached items.
+   * @param filePath An absolute path of the target `.octopus` file or a path relative to the current working directory. When omitted, the open `.octopus` file location is used instead. The API has to be configured in case there are uncached items.
    */
   async saveOctopusFile(filePath: string | null = null) {
     const localDesign = await this._getLocalDesign(filePath)

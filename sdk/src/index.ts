@@ -11,7 +11,7 @@ import { Sdk } from './sdk'
  *
  * Based on the provided configuration, various services are made available:
  *
- * - When Open Design API credentials (a token) is provided, online services (the API) is configured and available for uploading and downloading designs.
+ * - When Open Design API credentials (a token) is provided, the API is configured and available for uploading and downloading designs.
  * - A local rendering engine is available by default.
  * - Local system fonts can be used for rendering design by default.
  * - A local cache is available by default.

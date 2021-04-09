@@ -62,7 +62,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * See the [Octopus Format](https://opendesign.avocode.com/docs/octopus-format) documentation page for more info.
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Data
    */
@@ -215,7 +215,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns a list of bitmap assets used by layers in the artboard (optionally down to a specific nesting level).
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Asset Aggregation
    * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched.
@@ -232,7 +232,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns a list of fonts used by layers the artboard (optionally down to a specific nesting level).
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Asset Aggregation
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched.
@@ -246,7 +246,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns the background color of the artboard.
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Data
    */
@@ -259,7 +259,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns a collection of the first-level (root) layers objects within the artboard.
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Layer Lookup
    */
@@ -277,7 +277,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * The produced collection can be queried further for narrowing down the search.
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within the artboard to include in the collection. By default, all levels are included.
@@ -296,7 +296,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * Layer IDs are unique within individual artboards.
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Layer Lookup
    * @param layerId A layer ID.
@@ -324,7 +324,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns the first layer object from the artboard (optionally down to a specific nesting level) matching the specified criteria.
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
@@ -340,7 +340,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns a collection of all layer objects from the artboards (optionally down to a specific nesting level) matching the specified criteria.
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
@@ -358,7 +358,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns the nesting level at which the layer of the specified ID is contained within the layer tree of the artboard.
    *
-   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when offline services are configured). Online services have to be configured when working with an uncached artboard.
+   * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Layer Lookup
    * @param layerId A layer ID.
@@ -384,7 +384,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Rendering
    * @param filePath The target location of the produced PNG image file.
@@ -403,7 +403,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Rendering
    * @param layerId The ID of the artboard layer to render.
@@ -444,7 +444,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Rendering
    * @param layerIds The IDs of the artboard layers to render.
@@ -473,7 +473,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns various bounds of the specified layer.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Data
    * @param layerId The ID of the artboard layer to inspect.
@@ -485,7 +485,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns the top-most layer located at the specified coordinates within the specified artboard.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Layer Lookup
    * @param x The X coordinate in the coordinate system of the artboard where to look for a layer.
@@ -498,7 +498,7 @@ export class ArtboardFacade implements IArtboardFacade {
   /**
    * Returns all layers located within the specified area of the the specified artboard.
    *
-   * Offline services including the local rendering engine have to be configured when using this method.
+   * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Layer Lookup
    * @param bounds The area in the corrdinate system of the artboard where to look for layers.
