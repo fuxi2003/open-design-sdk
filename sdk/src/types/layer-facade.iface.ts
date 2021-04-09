@@ -69,7 +69,7 @@ export interface ILayerFacade {
   ): Array<AggregatedFontDescriptor>
 
   getBitmap(): IBitmap | null
-  getPrerenderedBitmap(): IBitmap | null
+  isBitmapPrerendered(): boolean
   getShape(): IShape | null
   getText(): IText | null
 

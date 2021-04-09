@@ -306,7 +306,7 @@ export class LayerFacade implements ILayerFacade {
   /**
    * Returns a list of bitmap assets used by the layer and layers nested within the layer (optionally down to a specific nesting level).
    *
-   * Note that this method aggregates results of the more granular bitmap asset-related methods of {@link LayerFacade.getBitmap}, {@link LayerFacade.getBitmapMask} and {@link LayerFacade.getPrerenderedBitmap} and pattern fill bitmap assets discoverable via {@link LayerFacade.getEffects}.
+   * Note that this method aggregates results of the more granular bitmap asset-related methods of {@link LayerFacade.getBitmap}, {@link LayerFacade.getBitmapMask} and pattern fill bitmap assets discoverable via {@link LayerFacade.getEffects}.
    *
    * @category Asset Aggregation
    * @param options.depth The maximum nesting level within the layer to search for bitmap asset usage. By default, all levels are searched. Specifying the depth of `0` leads to nested layer bitmap assets being omitted altogether.
@@ -331,12 +331,12 @@ export class LayerFacade implements ILayerFacade {
   /**
    * Returns the bitmap asset of the layer if there is one.
    *
-   * Only bitmap layers (`type=layer`) can return an asset here. Bitmap assets of layers of other types are considered "pre-rendered" and returned via {@link LayerFacade.getPrerenderedBitmap}.
-   *
    * @category Asset Aggregation
    */
   getBitmap() {
-    return this._layerEntity.getBitmap()
+    return (
+      this._layerEntity.getBitmap() || this._layerEntity.getPrerenderedBitmap()
+    )
   }
 
   /**
@@ -349,14 +349,14 @@ export class LayerFacade implements ILayerFacade {
   }
 
   /**
-   * Returns the "pre-rendered" bitmap asset of the layer if there is one.
+   * Returns whether the bitmap asset is "pre-rendered".
    *
-   * Only non-bitmap layers (`type!=layer`) can return an asset here. Bitmap assets of bitmap layers are not considered "pre-rendered" and are returned via {@link LayerFacade.getBitmap}.
+   * Only non-bitmap layers (`type!=layer`) have prerendered assets. Bitmap assets of bitmap layers are not considered "pre-rendered".
    *
    * @category Asset Aggregation
    */
-  getPrerenderedBitmap() {
-    return this._layerEntity.getPrerenderedBitmap()
+  isBitmapPrerendered() {
+    return Boolean(this._layerEntity.getPrerenderedBitmap())
   }
 
   /**
