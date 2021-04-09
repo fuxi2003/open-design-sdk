@@ -137,5 +137,7 @@ export interface IApiDesignConversion {
 
   // Conversion Results
 
+  getProcessedConversion(): Promise<IApiDesignConversion>
+
   getResultStream(): Promise<NodeJS.ReadableStream>
 }

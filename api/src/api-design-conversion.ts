@@ -44,16 +44,21 @@ export class ApiDesignConversion implements IApiDesignConversion {
     return this._openDesignApi.getDesignConversionById(this.designId, this.id)
   }
 
-  async getResultStream(): Promise<NodeJS.ReadableStream> {
+  async getProcessedConversion(): Promise<ApiDesignConversion> {
     if (this.status === 'uploading' || this.status === 'processing') {
       await sleep(1000)
-      return this._openDesignApi.getDesignConversionResultStream(
-        this.designId,
-        this.id
-      )
+
+      const nextConversion = await this.refresh()
+      return nextConversion.getProcessedConversion()
     }
 
-    const resultUrl = this.resultUrl
+    return this
+  }
+
+  async getResultStream(): Promise<NodeJS.ReadableStream> {
+    const processedConversion = await this.getProcessedConversion()
+
+    const resultUrl = processedConversion.resultUrl
     if (!resultUrl) {
       throw new Error('The conversion result location is not available')
     }
