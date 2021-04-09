@@ -1135,7 +1135,7 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('Unsupported target design file format')
     }
 
-    const conversion = await this._getConversionToFormat(format)
+    const conversion = await this.getConversionToFormat(format)
     return this._sdk.saveDesignFileStream(
       filePath,
       await conversion.getResultStream()
@@ -1175,9 +1175,15 @@ export class DesignFacade implements IDesignFacade {
     this._conversions.set(format, conversion)
   }
 
-  private async _getConversionToFormat(
-    format: DesignConversionTargetFormatEnum
-  ) {
+  /**
+   * Returns info about a design file of the specified format produced by a server-side design file format conversion.
+   *
+   * In case no such conversion has been done for the design yet, a new conversion is initiated and the resulting design file info is then returned.
+   *
+   * @category Serialization
+   * @param format The format to which the design should be converted.
+   */
+  async getConversionToFormat(format: DesignConversionTargetFormatEnum) {
     const prevConversion = this._conversions.get(format)
     if (prevConversion) {
       return prevConversion
