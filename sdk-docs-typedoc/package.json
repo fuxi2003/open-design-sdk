@@ -1,5 +1,5 @@
 {
   "name": "@opendesign/sdk-docs-typedoc",
-  "version": "0.0.0-dev.1",
+  "version": "0.0.1-alpha.5",
   "main": "./dist/docs.json"
 }

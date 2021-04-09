@@ -1,6 +1,6 @@
 {
   "name": "@opendesign/sdk",
-  "version": "0.0.0-dev",
+  "version": "0.0.1-alpha.5",
   "main": "dist",
   "browser": "dist-browser/bundle.js",
   "scripts": {
@@ -29,9 +29,9 @@
   "dependencies": {
     "@avocode/fontkit": "1.7.7-avocode.6",
     "@avocode/system-font-families": "0.4.0-avocode.8",
-    "@opendesign/api": "0.0.0-dev",
-    "@opendesign/octopus-reader": "0.0.0-dev",
-    "@opendesign/rendering": "0.0.0-dev",
+    "@opendesign/api": "0.0.1-alpha.5",
+    "@opendesign/octopus-reader": "0.0.1-alpha.5",
+    "@opendesign/rendering": "0.0.1-alpha.5",
     "fs-extra": "^9.1.0",
     "mkdirp": "1.0.4",
     "node-fetch": "2.6.1",
