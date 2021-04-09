@@ -18,6 +18,7 @@ export function createFileFromManifest(manifest: ManifestData): IFile {
 export * from './types/artboard.iface'
 export * from './types/bitmap-assets.type'
 export * from './types/bitmap.iface'
+export * from './types/bitmap-mask.iface'
 export * from './types/effects.iface'
 export * from './types/file.iface'
 export * from './types/fonts.type'
