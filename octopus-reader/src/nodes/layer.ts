@@ -76,7 +76,7 @@ export class Layer implements ILayer {
   getDepth(): number {
     const parentLayerId = this._parentLayerId
     if (!parentLayerId) {
-      return 0
+      return 1
     }
 
     const artboard = this._artboard
