@@ -1,4 +1,5 @@
 import { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
+import { DesignConversionFacade } from './design-conversion-facade'
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { PageFacade } from './page-facade'
 
@@ -22,7 +23,7 @@ import { sequence } from './utils/async'
 import { memoize } from './utils/memoize'
 import { getDesignFormatByFileName } from './utils/design-format-utils'
 
-import type { IApiDesign, IApiDesignConversion } from '@opendesign/api'
+import type { IApiDesign } from '@opendesign/api'
 import type {
   Bounds,
   IRenderingDesign,
@@ -61,7 +62,7 @@ export class DesignFacade implements IDesignFacade {
 
   private _conversions: Map<
     DesignConversionTargetFormatEnum,
-    IApiDesignConversion
+    DesignConversionFacade
   > = new Map()
 
   private _fallbackFontPostscriptNames: Array<string> = []
@@ -1170,7 +1171,7 @@ export class DesignFacade implements IDesignFacade {
   }
 
   /** @internal */
-  addConversion(conversion: IApiDesignConversion) {
+  addConversion(conversion: DesignConversionFacade) {
     const format = conversion.resultFormat
     this._conversions.set(format, conversion)
   }
@@ -1195,7 +1196,10 @@ export class DesignFacade implements IDesignFacade {
     }
 
     const conversion = await apiDesign.convertDesign({ format })
-    this._conversions.set(format, conversion)
+    const conversionFacade = new DesignConversionFacade(conversion, {
+      sdk: this._sdk,
+    })
+    this._conversions.set(format, conversionFacade)
 
     return conversion
   }

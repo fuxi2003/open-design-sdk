@@ -1,3 +1,4 @@
+import { DesignConversionFacade } from '../design-conversion-facade'
 import { DesignFacade } from '../design-facade'
 
 import type { IApiDesign, IApiDesignConversion } from '@opendesign/api'
@@ -32,7 +33,10 @@ export async function createDesignFromOpenDesignApiDesign(
 
   if (params.conversions) {
     params.conversions.forEach((conversion) => {
-      design.addConversion(conversion)
+      const conversionFacade = new DesignConversionFacade(conversion, {
+        sdk: params.sdk,
+      })
+      design.addConversion(conversionFacade)
     })
   }
 

@@ -6,7 +6,11 @@ import { mapFind } from './utils/async'
 import { inspect } from 'util'
 import { v4 as uuid } from 'uuid'
 
-import type { DesignImportFormatEnum, IOpenDesignApi } from '@opendesign/api'
+import type {
+  DesignImportFormatEnum,
+  IApiDesignConversion,
+  IOpenDesignApi,
+} from '@opendesign/api'
 import type { IRenderingEngine } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
 import type { FontMatchDescriptor, ISdk } from './types/sdk.iface'
@@ -355,12 +359,9 @@ export class Sdk implements ISdk {
     } = await openDesignApi.importFigmaDesignLinkWithConversions(params)
     const apiDesign = await openDesignApi.getDesignById(designId)
 
-    const designFacade = await this.fetchDesignById(apiDesign.id)
-    conversions.forEach((conversion) => {
-      designFacade.addConversion(conversion)
+    return this._fetchDesignById(apiDesign.id, {
+      conversions,
     })
-
-    return designFacade
   }
 
   /**
@@ -380,7 +381,10 @@ export class Sdk implements ISdk {
 
   private async _fetchDesignById(
     designId: string,
-    params: { sourceFilename?: string | null }
+    params: {
+      sourceFilename?: string | null
+      conversions?: Array<IApiDesignConversion> | null
+    }
   ): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
@@ -395,6 +399,7 @@ export class Sdk implements ISdk {
     const designFacade = await createDesignFromOpenDesignApiDesign(apiDesign, {
       sdk: this,
       sourceFilename: params.sourceFilename || null,
+      conversions: params.conversions || null,
     })
 
     const localDesignManager = this._localDesignManager
