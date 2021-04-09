@@ -363,7 +363,8 @@ export class LayerFacade implements ILayerFacade {
    * Returns a vector shape object of the layer if there is one.
    *
    * Only shape layers (`type=shapeLayer`) return shape objects here.
-
+   *
+   * @internal
    * @category Data
    */
   getShape() {
