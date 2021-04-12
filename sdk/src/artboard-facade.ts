@@ -218,7 +218,7 @@ export class ArtboardFacade implements IArtboardFacade {
    * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Asset Aggregation
-   * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    */
   async getBitmapAssets(
@@ -235,7 +235,7 @@ export class ArtboardFacade implements IArtboardFacade {
    * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Asset Aggregation
-   * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    */
   async getFonts(options: { depth?: number } = {}) {
     await this.load()
@@ -280,7 +280,7 @@ export class ArtboardFacade implements IArtboardFacade {
    * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *
    * @category Layer Lookup
-   * @param options.depth The maximum nesting level of layers within the artboard to include in the collection. By default, all levels are included.
+   * @param options.depth The maximum nesting level of layers within the artboard to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in the artboard should be included.
    */
   async getFlattenedLayers(options: { depth?: number } = {}) {
     await this.load()
@@ -328,7 +328,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
-   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    */
   async findLayer(selector: LayerSelector, options: { depth?: number } = {}) {
     await this.load()
@@ -344,7 +344,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
-   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    */
   async findLayers(selector: LayerSelector, options: { depth?: number } = {}) {
     await this.load()

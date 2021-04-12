@@ -429,7 +429,7 @@ export class DesignFacade implements IDesignFacade {
    * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Layer Lookup
-   * @param options.depth The maximum nesting level of layers within pages and artboards to include in the collection. By default, all levels are included.
+   * @param options.depth The maximum nesting level of layers within pages and artboards to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in artboards should be included.
    */
   async getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
     await this.load()
@@ -493,7 +493,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
-   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
   async findLayer(
     selector: FileLayerSelector,
@@ -518,7 +518,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
-   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
   async findLayers(
     selector: FileLayerSelector,
@@ -540,7 +540,7 @@ export class DesignFacade implements IDesignFacade {
    * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Asset Aggregation
-   * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    */
   async getBitmapAssets(
@@ -558,7 +558,7 @@ export class DesignFacade implements IDesignFacade {
    * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
    * @category Asset Aggregation
-   * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
   async getFonts(options: { depth?: number } = {}) {
     await this.load()

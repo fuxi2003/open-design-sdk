@@ -119,7 +119,7 @@ export class DesignLayerCollectionFacade
    *
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
-   * @param options.depth The maximum nesting level within the layers explictly included in the collection to search. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within the layers explictly included in the collection to search. By default, all levels are searched. `0` also means "no limit"; `1` means only the layers explicitly included in the collection should be searched.
    */
   findLayer(
     selector: FileLayerSelector,
@@ -138,7 +138,7 @@ export class DesignLayerCollectionFacade
    *
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
-   * @param options.depth The maximum nesting level within the layers explictly included in the collection to search. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within the layers explictly included in the collection to search. By default, all levels are searched. `0` also means "no limit"; `1` means only the layers explicitly included in the collection should be searched.
    */
   findLayers(
     selector: FileLayerSelector,
@@ -190,7 +190,7 @@ export class DesignLayerCollectionFacade
   /**
    * Returns a native `Array` which returns mapper function results for each of the layers from the collection.
    *
-   * The layers explicitly included in the collection are iterated over, but layers nested in them are not.
+   * The layers explicitly included in the collection are iterated ovser, but layers nested in them are not.
    *
    * @category Iteration
    * @param mapper The mapper function to apply to the layers in the collection.
@@ -263,7 +263,7 @@ export class DesignLayerCollectionFacade
    * Returns a new layer collection which includes all layers explicitly included in the original collection as well as layers nested within those layers (optionally down to a specific nesting level).
    *
    * @category Collection Manipulation
-   * @param options.depth The maximum nesting level within the layers explicitly included in the original collection to explicitly include in the new collection.
+   * @param options.depth The maximum nesting level within the layers explicitly included in the original collection to explicitly include in the new collection. `0` also means "no limit"; `1` means only the layers nested immediately in the collection layers should be included in the new colleciton.
    */
   flatten(options: { depth?: number } = {}): DesignLayerCollectionFacade {
     const flattenedLayerCollection = this._layerCollection.flatten(options)
@@ -279,7 +279,7 @@ export class DesignLayerCollectionFacade
    * Both layers explicitly included in the collection and layers nested within those layers are searched.
    *
    * @category Asset Aggregation
-   * @param options.depth The maximum nesting level within the layer to search for bitmap asset usage. By default, all levels are searched. Specifying the depth of `0` leads to nested layer bitmap assets being omitted altogether.
+   * @param options.depth The maximum nesting level within the layer to search for bitmap asset usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    */
   getBitmapAssets(
@@ -294,7 +294,7 @@ export class DesignLayerCollectionFacade
    * Both layers explicitly included in the collection and layers nested within those layers are searched.
    *
    * @category Asset Aggregation
-   * @param options.depth The maximum nesting level within the layer to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to nested layer bitmap assets being omitted altogether.
+   * @param options.depth The maximum nesting level within the layer to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    */
   getFonts(
     options: Partial<{ depth: number }> = {}

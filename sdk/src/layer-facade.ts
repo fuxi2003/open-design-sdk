@@ -203,7 +203,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
-   * @param options.depth The maximum nesting level within the layer to search. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within the layer to search. By default, all levels are searched. `0` also means "no limit"; `1` means only layers nested directly in the layer should be searched.
    */
   findNestedLayer(selector: LayerSelector, options: { depth?: number } = {}) {
     const layerEntity = this._layerEntity.findNestedLayer(selector, options)
@@ -219,7 +219,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
-   * @param options.depth The maximum nesting level within the layer to search. By default, all levels are searched.
+   * @param options.depth The maximum nesting level within the layer to search. By default, all levels are searched. `0` also means "no limit"; `1` means only layers nested directly in the layer should be searched.
    */
   findNestedLayers(selector: LayerSelector, options: { depth?: number } = {}) {
     const layerEntities = this._layerEntity.findNestedLayers(selector, options)
