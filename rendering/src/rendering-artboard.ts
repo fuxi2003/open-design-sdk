@@ -85,6 +85,22 @@ export class RenderingArtboard implements IRenderingArtboard {
     this._pendingSymbolIds = pendingSymbolIds
   }
 
+  async setPage(nextPageId: string | null) {
+    const setPageResult = await this._renderingProcess.execCommand(
+      'set-artboard-page',
+      {
+        'design': this._designId,
+        'artboard': this.id,
+        'page': nextPageId,
+      }
+    )
+    if (!setPageResult['ok']) {
+      throw new Error('Failed to assign artboard')
+    }
+
+    this._pageId = nextPageId
+  }
+
   async _getPendingArtboardDependencies(): Promise<Array<string>> {
     const dependencyResult = await this._renderingProcess.execCommand(
       'get-artboard-dependencies',

@@ -1257,6 +1257,7 @@ export class DesignFacade implements IDesignFacade {
     const desc = await renderingDesign.loadArtboard(artboardId, {
       octopusFilename,
       symbolId: artboard.componentId,
+      pageId: artboard.pageId,
     })
 
     // NOTE: This logic is more a future-proofing of the logic rather than a required step

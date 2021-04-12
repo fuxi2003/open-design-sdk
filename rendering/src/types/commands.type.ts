@@ -96,7 +96,7 @@ export type RenderingCommand =
       'offset': [number, number]
     }
   | {
-      'cmd': 'set-artboard-offset'
+      'cmd': 'set-artboard-page'
       'design': string
       'artboard': string
       'page': string | null

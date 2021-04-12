@@ -13,6 +13,7 @@ export interface IRenderingDesign {
     params: {
       octopusFilename: string
       symbolId?: string | null
+      pageId?: string | null
     }
   ): Promise<{ ready: boolean; pendingSymbolIds: Array<string> }>
 

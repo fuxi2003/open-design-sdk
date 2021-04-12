@@ -69,6 +69,11 @@ export class RenderingDesign implements IRenderingDesign {
       fontDirectoryPath: this.fontDirectoryPath,
     })
 
+    if (params.pageId) {
+      // TEMP: Until rendering fixes automatic page assignment during load.
+      artboard.setPage(params.pageId)
+    }
+
     return artboard
   }
 
