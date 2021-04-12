@@ -109,7 +109,6 @@ export class DesignFacade implements IDesignFacade {
     return {
       id: this.id,
       sourceFilename: this.sourceFilename,
-      octopusFilename: this.octopusFilename,
     }
   }
 
