@@ -699,6 +699,8 @@ export class DesignFacade implements IDesignFacade {
     const fonts = layer.getFonts()
     await this._loadSystemFontsToRendering(fonts)
 
+    await renderingDesign.markArtboardAsReady(artboardId)
+
     const { bounds, scale, ...layerAttributes } = options
     const resolvedLayerIds = await this._resolveVisibleArtboardLayerSubtree(
       artboardId,
@@ -785,6 +787,8 @@ export class DesignFacade implements IDesignFacade {
       this.downloadBitmapAssets(bitmapAssetDescs),
       this._loadSystemFontsToRendering(fonts),
     ])
+
+    await renderingDesign.markArtboardAsReady(artboardId)
 
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
