@@ -28,9 +28,9 @@ export function createSdk(params: {
   token?: string
   apiRoot?: string
   workingDirectory?: string | null
-  cached: boolean
-  rendering: boolean
-  systemFonts: boolean
+  cached?: boolean
+  rendering?: boolean
+  systemFonts?: boolean
 }) {
   const sdk = new Sdk()
 
