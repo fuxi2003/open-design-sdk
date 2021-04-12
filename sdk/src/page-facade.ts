@@ -43,7 +43,7 @@ export class PageFacade implements IPageFacade {
   /** @internal */
   toString() {
     const artboardInfo = this.toJSON()
-    return `Artboard ${inspect(artboardInfo)}`
+    return `Page ${inspect(artboardInfo)}`
   }
 
   /** @internal */
