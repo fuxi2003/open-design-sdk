@@ -21,7 +21,7 @@ export class DesignFileManager implements IDesignFileManager {
     const stream = createReadStream(filename)
 
     return new Promise((resolve, reject) => {
-      stream.once('ready', () => {
+      stream.once('readable', () => {
         resolve(stream)
       })
       stream.once('error', (err) => {
