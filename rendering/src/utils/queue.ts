@@ -16,12 +16,7 @@ async function extendQueue<Result>(
 ): Promise<Result> {
   try {
     await prevQueue
-  } catch (err) {
-    console.warn(
-      'RenderingProcess#execCommand(): previous command resulted in an error',
-      err
-    )
-  }
+  } catch (err) {}
 
   return fn()
 }
