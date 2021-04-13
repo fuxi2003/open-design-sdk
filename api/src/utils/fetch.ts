@@ -126,7 +126,6 @@ export async function postMultipart<
   const body = await res.json()
 
   if (res.status === 500) {
-    console.log('Server Error', { statusCode: res.status, body })
     throw new Error('Server Error')
   }
 
@@ -163,7 +162,6 @@ async function request<
   const body = await res.json()
 
   if (res.status === 500) {
-    console.log('Server Error', { statusCode: res.status, body })
     throw new Error('Server Error')
   }
 
@@ -194,7 +192,6 @@ async function requestStream<
   })
 
   if (res.status === 500) {
-    console.log('Server Error', { statusCode: res.status })
     throw new Error('Server Error')
   }
 
