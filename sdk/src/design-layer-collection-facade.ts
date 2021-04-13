@@ -2,17 +2,19 @@ import { inspect } from 'util'
 import { memoize } from './utils/memoize'
 
 import {
-  AggregatedFileBitmapAssetDescriptor,
   ILayerCollection,
-  AggregatedFileFontDescriptor,
   FileLayerSelector,
   ILayer,
+  ArtboardId,
+  LayerId,
 } from '@opendesign/octopus-reader'
+import type { Bounds } from '@opendesign/rendering'
 import type { LayerAttributesConfig } from './artboard-facade'
+import type { FontDescriptor } from './types/artboard-facade.iface'
 import type { DesignFacade } from './design-facade'
 import type { LayerFacade } from './layer-facade'
+import type { BitmapAssetDescriptor } from './types/local-design.iface'
 import type { IDesignLayerCollectionFacade } from './types/design-layer-collection-facade.iface'
-import type { Bounds } from '@opendesign/rendering/dist'
 
 export class DesignLayerCollectionFacade
   implements IDesignLayerCollectionFacade {
@@ -284,7 +286,11 @@ export class DesignLayerCollectionFacade
    */
   getBitmapAssets(
     options: Partial<{ depth: number; includePrerendered: boolean }> = {}
-  ): Array<AggregatedFileBitmapAssetDescriptor> {
+  ): Array<
+    BitmapAssetDescriptor & {
+      artboardLayerIds: Record<ArtboardId, Array<LayerId>>
+    }
+  > {
     return this._layerCollection.getBitmapAssets(options)
   }
 
@@ -296,9 +302,7 @@ export class DesignLayerCollectionFacade
    * @category Asset
    * @param options.depth The maximum nesting level within the layer to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    */
-  getFonts(
-    options: Partial<{ depth: number }> = {}
-  ): Array<AggregatedFileFontDescriptor> {
+  getFonts(options: Partial<{ depth: number }> = {}): Array<FontDescriptor> {
     return this._layerCollection.getFonts(options)
   }
 

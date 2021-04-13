@@ -30,10 +30,11 @@ import type {
   BlendingMode,
 } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
+import type { FontDescriptor } from './types/artboard-facade.iface'
 import type { Sdk } from './sdk'
 import type {
   ILocalDesign,
-  LocalBitmapAssetDescriptor,
+  BitmapAssetDescriptor,
 } from './types/local-design.iface'
 import type { IDesignFacade } from './types/design-facade.iface'
 import type { LayerFacade } from './layer-facade'
@@ -544,7 +545,13 @@ export class DesignFacade implements IDesignFacade {
    */
   async getBitmapAssets(
     options: { depth?: number; includePrerendered?: boolean } = {}
-  ) {
+  ): Promise<
+    Array<
+      BitmapAssetDescriptor & {
+        artboardLayerIds: Record<ArtboardId, Array<LayerId>>
+      }
+    >
+  > {
     await this.load()
 
     const entity = this._getDesignEntity()
@@ -559,7 +566,9 @@ export class DesignFacade implements IDesignFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
-  async getFonts(options: { depth?: number } = {}) {
+  async getFonts(
+    options: { depth?: number } = {}
+  ): Promise<Array<FontDescriptor>> {
     await this.load()
 
     const entity = this._getDesignEntity()
@@ -1039,9 +1048,7 @@ export class DesignFacade implements IDesignFacade {
    * @category Asset
    * @param bitmapAssetDescs A list of bitmap assets to download.
    */
-  async downloadBitmapAssets(
-    bitmapAssetDescs: Array<LocalBitmapAssetDescriptor>
-  ) {
+  async downloadBitmapAssets(bitmapAssetDescs: Array<BitmapAssetDescriptor>) {
     await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
       return this.downloadBitmapAsset(bitmapAssetDesc)
     })
@@ -1055,7 +1062,7 @@ export class DesignFacade implements IDesignFacade {
    * @category Asset
    * @param bitmapAssetDescs A list of bitmap assets to download.
    */
-  async downloadBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
+  async downloadBitmapAsset(bitmapAssetDesc: BitmapAssetDescriptor) {
     const apiDesign = this._apiDesign
     if (!apiDesign) {
       throw new Error(

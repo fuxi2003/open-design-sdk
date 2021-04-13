@@ -31,9 +31,9 @@ import type {
 } from '@opendesign/octopus-reader'
 import type {
   ApiDesignInfo,
+  BitmapAssetDescriptor,
   BitmapMapping,
   ILocalDesign,
-  LocalBitmapAssetDescriptor,
 } from '../types/local-design.iface'
 import type { LocalDesignManager } from './local-design-manager'
 
@@ -161,7 +161,7 @@ export class LocalDesign implements ILocalDesign {
     await writeJsonFileStream(contentFilename, contentStream)
   }
 
-  async hasBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
+  async hasBitmapAsset(bitmapAssetDesc: BitmapAssetDescriptor) {
     const { available } = await this.resolveBitmapAsset(bitmapAssetDesc)
     return available
   }
@@ -170,7 +170,7 @@ export class LocalDesign implements ILocalDesign {
     return joinPaths(this._filename, BITMAP_ASSET_DIRECTORY_BASENAME)
   }
 
-  async getBitmapAssetStream(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
+  async getBitmapAssetStream(bitmapAssetDesc: BitmapAssetDescriptor) {
     const {
       filename: bitmapAssetFilename,
       available,
@@ -182,7 +182,7 @@ export class LocalDesign implements ILocalDesign {
     return readFileStream(bitmapAssetFilename)
   }
 
-  async getBitmapAssetBlob(bitmapAssetDesc: LocalBitmapAssetDescriptor) {
+  async getBitmapAssetBlob(bitmapAssetDesc: BitmapAssetDescriptor) {
     const {
       filename: bitmapAssetFilename,
       available,
@@ -195,7 +195,7 @@ export class LocalDesign implements ILocalDesign {
   }
 
   async saveBitmapAsset(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor,
+    bitmapAssetDesc: BitmapAssetDescriptor,
     content: ArtboardOctopusData
   ): Promise<void> {
     await this._loadBitmapMapping()
@@ -216,7 +216,7 @@ export class LocalDesign implements ILocalDesign {
   }
 
   async saveBitmapAssetStream(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor,
+    bitmapAssetDesc: BitmapAssetDescriptor,
     contentStream: NodeJS.ReadableStream
   ): Promise<void> {
     await this._loadBitmapMapping()
@@ -237,7 +237,7 @@ export class LocalDesign implements ILocalDesign {
   }
 
   async saveBitmapAssetBlob(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor,
+    bitmapAssetDesc: BitmapAssetDescriptor,
     bitmapAssetBlob: Buffer
   ): Promise<void> {
     await this._loadBitmapMapping()
@@ -362,7 +362,7 @@ export class LocalDesign implements ILocalDesign {
   }
 
   async resolveBitmapAsset(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor
   ): Promise<{
     basename: string
     mapped: boolean
@@ -387,7 +387,7 @@ export class LocalDesign implements ILocalDesign {
   }
 
   async _getBitmapAssetBasename(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor
   ): Promise<{ basename: string; mapped: boolean }> {
     await this._loadBitmapMapping()
 
@@ -400,7 +400,7 @@ export class LocalDesign implements ILocalDesign {
   }
 
   _createBitmapAssetBasename(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor
   ): { basename: string; mapped: boolean } {
     const bitmapKey = bitmapAssetDesc.name.toLowerCase()
     if (this._checkBitmapBasenameValid(bitmapKey)) {

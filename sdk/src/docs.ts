@@ -16,10 +16,12 @@ import type {
 import type { BlendingMode } from '@opendesign/rendering'
 
 import type { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
+import type { FontDescriptor } from './types/artboard-facade.iface'
 import type { DesignConversionFacade } from './design-conversion-facade'
 import type { DesignFacade } from './design-facade'
 import type { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import type { LayerFacade } from './layer-facade'
+import type { BitmapAssetDescriptor } from './types/local-design.iface'
 import type { PageFacade } from './page-facade'
 import type { Sdk } from './sdk'
 
@@ -31,9 +33,11 @@ export type {
   ArtboardId,
   ArtboardOctopusData,
   ArtboardSelector,
+  BitmapAssetDescriptor,
   BlendingMode,
   ComponentId,
   FileLayerSelector,
+  FontDescriptor,
   IBitmap,
   IBitmapMask,
   LayerAttributesConfig,

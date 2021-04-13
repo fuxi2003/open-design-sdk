@@ -10,7 +10,7 @@ export type ApiDesignInfo = {
   designId?: string
 }
 
-export type LocalBitmapAssetDescriptor = { name: string; prerendered: boolean }
+export type BitmapAssetDescriptor = { name: string; prerendered: boolean }
 
 export type BitmapMapping = { [bitmapKey: string]: string }
 
@@ -61,24 +61,22 @@ export interface ILocalDesign {
     pageOctopusJsonStream: NodeJS.ReadableStream
   ): Promise<void>
 
-  hasBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor): Promise<boolean>
+  hasBitmapAsset(bitmapAssetDesc: BitmapAssetDescriptor): Promise<boolean>
   getBitmapAssetDirectory(): string
   getBitmapAssetStream(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor
   ): Promise<NodeJS.ReadableStream>
-  getBitmapAssetBlob(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor
-  ): Promise<Buffer>
+  getBitmapAssetBlob(bitmapAssetDesc: BitmapAssetDescriptor): Promise<Buffer>
   saveBitmapAssetStream(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor,
+    bitmapAssetDesc: BitmapAssetDescriptor,
     bitmapAssetStream: NodeJS.ReadableStream
   ): Promise<void>
   saveBitmapAssetBlob(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor,
+    bitmapAssetDesc: BitmapAssetDescriptor,
     bitmapAssetBlob: Buffer
   ): Promise<void>
   resolveBitmapAsset(
-    bitmapAssetDesc: LocalBitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor
   ): Promise<{
     basename: string
     mapped: boolean

@@ -4,6 +4,7 @@ import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { LayerFacade } from './layer-facade'
 
 import type {
+  ArtboardId,
   ArtboardManifestData,
   ArtboardOctopusData as ArtboardOctopusDataType,
   IArtboard,
@@ -13,8 +14,12 @@ import type {
   RgbaColor,
 } from '@opendesign/octopus-reader'
 import type { BlendingMode, Bounds } from '@opendesign/rendering'
+import type {
+  FontDescriptor,
+  IArtboardFacade,
+} from './types/artboard-facade.iface'
 import type { DesignFacade } from './design-facade'
-import type { IArtboardFacade } from './types/artboard-facade.iface'
+import type { BitmapAssetDescriptor } from './types/local-design.iface'
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
 interface ArtboardOctopusData extends ArtboardOctopusDataType {}
@@ -223,7 +228,13 @@ export class ArtboardFacade implements IArtboardFacade {
    */
   async getBitmapAssets(
     options: { depth?: number; includePrerendered?: boolean } = {}
-  ) {
+  ): Promise<
+    Array<
+      BitmapAssetDescriptor & {
+        artboardLayerIds: Record<ArtboardId, Array<LayerId>>
+      }
+    >
+  > {
     await this.load()
 
     return this._artboardEntity.getBitmapAssets(options)
@@ -237,7 +248,9 @@ export class ArtboardFacade implements IArtboardFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    */
-  async getFonts(options: { depth?: number } = {}) {
+  async getFonts(
+    options: { depth?: number } = {}
+  ): Promise<Array<FontDescriptor>> {
     await this.load()
 
     return this._artboardEntity.getFonts(options)

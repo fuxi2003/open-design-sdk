@@ -11,7 +11,9 @@ import type {
   LayerSelector,
 } from '@opendesign/octopus-reader'
 import type { ArtboardFacade } from './artboard-facade'
+import type { FontDescriptor } from './types/artboard-facade.iface'
 import type { DesignFacade } from './design-facade'
+import type { BitmapAssetDescriptor } from './types/local-design.iface'
 import type { IPageFacade } from './types/page-facade.iface'
 
 export class PageFacade implements IPageFacade {
@@ -201,7 +203,13 @@ export class PageFacade implements IPageFacade {
    */
   async getBitmapAssets(
     options: { depth?: number; includePrerendered?: boolean } = {}
-  ) {
+  ): Promise<
+    Array<
+      BitmapAssetDescriptor & {
+        artboardLayerIds: Record<ArtboardId, Array<LayerId>>
+      }
+    >
+  > {
     await this.load()
 
     return this._pageEntity.getBitmapAssets(options)
@@ -215,7 +223,9 @@ export class PageFacade implements IPageFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
-  async getFonts(options: { depth?: number } = {}) {
+  async getFonts(
+    options: { depth?: number } = {}
+  ): Promise<Array<FontDescriptor>> {
     await this.load()
 
     return this._pageEntity.getFonts(options)
