@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid'
 
 import type {
   DesignImportFormatEnum,
-  IApiDesignConversion,
+  IApiDesignExport,
   IOpenDesignApi,
 } from '@opendesign/api'
 import type { IRenderingEngine } from '@opendesign/rendering'
@@ -21,7 +21,7 @@ import type { LocalDesignManager } from './local/local-design-manager'
 import type { ILocalDesign } from './types/local-design.iface'
 import type { ISystemFontManager } from './types/system-font-manager.iface'
 
-type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
+type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 
 export class Sdk implements ISdk {
   private _openDesignApi: IOpenDesignApi | null = null
@@ -322,7 +322,7 @@ export class Sdk implements ISdk {
   }
 
   /**
-   * Opens a Figma design while initiating a conversion to another design file format (currently only Sketch is available).
+   * Opens a Figma design while initiating a export to another design file format (currently only Sketch is available).
    *
    * The API has to be configured when using this method. A file system has to be available for downloading the converted design file from the API but downloading the result is not a required step as it can be done later from another client.
    *
@@ -334,15 +334,15 @@ export class Sdk implements ISdk {
    * @param params.figmaFileKey A Figma design "file key" from the design URL (i.e. `abc` from `https://www.figma.com/file/abc/Sample-File`).
    * @param params.figmaIds A listing of Figma design frames to use.
    * @param params.designName A name override for the design. The original Figma design name is used by default.
-   * @param params.conversions Design file conversion configurations. Only a single conversion to the `"sketch"` (Sketch) file format is available currently.
-   * @returns A design object which can be used for retrieving data from the Figma design or downloading the converted design file using the API.
+   * @param params.exports Design file export configurations. Only a single export to the `"sketch"` (Sketch) file format is available currently.
+   * @returns A design object which can be used for retrieving data from the Figma design or downloading the exported design file using the API.
    */
   async convertFigmaDesign(params: {
     figmaToken: string
     figmaFileKey: string
     figmaIds?: Array<string>
     designName?: string | null
-    conversions: Array<{ format: DesignConversionTargetFormatEnum }>
+    exports: Array<{ format: DesignExportTargetFormatEnum }>
   }): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
@@ -355,12 +355,12 @@ export class Sdk implements ISdk {
 
     const {
       designId,
-      conversions,
-    } = await openDesignApi.importFigmaDesignLinkWithConversions(params)
+      exports,
+    } = await openDesignApi.importFigmaDesignLinkWithExports(params)
     const apiDesign = await openDesignApi.getDesignById(designId)
 
     return this._fetchDesignById(apiDesign.id, {
-      conversions,
+      exports,
     })
   }
 
@@ -383,7 +383,7 @@ export class Sdk implements ISdk {
     designId: string,
     params: {
       sourceFilename?: string | null
-      conversions?: Array<IApiDesignConversion> | null
+      exports?: Array<IApiDesignExport> | null
     }
   ): Promise<DesignFacade> {
     if (this.isDestroyed()) {
@@ -399,7 +399,7 @@ export class Sdk implements ISdk {
     const designFacade = await createDesignFromOpenDesignApiDesign(apiDesign, {
       sdk: this,
       sourceFilename: params.sourceFilename || null,
-      conversions: params.conversions || null,
+      exports: params.exports || null,
     })
 
     const localDesignManager = this._localDesignManager

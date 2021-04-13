@@ -3,9 +3,9 @@ import type { components } from 'open-design-api-types'
 import type { OpenDesignApi } from './open-design-api'
 import type { IApiDesign } from './types/ifaces'
 
-type ConversionId = components['schemas']['ConversionId']
+type DesignExportId = components['schemas']['DesignExportId']
 type Design = components['schemas']['Design']
-type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
+type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 
 export class ApiDesign implements IApiDesign {
   _info: Design
@@ -104,18 +104,18 @@ export class ApiDesign implements IApiDesign {
     )
   }
 
-  convertDesign(params: { format: DesignConversionTargetFormatEnum }) {
-    return this._openDesignApi.convertDesign(this.id, params)
+  exportDesign(params: { format: DesignExportTargetFormatEnum }) {
+    return this._openDesignApi.exportDesign(this.id, params)
   }
 
-  getConversionById(conversionId: ConversionId) {
-    return this._openDesignApi.getDesignConversionById(this.id, conversionId)
+  getDesignExportById(designExportId: DesignExportId) {
+    return this._openDesignApi.getDesignExportById(this.id, designExportId)
   }
 
-  getConversionResultStream(conversionId: ConversionId) {
-    return this._openDesignApi.getDesignConversionResultStream(
+  getDesignExportResultStream(designExportId: DesignExportId) {
+    return this._openDesignApi.getDesignExportResultStream(
       this.id,
-      conversionId
+      designExportId
     )
   }
 

@@ -407,7 +407,7 @@ describe('DesignFacade', () => {
       designId = designFacade.id
     })
 
-    it('should save a Sketch conversion result file', async function () {
+    it('should save a Sketch export result file', async function () {
       const { sdk } = await createSdk({
         token: tokenFromBefore,
         designFiles: true,
@@ -434,7 +434,7 @@ describe('DesignFacade', () => {
       const designFacade = await sdk.convertFigmaDesign({
         figmaToken: process.env['E2E_FIGMA_TOKEN'] || '',
         figmaFileKey: process.env['E2E_FIGMA_FILE_KEY'] || '',
-        conversions: [{ format: 'sketch' }],
+        exports: [{ format: 'sketch' }],
       })
 
       const filename = await createTempFileTarget('file.sketch')

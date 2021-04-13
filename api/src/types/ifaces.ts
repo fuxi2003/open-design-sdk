@@ -3,13 +3,13 @@ import type { ManifestData } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
 
 type ArtboardId = components['schemas']['ArtboardId']
-type ConversionId = components['schemas']['ConversionId']
-type ConversionData = components['schemas']['Conversion']
 type DesignData = components['schemas']['Design']
+type DesignExportData = components['schemas']['DesignExport']
+type DesignExportId = components['schemas']['DesignExportId']
+type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 type DesignSummary = components['schemas']['DesignSummary']
 type DesignId = components['schemas']['DesignId']
 type DesignImportFormatEnum = components['schemas']['DesignImportFormatEnum']
-type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
 type OctopusDocument = components['schemas']['OctopusDocument']
 
 // Top-level API
@@ -40,15 +40,15 @@ export interface IOpenDesignApi {
     name?: string | null
   }): Promise<IApiDesign>
 
-  importFigmaDesignLinkWithConversions(params: {
+  importFigmaDesignLinkWithExports(params: {
     figmaToken: string
     figmaFileKey: string
     figmaIds?: Array<string> | null
     name?: string | null
-    conversions: Array<{ format: DesignConversionTargetFormatEnum }>
+    exports: Array<{ format: DesignExportTargetFormatEnum }>
   }): Promise<{
     designId: DesignId
-    conversions: Array<IApiDesignConversion>
+    exports: Array<IApiDesignExport>
   }>
 
   // Designs
@@ -69,21 +69,21 @@ export interface IOpenDesignApi {
     artboardId: ArtboardId
   ): Promise<NodeJS.ReadableStream>
 
-  // - Design Conversions
+  // - Design Exports
 
-  convertDesign(
+  exportDesign(
     designId: DesignId,
-    params: { format: DesignConversionTargetFormatEnum }
-  ): Promise<IApiDesignConversion>
+    params: { format: DesignExportTargetFormatEnum }
+  ): Promise<IApiDesignExport>
 
-  getDesignConversionById(
+  getDesignExportById(
     designId: DesignId,
-    conversionId: ConversionId
-  ): Promise<IApiDesignConversion>
+    designExportId: DesignExportId
+  ): Promise<IApiDesignExport>
 
-  getDesignConversionResultStream(
+  getDesignExportResultStream(
     designId: DesignId,
-    conversionId: ConversionId
+    designExportId: DesignExportId
   ): Promise<NodeJS.ReadableStream>
 }
 
@@ -110,34 +110,34 @@ export interface IApiDesign {
     artboardId: ArtboardId
   ): Promise<NodeJS.ReadableStream>
 
-  // Design Conversions
+  // Design Exports
 
-  convertDesign(params: {
-    format: DesignConversionTargetFormatEnum
-  }): Promise<IApiDesignConversion>
+  exportDesign(params: {
+    format: DesignExportTargetFormatEnum
+  }): Promise<IApiDesignExport>
 
-  getConversionById(conversionId: ConversionId): Promise<IApiDesignConversion>
+  getDesignExportById(exportId: DesignExportId): Promise<IApiDesignExport>
 
-  getConversionResultStream(
-    conversionId: ConversionId
+  getDesignExportResultStream(
+    exportId: DesignExportId
   ): Promise<NodeJS.ReadableStream>
 
   getBitmapAssetStream(bitmapKey: string): Promise<NodeJS.ReadableStream>
 }
 
-export interface IApiDesignConversion {
-  id: ConversionData['id']
-  status: ConversionData['status']
-  resultFormat: ConversionData['result_format']
-  resultUrl: ConversionData['result_url']
+export interface IApiDesignExport {
+  id: DesignExportData['id']
+  status: DesignExportData['status']
+  resultFormat: DesignExportData['result_format']
+  resultUrl: DesignExportData['result_url']
 
   // Design Structure
 
   designId: DesignData['id']
 
-  // Conversion Results
+  // Design Export Results
 
-  getProcessedConversion(): Promise<IApiDesignConversion>
+  getProcessedDesignExport(): Promise<IApiDesignExport>
 
   getResultStream(): Promise<NodeJS.ReadableStream>
 }

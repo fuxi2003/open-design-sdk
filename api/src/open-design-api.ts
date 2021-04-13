@@ -3,15 +3,15 @@ import { sleep } from './utils/sleep'
 import fetch from 'node-fetch'
 
 import { ApiDesign } from './api-design'
-import { ApiDesignConversion } from './api-design-conversion'
+import { ApiDesignExport } from './api-design-export'
 
 import type { ReadStream } from 'fs'
 import type { ArtboardId } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
 import type { IOpenDesignApi } from './types/ifaces'
 
-export type ConversionId = components['schemas']['ConversionId']
-export type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
+export type DesignExportId = components['schemas']['DesignExportId']
+export type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 export type Design = components['schemas']['Design']
 export type DesignId = components['schemas']['DesignId']
 export type DesignImportFormatEnum = components['schemas']['DesignImportFormatEnum']
@@ -166,13 +166,13 @@ export class OpenDesignApi implements IOpenDesignApi {
     return this.getDesignById(designId)
   }
 
-  async importFigmaDesignLinkWithConversions(params: {
+  async importFigmaDesignLinkWithExports(params: {
     figmaToken: string
     figmaFileKey: string
     figmaIds?: Array<string> | null
     name?: string | null
-    conversions: Array<{ format: DesignConversionTargetFormatEnum }>
-  }): Promise<{ designId: DesignId; conversions: Array<ApiDesignConversion> }> {
+    exports: Array<{ format: DesignExportTargetFormatEnum }>
+  }): Promise<{ designId: DesignId; exports: Array<ApiDesignExport> }> {
     const res = await post(
       this._apiRoot,
       '/designs/figma-link',
@@ -180,7 +180,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         'figma_token': params.figmaToken,
         'figma_filekey': params.figmaFileKey,
-        'conversions': params.conversions,
+        'exports': params.exports,
         ...(params.figmaIds ? { 'figma_ids': params.figmaIds } : {}),
         ...(params.name ? { 'design_name': params.name } : {}),
       },
@@ -196,8 +196,8 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     return {
       designId,
-      conversions: res.body['conversions'].map((conversionData) => {
-        return new ApiDesignConversion(conversionData, {
+      exports: res.body['exports'].map((designExportData) => {
+        return new ApiDesignExport(designExportData, {
           designId,
           openDesignApi: this,
         })
@@ -257,15 +257,15 @@ export class OpenDesignApi implements IOpenDesignApi {
     return res.stream
   }
 
-  async convertDesign(
+  async exportDesign(
     designId: DesignId,
     params: {
-      format: DesignConversionTargetFormatEnum
+      format: DesignExportTargetFormatEnum
     }
-  ): Promise<ApiDesignConversion> {
+  ): Promise<ApiDesignExport> {
     const res = await post(
       this._apiRoot,
-      '/designs/{design_id}/conversions',
+      '/designs/{design_id}/exports',
       { 'design_id': designId },
       { 'format': params.format },
       this._getAuthInfo()
@@ -273,60 +273,56 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode !== 201) {
       console.error(
-        'OpenDesignApi#convertDesign()',
+        'OpenDesignApi#exportDesign()',
         { designId, ...params },
         res
       )
       throw new Error('Cannot convert the design')
     }
     if (res.body['status'] === 'failed') {
-      throw new Error('Design conversion failed')
+      throw new Error('Design export failed')
     }
 
-    return new ApiDesignConversion(res.body, {
+    return new ApiDesignExport(res.body, {
       designId,
       openDesignApi: this,
     })
   }
 
-  async getDesignConversionById(
+  async getDesignExportById(
     designId: DesignId,
-    conversionId: ConversionId
-  ): Promise<ApiDesignConversion> {
+    designExportId: DesignExportId
+  ): Promise<ApiDesignExport> {
     const res = await get(
       this._apiRoot,
-      '/designs/{design_id}/conversions/{conversion_id}',
-      { 'design_id': designId, 'conversion_id': conversionId },
+      '/designs/{design_id}/exports/{export_id}',
+      { 'design_id': designId, 'export_id': designExportId },
       this._getAuthInfo()
     )
 
     if (res.statusCode !== 200) {
-      console.error(
-        'OpenDesignApi#getDesignConversionById()',
-        { designId },
-        res
-      )
-      throw new Error('Cannot fetch design conversion info')
+      console.error('OpenDesignApi#getDesignExportById()', { designId }, res)
+      throw new Error('Cannot fetch design export info')
     }
     if (res.body['status'] === 'failed') {
-      throw new Error('Design conversion failed')
+      throw new Error('Design export failed')
     }
 
-    return new ApiDesignConversion(res.body, {
+    return new ApiDesignExport(res.body, {
       designId,
       openDesignApi: this,
     })
   }
 
-  async getDesignConversionResultStream(
+  async getDesignExportResultStream(
     designId: DesignId,
-    conversionId: ConversionId
+    designExportId: DesignExportId
   ): Promise<NodeJS.ReadableStream> {
-    const conversion = await this.getDesignConversionById(
+    const designExport = await this.getDesignExportById(
       designId,
-      conversionId
+      designExportId
     )
-    return conversion.getResultStream()
+    return designExport.getResultStream()
   }
 
   async getDesignBitmapAssetStream(designId: DesignId, bitmapKey: string) {

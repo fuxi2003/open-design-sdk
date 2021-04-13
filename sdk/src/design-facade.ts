@@ -1,5 +1,5 @@
 import { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
-import { DesignConversionFacade } from './design-conversion-facade'
+import { DesignExportFacade } from './design-export-facade'
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { PageFacade } from './page-facade'
 
@@ -39,7 +39,7 @@ import type {
 import type { IDesignFacade } from './types/design-facade.iface'
 import type { LayerFacade } from './layer-facade'
 
-type DesignConversionTargetFormatEnum = components['schemas']['DesignConversionTargetFormatEnum']
+type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 
 export class DesignFacade implements IDesignFacade {
   /**
@@ -61,9 +61,9 @@ export class DesignFacade implements IDesignFacade {
   private _manifestLoaded: boolean = false
   private _pendingManifestUpdate: ManifestData | null = null
 
-  private _conversions: Map<
-    DesignConversionTargetFormatEnum,
-    DesignConversionFacade
+  private _designExports: Map<
+    DesignExportTargetFormatEnum,
+    DesignExportFacade
   > = new Map()
 
   private _fallbackFontPostscriptNames: Array<string> = []
@@ -1130,9 +1130,9 @@ export class DesignFacade implements IDesignFacade {
   }
 
   /**
-   * Downloads the design file of the specified format produced by a server-side design file format conversion.
+   * Downloads the design file of the specified format produced by a server-side design file export.
    *
-   * In case no such conversion has been done for the design yet, a new conversion is initiated and the resulting design file is downloaded.
+   * In case no such export has been done for the design yet, a new export is initiated and the resulting design file is downloaded.
    *
    * @category Serialization
    * @param filePath An absolute path to which to save the design file or a path relative to the current working directory.
@@ -1146,10 +1146,10 @@ export class DesignFacade implements IDesignFacade {
       throw new Error('Unsupported target design file format')
     }
 
-    const conversion = await this.getConversionToFormat(format)
+    const designExport = await this.getExportToFormat(format)
     return this._sdk.saveDesignFileStream(
       filePath,
-      await conversion.getResultStream()
+      await designExport.getResultStream()
     )
   }
 
@@ -1181,37 +1181,37 @@ export class DesignFacade implements IDesignFacade {
   }
 
   /** @internal */
-  addConversion(conversion: DesignConversionFacade) {
-    const format = conversion.resultFormat
-    this._conversions.set(format, conversion)
+  addDesignExport(designExport: DesignExportFacade) {
+    const format = designExport.resultFormat
+    this._designExports.set(format, designExport)
   }
 
   /**
-   * Returns info about a design file of the specified format produced by a server-side design file format conversion.
+   * Returns info about a design file of the specified format produced by a server-side design file format export.
    *
-   * In case no such conversion has been done for the design yet, a new conversion is initiated and the resulting design file info is then returned.
+   * In case no such export has been done for the design yet, a new export is initiated and the resulting design file info is then returned.
    *
    * @category Serialization
-   * @param format The format to which the design should be converted.
+   * @param format The format to which the design should be exported.
    */
-  async getConversionToFormat(format: DesignConversionTargetFormatEnum) {
-    const prevConversion = this._conversions.get(format)
-    if (prevConversion) {
-      return prevConversion
+  async getExportToFormat(format: DesignExportTargetFormatEnum) {
+    const prevExport = this._designExports.get(format)
+    if (prevExport) {
+      return prevExport
     }
 
     const apiDesign = this._apiDesign
     if (!apiDesign) {
-      throw new Error('The API is not configured, cannot convert the design')
+      throw new Error('The API is not configured, cannot export the design')
     }
 
-    const conversion = await apiDesign.convertDesign({ format })
-    const conversionFacade = new DesignConversionFacade(conversion, {
+    const designExport = await apiDesign.exportDesign({ format })
+    const designExportFacade = new DesignExportFacade(designExport, {
       sdk: this._sdk,
     })
-    this._conversions.set(format, conversionFacade)
+    this._designExports.set(format, designExportFacade)
 
-    return conversion
+    return designExport
   }
 
   private async _loadRenderingDesignPage(

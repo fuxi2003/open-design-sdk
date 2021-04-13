@@ -17,7 +17,7 @@ import type { BlendingMode } from '@opendesign/rendering'
 
 import type { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
 import type { FontDescriptor } from './types/artboard-facade.iface'
-import type { DesignConversionFacade } from './design-conversion-facade'
+import type { DesignExportFacade } from './design-export-facade'
 import type { DesignFacade } from './design-facade'
 import type { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import type { LayerFacade } from './layer-facade'
@@ -50,7 +50,7 @@ export type {
 
 export type {
   ArtboardFacade,
-  DesignConversionFacade,
+  DesignExportFacade,
   DesignFacade,
   DesignLayerCollectionFacade,
   LayerFacade,
