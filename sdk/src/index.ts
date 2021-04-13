@@ -25,7 +25,7 @@ import { Sdk } from './sdk'
  * @param params.systemFonts Whether to use local system fonts for rendering designs via the rendering engine. This is enabled by default.
  */
 export function createSdk(params: {
-  token?: string
+  token: string
   apiRoot?: string
   workingDirectory?: string | null
   cached?: boolean
@@ -37,14 +37,12 @@ export function createSdk(params: {
   sdk.useDesignFileManager(new DesignFileManager())
   sdk.useLocalDesignManager(new LocalDesignManager())
 
-  if (params.token) {
-    sdk.useOpenDesignApi(
-      createOpenDesignApi({
-        token: params.token,
-        apiRoot: params.apiRoot || null,
-      })
-    )
-  }
+  sdk.useOpenDesignApi(
+    createOpenDesignApi({
+      token: params.token,
+      apiRoot: params.apiRoot || null,
+    })
+  )
 
   if (params.systemFonts !== false) {
     sdk.useSystemFontManager(new SystemFontManager())
