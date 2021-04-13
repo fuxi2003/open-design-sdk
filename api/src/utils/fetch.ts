@@ -20,9 +20,14 @@ type MethodPathPatterns<M> = {
 
 type AuthInfo = { token: string }
 
-const fetch = (...args: Parameters<typeof fetchInternal>) => {
-  console.log('fetch()', ...args)
-  return fetchInternal(...args)
+const fetch = async (url: string, init: RequestInit = {}) => {
+  const method = init.method?.toUpperCase() || 'GET'
+  console.debug(method, url, '...')
+
+  const res = await fetchInternal(url, init)
+  console.log(method, url, '->', `${res.status} ${res.statusText}`)
+
+  return res
 }
 
 // JSON
