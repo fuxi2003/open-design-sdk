@@ -1,4 +1,4 @@
-import { basename, extname, join as joinPaths } from 'path'
+import { basename, join as joinPaths } from 'path'
 import {
   checkFile,
   readJsonFile,
@@ -11,7 +11,6 @@ import {
   moveDirectory,
   deleteFile,
 } from '../utils/fs'
-import { v4 as uuid } from 'uuid'
 
 import {
   ARTBOARD_CONTENT_BASENAME,
