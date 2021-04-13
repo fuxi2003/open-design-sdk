@@ -126,7 +126,6 @@ export class LocalDesign implements ILocalDesign {
     contentStream: NodeJS.ReadableStream
   ): Promise<void> {
     const contentFilename = this._getArtboardContentFilename(artboardId)
-    console.log('save octopus', artboardId, contentFilename)
     await writeJsonFileStream(contentFilename, contentStream)
   }
 

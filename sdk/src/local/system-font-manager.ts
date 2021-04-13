@@ -69,7 +69,6 @@ export class SystemFontManager {
 
       return this._parseCollectionFontFiles(fontCollectionFilenames)
     } catch (err) {
-      console.debug('SystemFontManager: no collection fonts', err)
       return {}
     }
   }
