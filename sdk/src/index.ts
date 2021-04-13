@@ -18,6 +18,27 @@ import { Sdk } from './sdk'
  * - Local system fonts can be used for rendering design by default.
  * - A local cache is available by default.
  *
+ * @example
+ * ```typescript
+ * // Full SDK
+ * const sdk = createSdk({
+ *   token: '<TOKEN>',
+ * })
+ *
+ * // Full SDK with all logs for debugging purposes
+ * const sdk = createSdk({
+ *   token: '<TOKEN>',
+ *   console: { level: 'debug' }
+ * })
+ *
+ * // SDK without the local rendering engine
+ * const sdk = createSdk({
+ *   token: '<TOKEN>',
+ *   rendering: false,
+ *   systemFonts: false,
+ * })
+ * ```
+ *
  * @category Primary Entry Point
  * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication). When no token is provided, online services (the API) is not configured.
  * @param params.apiRoot The URL base for Open Design API calls. By default, production Avocode Open Design API servers are used.

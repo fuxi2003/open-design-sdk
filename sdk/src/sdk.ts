@@ -78,6 +78,13 @@ export class Sdk {
    * Any design objects created by the SDK are no longer usable and the user should dispose any references to such objects to prevent memory leaks.
    *
    * @category Status
+   *
+   * @example
+   * ```typescript
+   * sdk.destroy()
+   *
+   * sdk.openDesignFile('design.sketch') // throws
+   * ```
    */
   async destroy() {
     if (this._destroyed) {
@@ -122,6 +129,20 @@ export class Sdk {
    *
    * @category Configuration
    * @returns An absolute path to the working directory. Defaults to the current process working directory (`process.cwd()` in node.js) when the workspace directory is not configured via {@link Sdk.setWorkingDirectory}.
+   *
+   * @example
+   * ```typescript
+   * // Default directory (the process working directory)
+   * sdk.getWorkingDirectory() // == process.cwd()
+   *
+   * // Custom directory (relative path to the process working directory)
+   * sdk.setWorkingDirectory('data')
+   * sdk.getWorkingDirectory() // == path.join(process.cwd(), 'data')
+   *
+   * // Custom directory (absolute path)
+   * sdk.setWorkingDirectory('/tmp/data')
+   * sdk.getWorkingDirectory() // == '/tmp/data'
+   * ```
    */
   getWorkingDirectory(): string | null {
     return (
@@ -142,6 +163,21 @@ export class Sdk {
    *
    * @category Configuration
    * @param workingDirectory An absolute path to the directory or a path relative to the process working directory (`process.cwd()` in node.js). When `null` is provided, the working directory is reset to the process working directory.
+   *
+   * @exmaple
+   * ```typescript
+   * // Custom directory (relative path to the process working directory)
+   * sdk.setWorkingDirectory('data')
+   * sdk.getWorkingDirectory() // == path.join(process.cwd(), 'data')
+   *
+   * // Custom directory (absolute path)
+   * sdk.setWorkingDirectory('/tmp/data')
+   * sdk.getWorkingDirectory() // == '/tmp/data'
+   *
+   * // Reset to the default directory (the process working directory)
+   * sdk.setWorkingDirectory(null)
+   * sdk.getWorkingDirectory() // == process.cwd()
+   * ```
    */
   setWorkingDirectory(workingDirectory: string | null) {
     const localDesignCache = this._localDesignCache
@@ -189,6 +225,12 @@ export class Sdk {
    * The first font from this list which is available in the system is used for all text layers with missing actual fonts. If none of the fonts are available, the text layers are not rendered.
    *
    * This configuration can be overriden/extended for each individual design via {@link DesignFacade.setFallbackFonts}. Fonts provided to an individual design are preferred over fonts specified here.
+   *
+   * @example
+   * ```typescript
+   * // Set preferred fallback fonts
+   * sdk.setFallbackFonts(['Arial', 'Courier-Bold'])
+   * ```
    *
    * @category Configuration
    * @param fallbackFonts An ordered list of font postscript names or font file paths.
@@ -316,6 +358,16 @@ export class Sdk {
    *
    * The design is automatically uploaded to the API and local caching is established.
    *
+   * @example
+   * ```typescript
+   * const design = await sdk.openDesignFile('data.sketch')
+   * console.log(design.sourceFilename) // == path.join(process.cwd(), 'data.sketch')
+   * console.log(design.id) // == server-generated UUID
+   *
+   * // Continue working with the processed design
+   * const artboards = design.getArtboards()
+   * ```
+   *
    * @category Local Design File Usage
    * @param filePath An absolute design file path or a path relative to the current working directory.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the design is not deleted from the server when the token is cancelled during processing; the server still finishes the processing but the SDK stops watching its progress and does not download the result). A cancellation token can be created via {@link createCancelToken}.
@@ -362,6 +414,15 @@ export class Sdk {
    *
    * The design file is not downloaded to the local environment but rather imported via the API directly. Once imported via the API, the design behaves exactly like a design fetched via {@link Sdk.fetchDesignById}.
    *
+   * @example
+   * ```typescript
+   * const design = await sdk.openDesignLink('https://example.com/designs/data.sketch')
+   * console.log(design.id) // == server-generated UUID
+   *
+   * // Continue working with the processed design
+   * const artboards = design.getArtboards()
+   * ```
+   *
    * @category Local Design File Usage
    * @param filePath An absolute design file path or a path relative to the current working directory.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the design is not deleted from the server when the token is cancelled during processing; the server still finishes the processing but the SDK stops watching its progress and does not download the result). A cancellation token can be created via {@link createCancelToken}.
@@ -396,6 +457,19 @@ export class Sdk {
    * The API has to be configured when using this method.
    *
    * The design is automatically imported by the API and local caching is established.
+   *
+   * @example
+   * ```typescript
+   * const design = await sdk.openFigmaDesign({
+   *   figmaToken: '<FIGMA_TOKEN>',
+   *   figmaFileKey: 'abc',
+   * })
+   *
+   * console.log(design.id) // == server-generated UUID
+   *
+   * // Continue working with the processed design
+   * const artboards = design.getArtboards()
+   * ```
    *
    * @category Figma Design Usage
    * @param params Info about the Figma design
@@ -433,6 +507,20 @@ export class Sdk {
    * The API has to be configured when using this method. A file system has to be available for downloading the converted design file from the API but downloading the result is not a required step as it can be done later from another client.
    *
    * The design is automatically imported by the API and local caching is established in case the local cache is configured.
+   *
+   * @example
+   * ```typescript
+   * const design = await sdk.openFigmaDesign({
+   *   figmaToken: '<FIGMA_TOKEN>',
+   *   figmaFileKey: 'abc',
+   *   conversions: [
+   *     { format: 'sketch' }
+   *   ]
+   * })
+   *
+   * // Download the converted design file
+   * await design.saveDesignFile('design.sketch')
+   * ```
    *
    * @category Figma Design Usage
    * @param params Info about the Figma design
@@ -481,6 +569,14 @@ export class Sdk {
    * The API has to be configured when using this method.
    *
    * The design is automatically uploaded to the API and local caching is established in case the local cache is configured.
+   *
+   * @example
+   * ```typescript
+   * const design = await sdk.fetchDesignById('<DESIGN_ID>')
+   *
+   * // Continue working with the processed design
+   * const artboards = design.getArtboards()
+   * ```
    *
    * @category Server Side Design File Usage
    * @param designId An ID of a server-side design assigned during import (via `importDesignFile()`, `openFigmaDesign()` or `convertFigmaDesign()`).
