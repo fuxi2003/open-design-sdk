@@ -142,7 +142,7 @@ describe('DesignFacade', () => {
     it('should return contents of an uploaded design', async function () {
       const { sdk } = await createSdk({ designFiles: true, api: true })
 
-      const designFacade = await sdk.openDesignFile(
+      const designFacade = await sdk.importDesignFile(
         singleArtboardSketchFileFixture.filename
       )
 
@@ -162,7 +162,7 @@ describe('DesignFacade', () => {
     it('should list all bitmaps in an uploaded design', async function () {
       const { sdk } = await createSdk({ designFiles: true, api: true })
 
-      const designFacade = await sdk.openDesignFile(
+      const designFacade = await sdk.importDesignFile(
         multiArtboardSketchFileFixture.filename
       )
 
@@ -186,7 +186,7 @@ describe('DesignFacade', () => {
       ok(token)
       tokenFromBefore = token
 
-      const designFacade = await sdk.openDesignFile(
+      const designFacade = await sdk.importDesignFile(
         singleArtboardSketchFileFixture.filename
       )
       ok(designFacade.id)
@@ -344,7 +344,7 @@ describe('DesignFacade', () => {
         api: true,
       })
 
-      const designFacade = await sdk.openDesignFile(
+      const designFacade = await sdk.importDesignFile(
         multiArtboardSketchFileFixture.filename
       )
 
@@ -370,7 +370,7 @@ describe('DesignFacade', () => {
         api: true,
       })
 
-      const designFacade = await sdk.openDesignFile(
+      const designFacade = await sdk.importDesignFile(
         singleInlineArtboardPhotoshopFileFixture.filename
       )
 
@@ -417,7 +417,7 @@ describe('DesignFacade', () => {
       const designFacade = await sdk.fetchDesignById(designId)
 
       const filename = await createTempFileTarget('file.sketch')
-      await designFacade.saveDesignFile(filename)
+      await designFacade.exportDesignFile(filename)
 
       doesNotThrow(() => {
         const stats = statSync(filename)
@@ -438,7 +438,7 @@ describe('DesignFacade', () => {
       })
 
       const filename = await createTempFileTarget('file.sketch')
-      await designFacade.saveDesignFile(filename)
+      await designFacade.exportDesignFile(filename)
 
       doesNotThrow(() => {
         const stats = statSync(filename)

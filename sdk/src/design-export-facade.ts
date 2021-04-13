@@ -99,7 +99,7 @@ export class DesignExportFacade implements IDesignExportFacade {
    * @category Serialization
    * @param filePath An absolute path to which to save the design file or a path relative to the current working directory.
    */
-  async saveDesignFile(filePath: string) {
+  async exportDesignFile(filePath: string) {
     return this._sdk.saveDesignFileStream(
       filePath,
       await this.getResultStream()

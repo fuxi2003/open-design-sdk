@@ -232,7 +232,7 @@ export class Sdk implements ISdk {
    * @param filePath An absolute design file path or a path relative to the current working directory.
    * @returns A design object which can be used for retrieving data from the local design file using the API.
    */
-  async openDesignFile(filePath: string): Promise<DesignFacade> {
+  async importDesignFile(filePath: string): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
     }
@@ -268,7 +268,7 @@ export class Sdk implements ISdk {
    * @param filePath An absolute design file path or a path relative to the current working directory.
    * @returns A design object which can be used for retrieving data from the local design file using the API.
    */
-  async openDesignLink(
+  async importDesignLink(
     url: string,
     options: { format?: DesignImportFormatEnum } = {}
   ): Promise<DesignFacade> {
@@ -372,7 +372,7 @@ export class Sdk implements ISdk {
    * The design is automatically uploaded to the API and local caching is established in case the local cache is configured.
    *
    * @category Server Side Design File Usage
-   * @param designId An ID of a server-side design assigned during import (via `openDesignFile()`, `openFigmaDesign()` or `convertFigmaDesign()`).
+   * @param designId An ID of a server-side design assigned during import (via `importDesignFile()`, `openFigmaDesign()` or `convertFigmaDesign()`).
    * @returns A design object which can be used for retrieving data from the design using the API.
    */
   async fetchDesignById(designId: string): Promise<DesignFacade> {

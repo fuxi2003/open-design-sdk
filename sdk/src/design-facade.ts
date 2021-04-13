@@ -1137,7 +1137,7 @@ export class DesignFacade implements IDesignFacade {
    * @category Serialization
    * @param filePath An absolute path to which to save the design file or a path relative to the current working directory.
    */
-  async saveDesignFile(filePath: string) {
+  async exportDesignFile(filePath: string) {
     const format = getDesignFormatByFileName(filePath)
     if (!format) {
       throw new Error('Unknown target design file format')

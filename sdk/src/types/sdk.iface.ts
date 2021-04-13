@@ -15,8 +15,8 @@ export interface ISdk {
   isDestroyed(): boolean
   destroy(): Promise<void>
 
-  openDesignFile(filePath: string): Promise<IDesignFacade>
-  openDesignLink(url: string): Promise<IDesignFacade>
+  importDesignFile(filePath: string): Promise<IDesignFacade>
+  importDesignLink(url: string): Promise<IDesignFacade>
   openOctopusFile(filePath: string): Promise<IDesignFacade>
   fetchDesignById(designId: string): Promise<IDesignFacade>
 
