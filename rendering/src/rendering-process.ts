@@ -27,17 +27,17 @@ export class RenderingProcess implements IRenderingProcess {
     this._process = spawnMonroeCli()
 
     this._process.on('error', (err) => {
-      console.log('RenderingProcess error:', err)
+      console.error('Rendering: error>', err)
     })
     this._process.on('close', () => {
       this._process = null
     })
 
     this._process.stdout?.on('data', (data) => {
-      console.log('RenderingProcess stdout:', String(data))
+      console.debug('Rendering: stdout>', String(data))
     })
     this._process.stderr?.on('data', (data) => {
-      console.log('RenderingProcess stderr:', String(data))
+      console.error('Rendering: stderr>', String(data))
     })
   }
 
@@ -94,7 +94,7 @@ export class RenderingProcess implements IRenderingProcess {
       renderingProcess.once('error', handleError)
 
       const cmdJson = JSON.stringify({ 'cmd': cmdName, ...data })
-      console.log('RenderingProcess stdin>', cmdJson)
+      console.log('Rendering: stdin>', cmdJson)
       stdin.write(`${cmdJson}\n`)
     })
   }

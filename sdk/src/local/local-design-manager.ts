@@ -84,7 +84,7 @@ export class LocalDesignManager implements ILocalDesignManager {
   ): Promise<LocalDesign> {
     const filename = await this._createTempLocation(options.name || null)
     const localDesign = await this.createOctopusFile(filename)
-    console.log('temp octopus file from manifest', filename)
+    console.debug('Cache:', filename)
 
     await localDesign.saveManifest(manifest)
 

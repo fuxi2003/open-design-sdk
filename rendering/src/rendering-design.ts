@@ -140,7 +140,7 @@ export class RenderingDesign implements IRenderingDesign {
       ...(options.bounds ? { 'bounds': serializeBounds(options.bounds) } : {}),
     })
     if (!result['ok']) {
-      console.error('RenderingDesign#renderPageToFile() render-page:', result)
+      console.error('Rendering:', 'render-page', '->', result)
       throw new Error('Failed to render page')
     }
   }
@@ -238,7 +238,7 @@ export class RenderingDesign implements IRenderingDesign {
     })
 
     if (!result['ok']) {
-      console.error('RenderingDesign#destroy() unload-design:', result)
+      console.error('Rendering:', 'unload-design', '->', result)
       throw new Error('Failed to destroy design')
     }
   }

@@ -147,10 +147,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       ...(options.bounds ? { 'bounds': serializeBounds(options.bounds) } : {}),
     })
     if (!result['ok']) {
-      console.error(
-        'RenderingDesign#renderArtboardToFile() render-artboard:',
-        result
-      )
+      console.error('Rendering:', 'render-artboard', '->', result)
       throw new Error('Failed to render artboard')
     }
   }
@@ -183,10 +180,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       ...serializeLayerAttributes(options),
     })
     if (!result['ok']) {
-      console.error(
-        'RenderingDesign#renderArtboardLayerToFile() render-layer:',
-        result
-      )
+      console.error('Rendering:', 'render-layer', '->', result)
       throw new Error('Failed to render artboard layer')
     }
   }
@@ -231,10 +225,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       }
     )
     if (!result['ok']) {
-      console.error(
-        'RenderingDesign#renderLayersToFile() render-artboard-composition:',
-        result
-      )
+      console.error('Rendering: render-artboard-', 'omposi', '->ion:', result)
       throw new Error('Failed to render artboard layers')
     }
   }
@@ -250,7 +241,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       'layer': layerId,
     })
     if (!result['ok']) {
-      console.error('RenderingDesign#getLayerBounds() get-layer:', result)
+      console.error('Rendering:', 'get-layer', '->', result)
       throw new Error('Failed to retrieve artboard layer info')
     }
 
@@ -274,7 +265,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       'position': [x, y],
     })
     if (!result['ok']) {
-      console.error('RenderingDesign#getLayerBounds() get-layer:', result)
+      console.error('Rendering:', 'identify-layer', '->', result)
       throw new Error('Failed to retrieve artboard layer info')
     }
 
@@ -296,7 +287,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       'policy': options.partialOverlap ? 'partial' : 'partial-external',
     })
     if (!result['ok']) {
-      console.error('RenderingDesign#getLayerBounds() get-layer:', result)
+      console.error('Rendering:', 'identify-layers', '->', result)
       throw new Error('Failed to retrieve artboard layer info')
     }
 
@@ -316,10 +307,7 @@ export class RenderingArtboard implements IRenderingArtboard {
     })
 
     if (!result['ok']) {
-      console.error(
-        'RenderingDesign#destroyArtboard() unload-artboard:',
-        result
-      )
+      console.error('Rendering:', 'unload-artboard', '-', result)
       throw new Error('Failed to unload artboard')
     }
   }

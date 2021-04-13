@@ -22,10 +22,10 @@ type AuthInfo = { token: string }
 
 const fetch = async (url: string, init: RequestInit = {}) => {
   const method = init.method?.toUpperCase() || 'GET'
-  console.debug(method, url, '...')
+  console.debug('API:', method, url, '...')
 
   const res = await fetchInternal(url, init)
-  console.log(method, url, '->', `${res.status} ${res.statusText}`)
+  console.log('API:', method, url, '->', `${res.status} ${res.statusText}`)
 
   return res
 }
