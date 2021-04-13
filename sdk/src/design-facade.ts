@@ -538,7 +538,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    */
@@ -556,7 +556,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * This method internally triggers loading of all pages and artboards. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
   async getFonts(options: { depth?: number } = {}) {
@@ -1036,7 +1036,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * The API and the local cache have to be configured when using this method.
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param bitmapAssetDescs A list of bitmap assets to download.
    */
   async downloadBitmapAssets(
@@ -1052,7 +1052,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * The API and the local cache have to be configured when using this method.
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param bitmapAssetDescs A list of bitmap assets to download.
    */
   async downloadBitmapAsset(bitmapAssetDesc: LocalBitmapAssetDescriptor) {

@@ -308,7 +308,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * Note that this method aggregates results of the more granular bitmap asset-related methods of {@link LayerFacade.getBitmap}, {@link LayerFacade.getBitmapMask} and pattern fill bitmap assets discoverable via {@link LayerFacade.getEffects}.
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param options.depth The maximum nesting level within the layer to search for bitmap asset usage. By default, all levels are searched. Specifying the depth of `0` leads to nested layer bitmap assets being omitted altogether.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    */
@@ -321,7 +321,7 @@ export class LayerFacade implements ILayerFacade {
   /**
    * Returns a list of fonts used by the layer and layers nested within the layer (optionally down to a specific nesting level).
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to fonts used by nested layers being omitted altogether.
    */
   getFonts(options: { depth?: number } = {}) {
@@ -331,7 +331,7 @@ export class LayerFacade implements ILayerFacade {
   /**
    * Returns the bitmap asset of the layer if there is one.
    *
-   * @category Asset Aggregation
+   * @category Asset
    */
   getBitmap() {
     return (
@@ -342,7 +342,7 @@ export class LayerFacade implements ILayerFacade {
   /**
    * Returns the bitmap mask of the layer if there is one.
    *
-   * @category Asset Aggregation
+   * @category Asset
    */
   getBitmapMask() {
     return this._layerEntity.getBitmapMask()
@@ -353,7 +353,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * Only non-bitmap layers (`type!=layer`) have prerendered assets. Bitmap assets of bitmap layers are not considered "pre-rendered".
    *
-   * @category Asset Aggregation
+   * @category Asset
    */
   isBitmapPrerendered() {
     return Boolean(this._layerEntity.getPrerenderedBitmap())

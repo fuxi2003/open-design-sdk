@@ -195,7 +195,7 @@ export class PageFacade implements IPageFacade {
    *
    * This method internally triggers loading of all artboards the page contains. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    */
@@ -212,7 +212,7 @@ export class PageFacade implements IPageFacade {
    *
    * This method internally triggers loading of all artboards the page contains. Uncached items are downloaded when the API is configured (and cached when the local cache is configured).
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
   async getFonts(options: { depth?: number } = {}) {

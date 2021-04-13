@@ -98,11 +98,11 @@ export interface IFile {
     options?: Partial<{ depth: number }>
   ): ILayerCollection
 
-  /** @category Asset Aggregation */
+  /** @category Asset */
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
   ): Array<AggregatedFileBitmapAssetDescriptor>
-  /** @category Asset Aggregation */
+  /** @category Asset */
   getFonts(
     options?: Partial<{ depth: number }>
   ): Array<AggregatedFileFontDescriptor>

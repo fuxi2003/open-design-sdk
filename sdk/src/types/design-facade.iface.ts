@@ -76,11 +76,11 @@ export interface IDesignFacade {
     options?: Partial<{ depth: number }>
   ): Promise<IDesignLayerCollectionFacade>
 
-  /** @category Asset Aggregation */
+  /** @category Asset */
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
   ): Promise<Array<AggregatedFileBitmapAssetDescriptor>>
-  /** @category Asset Aggregation */
+  /** @category Asset */
   getFonts(
     options?: Partial<{ depth: number }>
   ): Promise<Array<AggregatedFileFontDescriptor>>

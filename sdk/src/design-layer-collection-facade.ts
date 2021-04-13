@@ -278,7 +278,7 @@ export class DesignLayerCollectionFacade
    *
    * Both layers explicitly included in the collection and layers nested within those layers are searched.
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param options.depth The maximum nesting level within the layer to search for bitmap asset usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    */
@@ -293,7 +293,7 @@ export class DesignLayerCollectionFacade
    *
    * Both layers explicitly included in the collection and layers nested within those layers are searched.
    *
-   * @category Asset Aggregation
+   * @category Asset
    * @param options.depth The maximum nesting level within the layer to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    */
   getFonts(
