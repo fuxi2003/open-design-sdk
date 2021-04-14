@@ -61,6 +61,7 @@ buildPackages() {
 }
 
 releasePackages() {
+  echo ""
   log "Releasing packages as version ${VERSION}…"
 
   yarn workspace @opendesign/octopus-reader publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
@@ -69,6 +70,7 @@ releasePackages() {
   yarn workspace @opendesign/sdk publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
   yarn workspace @opendesign/sdk-docs-typedoc publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
 
+  echo ""
   logSuccess "Packages successfully released"
 }
 
@@ -112,11 +114,13 @@ main() {
   }
 
   releasePackages || {
+    echo ""
     logWarning "Not restoring the original repository state"
     return 1
   }
 
   commitRelease || {
+    echo ""
     logWarning "The packages @opendesign/sdk, @opendesign/octopus-reader, @opendesign/api, @opendesign/rendering and @opendesign/sdk-docs-typedoc have already been released!"
     logWarning "Not restoring the original repository state"
     return 1
