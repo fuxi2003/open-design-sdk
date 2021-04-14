@@ -54,21 +54,63 @@ buildPackages() {
   echo ""
   log "Building packages…"
 
+  echo ""
+  log "Building @opendesign/octopus-reader@${VERSION}…"
   yarn build:octopus-reader || return 1
+  logSuccess "Package @opendesign/octopus-reader@$VERSION successfully built"
+
+  echo ""
+  log "Building @opendesign/api@${VERSION}…"
   yarn build:api || return 1
+  logSuccess "Package @opendesign/api@$VERSION successfully built"
+
+  echo ""
+  log "Building @opendesign/rendering@${VERSION}…"
+  yarn build:rendering || return 1
+  logSuccess "Package @opendesign/rendering@$VERSION successfully built"
+
+  echo ""
+  log "Building @opendesign/sdk@${VERSION}…"
   yarn build:sdk || return 1
+  logSuccess "Package @opendesign/sdk@$VERSION successfully built"
+
+  echo ""
+  log "Building @opendesign/sdk-docs-typedoc@${VERSION}…"
   yarn build:sdk-docs-typedoc || return 1
+  logSuccess "Package @opendesign/sdk-docs-typedoc@$VERSION successfully built"
+
+  echo ""
+  logSuccess "Packages successfully built"
 }
 
 releasePackages() {
   echo ""
   log "Releasing packages as version ${VERSION}…"
 
+  echo ""
+  log "Releasing @opendesign/octopus-reader@${VERSION}…"
   yarn workspace @opendesign/octopus-reader publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
+  logSuccess "Package @opendesign/octopus-reader@$VERSION successfully released"
+
+  echo ""
+  log "Releasing @opendesign/api@${VERSION}…"
   yarn workspace @opendesign/api publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
+  logSuccess "Package @opendesign/api@$VERSION successfully released"
+
+  echo ""
+  log "Releasing @opendesign/rendering@${VERSION}…"
   yarn workspace @opendesign/rendering publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
+  logSuccess "Package @opendesign/rendering@$VERSION successfully released"
+
+  echo ""
+  log "Releasing @opendesign/sdk@${VERSION}…"
   yarn workspace @opendesign/sdk publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
+  logSuccess "Package @opendesign/sdk@$VERSION successfully released"
+
+  echo ""
+  log "Releasing @opendesign/sdk-docs-typedoc@${VERSION}…"
   yarn workspace @opendesign/sdk-docs-typedoc publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
+  logSuccess "Package @opendesign/sdk-docs-typedoc@$VERSION successfully released"
 
   echo ""
   logSuccess "Packages successfully released"
