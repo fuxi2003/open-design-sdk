@@ -28,16 +28,15 @@ import type {
   Bounds,
   IRenderingDesign,
   BlendingMode,
+  LayerBounds,
 } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
-import type { Sdk } from './sdk'
-import type {
-  ILocalDesign,
-  BitmapAssetDescriptor,
-} from './types/local-design.iface'
 import type { IDesignFacade } from './types/design-facade.iface'
 import type { LayerFacade } from './layer-facade'
 import type { FontDescriptor } from './types/layer-facade.iface'
+import type { Sdk } from './sdk'
+import type { LocalDesign } from './local/local-design'
+import type { BitmapAssetDescriptor } from './types/local-design.iface'
 
 type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 
@@ -51,7 +50,7 @@ export class DesignFacade implements IDesignFacade {
   private _sdk: Sdk
 
   private _designEntity: IFile | null = null
-  private _localDesign: ILocalDesign | null = null
+  private _localDesign: LocalDesign | null = null
   private _apiDesign: IApiDesign | null = null
   private _renderingDesign: IRenderingDesign | null = null
 
@@ -133,28 +132,30 @@ export class DesignFacade implements IDesignFacade {
     this._getPagesMemoized.clear()
   }
 
-  private _getDesignEntity = memoize(() => {
-    const entity = this._designEntity || createEmptyFile()
+  private _getDesignEntity = memoize(
+    (): IFile => {
+      const entity = this._designEntity || createEmptyFile()
 
-    const pendingManifestUpdate = this._pendingManifestUpdate
-    if (pendingManifestUpdate) {
-      this._pendingManifestUpdate = null
-      entity.setManifest(pendingManifestUpdate)
+      const pendingManifestUpdate = this._pendingManifestUpdate
+      if (pendingManifestUpdate) {
+        this._pendingManifestUpdate = null
+        entity.setManifest(pendingManifestUpdate)
 
-      this._getArtboardsMemoized.clear()
-      this._getPagesMemoized.clear()
+        this._getArtboardsMemoized.clear()
+        this._getPagesMemoized.clear()
+      }
+
+      return entity
     }
-
-    return entity
-  })
+  )
 
   /** @internal */
-  getLocalDesign() {
+  getLocalDesign(): LocalDesign | null {
     return this._localDesign
   }
 
   /** @internal */
-  async setLocalDesign(localDesign: ILocalDesign) {
+  async setLocalDesign(localDesign: LocalDesign) {
     this._localDesign = localDesign
 
     if (!this._manifestLoaded) {
@@ -181,32 +182,34 @@ export class DesignFacade implements IDesignFacade {
    *
    * @category Artboard Lookup
    */
-  getArtboards() {
+  getArtboards(): Array<ArtboardFacade> {
     return this._getArtboardsMemoized()
   }
 
-  private _getArtboardsMemoized = memoize(() => {
-    const prevArtboardFacades = this._artboardFacades
-    const nextArtboardFacades: Map<ArtboardId, ArtboardFacade> = new Map()
+  private _getArtboardsMemoized = memoize(
+    (): Array<ArtboardFacade> => {
+      const prevArtboardFacades = this._artboardFacades
+      const nextArtboardFacades: Map<ArtboardId, ArtboardFacade> = new Map()
 
-    const entity = this._getDesignEntity()
-    const artboardEntities = entity.getArtboards()
+      const entity = this._getDesignEntity()
+      const artboardEntities = entity.getArtboards()
 
-    artboardEntities.forEach((artboardEntity) => {
-      const artboardId = artboardEntity.id
-      const artboardFacade =
-        prevArtboardFacades.get(artboardId) ||
-        this._createArtboardFacade(artboardEntity)
+      artboardEntities.forEach((artboardEntity) => {
+        const artboardId = artboardEntity.id
+        const artboardFacade =
+          prevArtboardFacades.get(artboardId) ||
+          this._createArtboardFacade(artboardEntity)
 
-      artboardFacade.setArtboardEntity(artboardEntity)
+        artboardFacade.setArtboardEntity(artboardEntity)
 
-      nextArtboardFacades.set(artboardId, artboardFacade)
-    })
+        nextArtboardFacades.set(artboardId, artboardFacade)
+      })
 
-    this._artboardFacades = nextArtboardFacades
+      this._artboardFacades = nextArtboardFacades
 
-    return [...nextArtboardFacades.values()]
-  })
+      return [...nextArtboardFacades.values()]
+    }
+  )
 
   /**
    * Returns a single artboard object. These can be used to work with the artboard contents.
@@ -286,7 +289,7 @@ export class DesignFacade implements IDesignFacade {
    *
    * @category Page Lookup
    */
-  isPaged() {
+  isPaged(): boolean {
     const entity = this._getDesignEntity()
     return entity.isPaged()
   }
@@ -298,31 +301,33 @@ export class DesignFacade implements IDesignFacade {
    *
    * @category Page Lookup
    */
-  getPages() {
+  getPages(): Array<PageFacade> {
     return this._getPagesMemoized()
   }
 
-  private _getPagesMemoized = memoize(() => {
-    const prevPageFacades = this._pageFacades
-    const nextPageFacades: Map<PageId, PageFacade> = new Map()
+  private _getPagesMemoized = memoize(
+    (): Array<PageFacade> => {
+      const prevPageFacades = this._pageFacades
+      const nextPageFacades: Map<PageId, PageFacade> = new Map()
 
-    const entity = this._getDesignEntity()
-    const pageEntities = entity.getPages()
+      const entity = this._getDesignEntity()
+      const pageEntities = entity.getPages()
 
-    pageEntities.forEach((pageEntity) => {
-      const pageId = pageEntity.id
-      const pageFacade =
-        prevPageFacades.get(pageId) || this._createPageFacade(pageEntity)
+      pageEntities.forEach((pageEntity) => {
+        const pageId = pageEntity.id
+        const pageFacade =
+          prevPageFacades.get(pageId) || this._createPageFacade(pageEntity)
 
-      pageFacade.setPageEntity(pageEntity)
+        pageFacade.setPageEntity(pageEntity)
 
-      nextPageFacades.set(pageId, pageFacade)
-    })
+        nextPageFacades.set(pageId, pageFacade)
+      })
 
-    this._pageFacades = nextPageFacades
+      this._pageFacades = nextPageFacades
 
-    return [...nextPageFacades.values()]
-  })
+      return [...nextPageFacades.values()]
+    }
+  )
 
   /**
    * Returns a single page object. These can be used to work with the page contents and contents of artboards inside the page.
@@ -431,7 +436,9 @@ export class DesignFacade implements IDesignFacade {
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within pages and artboards to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in artboards should be included.
    */
-  async getFlattenedLayers(options: Partial<{ depth: number }> = {}) {
+  async getFlattenedLayers(
+    options: Partial<{ depth: number }> = {}
+  ): Promise<DesignLayerCollectionFacade> {
     await this.load()
 
     const entity = this._getDesignEntity()
@@ -452,7 +459,7 @@ export class DesignFacade implements IDesignFacade {
    * @category Layer Lookup
    * @param layerId A layer ID.
    */
-  async findLayerById(layerId: LayerId) {
+  async findLayerById(layerId: LayerId): Promise<LayerFacade | null> {
     await this.load()
 
     const entity = this._getDesignEntity()
@@ -475,7 +482,7 @@ export class DesignFacade implements IDesignFacade {
    * @category Layer Lookup
    * @param layerId A layer ID.
    */
-  async findLayersById(layerId: LayerId) {
+  async findLayersById(layerId: LayerId): Promise<DesignLayerCollectionFacade> {
     await this.load()
 
     const entity = this._getDesignEntity()
@@ -498,7 +505,7 @@ export class DesignFacade implements IDesignFacade {
   async findLayer(
     selector: FileLayerSelector,
     options: { depth?: number } = {}
-  ) {
+  ): Promise<LayerFacade | null> {
     await this.load()
 
     const entity = this._getDesignEntity()
@@ -523,7 +530,7 @@ export class DesignFacade implements IDesignFacade {
   async findLayers(
     selector: FileLayerSelector,
     options: { depth?: number } = {}
-  ) {
+  ): Promise<DesignLayerCollectionFacade> {
     await this.load()
 
     const entity = this._getDesignEntity()
@@ -820,7 +827,10 @@ export class DesignFacade implements IDesignFacade {
    * @param artboardId The ID of the artboard from which to inspect the layer.
    * @param layerId The ID of the layer to inspect.
    */
-  async getArtboardLayerBounds(artboardId: ArtboardId, layerId: LayerId) {
+  async getArtboardLayerBounds(
+    artboardId: ArtboardId,
+    layerId: LayerId
+  ): Promise<LayerBounds> {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {
       throw new Error('No such artboard')
@@ -1052,7 +1062,9 @@ export class DesignFacade implements IDesignFacade {
    * @category Asset
    * @param bitmapAssetDescs A list of bitmap assets to download.
    */
-  async downloadBitmapAssets(bitmapAssetDescs: Array<BitmapAssetDescriptor>) {
+  async downloadBitmapAssets(
+    bitmapAssetDescs: Array<BitmapAssetDescriptor>
+  ): Promise<void> {
     await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
       return this.downloadBitmapAsset(bitmapAssetDesc)
     })
@@ -1066,7 +1078,9 @@ export class DesignFacade implements IDesignFacade {
    * @category Asset
    * @param bitmapAssetDescs A list of bitmap assets to download.
    */
-  async downloadBitmapAsset(bitmapAssetDesc: BitmapAssetDescriptor) {
+  async downloadBitmapAsset(
+    bitmapAssetDesc: BitmapAssetDescriptor
+  ): Promise<void> {
     const apiDesign = this._apiDesign
     if (!apiDesign) {
       throw new Error(
@@ -1102,7 +1116,7 @@ export class DesignFacade implements IDesignFacade {
    * @category Serialization
    * @param filePath An absolute path of the target `.octopus` file or a path relative to the current working directory. When omitted, the open `.octopus` file location is used instead. The API has to be configured in case there are uncached items.
    */
-  async saveOctopusFile(filePath: string | null = null) {
+  async saveOctopusFile(filePath: string | null = null): Promise<void> {
     const localDesign = await this._getLocalDesign(filePath)
     const apiDesign = this._apiDesign
 
@@ -1141,7 +1155,7 @@ export class DesignFacade implements IDesignFacade {
    * @category Serialization
    * @param filePath An absolute path to which to save the design file or a path relative to the current working directory.
    */
-  async exportDesignFile(filePath: string) {
+  async exportDesignFile(filePath: string): Promise<void> {
     const format = getDesignFormatByFileName(filePath)
     if (!format) {
       throw new Error('Unknown target design file format')
@@ -1157,9 +1171,7 @@ export class DesignFacade implements IDesignFacade {
     )
   }
 
-  private async _getLocalDesign(
-    filePath: string | null
-  ): Promise<ILocalDesign> {
+  private async _getLocalDesign(filePath: string | null): Promise<LocalDesign> {
     const localDesign = this._localDesign
 
     if (!filePath) {
@@ -1198,7 +1210,9 @@ export class DesignFacade implements IDesignFacade {
    * @category Serialization
    * @param format The format to which the design should be exported.
    */
-  async getExportToFormat(format: DesignExportTargetFormatEnum) {
+  async getExportToFormat(
+    format: DesignExportTargetFormatEnum
+  ): Promise<DesignExportFacade> {
     const prevExport = this._designExports.get(format)
     if (prevExport) {
       return prevExport
@@ -1215,7 +1229,7 @@ export class DesignFacade implements IDesignFacade {
     })
     this._designExports.set(format, designExportFacade)
 
-    return designExport
+    return designExportFacade
   }
 
   private async _loadRenderingDesignPage(

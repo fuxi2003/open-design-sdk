@@ -12,6 +12,7 @@ import type {
 } from '@opendesign/octopus-reader'
 import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
+import type { LayerFacade } from './layer-facade'
 import type { FontDescriptor } from './types/layer-facade.iface'
 import type { BitmapAssetDescriptor } from './types/local-design.iface'
 import type { IPageFacade } from './types/page-facade.iface'
@@ -70,7 +71,7 @@ export class PageFacade implements IPageFacade {
    * Returns the design object associated with the page object.
    * @category Reference
    */
-  getDesign() {
+  getDesign(): DesignFacade {
     return this._designFacade
   }
 
@@ -78,7 +79,7 @@ export class PageFacade implements IPageFacade {
    * Returns whether the page content and the content of all artboards the page contains are loaded in memory from the API, a local `.octopus` file or a local cache.
    * @category Status
    */
-  isLoaded() {
+  isLoaded(): boolean {
     const artboards = this.getArtboards()
     return artboards.every((artboard) => {
       return artboard.isLoaded()
@@ -100,7 +101,7 @@ export class PageFacade implements IPageFacade {
    *
    * @category Artboard Lookup
    */
-  getArtboards() {
+  getArtboards(): Array<ArtboardFacade> {
     return this._designFacade.getPageArtboards(this.id)
   }
 
@@ -245,7 +246,9 @@ export class PageFacade implements IPageFacade {
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within the artboards to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in the artboard should be included.
    */
-  async getFlattenedLayers(options: { depth?: number } = {}) {
+  async getFlattenedLayers(
+    options: { depth?: number } = {}
+  ): Promise<DesignLayerCollectionFacade> {
     await this.load()
 
     const layerCollection = this._pageEntity.getFlattenedLayers(options)
@@ -265,7 +268,10 @@ export class PageFacade implements IPageFacade {
    * @param layerId A layer ID.
    * @param options.depth The maximum nesting level within artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
-  async findLayerById(layerId: LayerId, options: { depth?: number } = {}) {
+  async findLayerById(
+    layerId: LayerId,
+    options: { depth?: number } = {}
+  ): Promise<LayerFacade | null> {
     await this.load()
 
     const layerEntity = this._pageEntity.findLayerById(layerId, options)
@@ -291,7 +297,10 @@ export class PageFacade implements IPageFacade {
    * @param layerId A layer ID.
    * @param options.depth The maximum nesting level within artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
-  async findLayersById(layerId: LayerId, options: { depth?: number } = {}) {
+  async findLayersById(
+    layerId: LayerId,
+    options: { depth?: number } = {}
+  ): Promise<DesignLayerCollectionFacade> {
     await this.load()
 
     const layerCollection = this._pageEntity.findLayersById(layerId, options)
@@ -309,7 +318,10 @@ export class PageFacade implements IPageFacade {
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
-  async findLayer(selector: LayerSelector, options: { depth?: number } = {}) {
+  async findLayer(
+    selector: LayerSelector,
+    options: { depth?: number } = {}
+  ): Promise<LayerFacade | null> {
     await this.load()
 
     const layerEntity = this._pageEntity.findLayer(selector, options)
@@ -333,7 +345,10 @@ export class PageFacade implements IPageFacade {
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    */
-  async findLayers(selector: LayerSelector, options: { depth?: number } = {}) {
+  async findLayers(
+    selector: LayerSelector,
+    options: { depth?: number } = {}
+  ): Promise<DesignLayerCollectionFacade> {
     await this.load()
 
     const layerCollection = this._pageEntity.findLayers(selector, options)

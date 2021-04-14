@@ -60,7 +60,7 @@ export class LocalDesign implements ILocalDesign {
     this._apiDesignInfo = init.apiDesignInfo || null
   }
 
-  get filename() {
+  get filename(): string {
     return this._filename
   }
 
@@ -78,7 +78,7 @@ export class LocalDesign implements ILocalDesign {
     this._filename = nextFilename
   }
 
-  async getManifest() {
+  async getManifest(): Promise<ManifestData> {
     const manifestFilename = this._getManifestFilename()
     const manifest = (await readJsonFile(manifestFilename)) as ManifestData
     return manifest
@@ -89,12 +89,14 @@ export class LocalDesign implements ILocalDesign {
     await writeJsonFile(manifestFilename, manifest)
   }
 
-  async hasArtboardContent(artboardId: ArtboardId) {
+  async hasArtboardContent(artboardId: ArtboardId): Promise<boolean> {
     const contentFilename = this._getArtboardContentFilename(artboardId)
     return checkFile(contentFilename)
   }
 
-  async getArtboardContentFilename(artboardId: ArtboardId) {
+  async getArtboardContentFilename(
+    artboardId: ArtboardId
+  ): Promise<string | null> {
     if (!this.hasArtboardContent(artboardId)) {
       return null
     }
@@ -102,13 +104,17 @@ export class LocalDesign implements ILocalDesign {
     return this._getArtboardContentFilename(artboardId)
   }
 
-  async getArtboardContent(artboardId: ArtboardId) {
+  async getArtboardContent(
+    artboardId: ArtboardId
+  ): Promise<ArtboardOctopusData> {
     const contentFilename = this._getArtboardContentFilename(artboardId)
     const content = (await readJsonFile(contentFilename)) as ArtboardOctopusData
     return content
   }
 
-  async getArtboardContentJsonStream(artboardId: ArtboardId) {
+  async getArtboardContentJsonStream(
+    artboardId: ArtboardId
+  ): Promise<NodeJS.ReadableStream> {
     const contentFilename = this._getArtboardContentFilename(artboardId)
     return readFileStream(contentFilename)
   }
@@ -129,18 +135,20 @@ export class LocalDesign implements ILocalDesign {
     await writeJsonFileStream(contentFilename, contentStream)
   }
 
-  async hasPageContent(pageId: PageId) {
+  async hasPageContent(pageId: PageId): Promise<boolean> {
     const contentFilename = this._getPageContentFilename(pageId)
     return checkFile(contentFilename)
   }
 
-  async getPageContent(pageId: PageId) {
+  async getPageContent(pageId: PageId): Promise<ArtboardOctopusData> {
     const contentFilename = this._getPageContentFilename(pageId)
     const content = (await readJsonFile(contentFilename)) as ArtboardOctopusData
     return content
   }
 
-  async getPageContentJsonStream(pageId: PageId) {
+  async getPageContentJsonStream(
+    pageId: PageId
+  ): Promise<NodeJS.ReadableStream> {
     const contentFilename = this._getPageContentFilename(pageId)
     return readFileStream(contentFilename)
   }
@@ -161,16 +169,20 @@ export class LocalDesign implements ILocalDesign {
     await writeJsonFileStream(contentFilename, contentStream)
   }
 
-  async hasBitmapAsset(bitmapAssetDesc: BitmapAssetDescriptor) {
+  async hasBitmapAsset(
+    bitmapAssetDesc: BitmapAssetDescriptor
+  ): Promise<boolean> {
     const { available } = await this.resolveBitmapAsset(bitmapAssetDesc)
     return available
   }
 
-  getBitmapAssetDirectory() {
+  getBitmapAssetDirectory(): string {
     return joinPaths(this._filename, BITMAP_ASSET_DIRECTORY_BASENAME)
   }
 
-  async getBitmapAssetStream(bitmapAssetDesc: BitmapAssetDescriptor) {
+  async getBitmapAssetStream(
+    bitmapAssetDesc: BitmapAssetDescriptor
+  ): Promise<NodeJS.ReadableStream> {
     const {
       filename: bitmapAssetFilename,
       available,
@@ -182,7 +194,9 @@ export class LocalDesign implements ILocalDesign {
     return readFileStream(bitmapAssetFilename)
   }
 
-  async getBitmapAssetBlob(bitmapAssetDesc: BitmapAssetDescriptor) {
+  async getBitmapAssetBlob(
+    bitmapAssetDesc: BitmapAssetDescriptor
+  ): Promise<Buffer> {
     const {
       filename: bitmapAssetFilename,
       available,

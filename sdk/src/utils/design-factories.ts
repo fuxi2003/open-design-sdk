@@ -2,11 +2,11 @@ import { DesignExportFacade } from '../design-export-facade'
 import { DesignFacade } from '../design-facade'
 
 import type { IApiDesign, IApiDesignExport } from '@opendesign/api'
-import type { ILocalDesign } from '../types/local-design.iface'
+import type { LocalDesign } from '../local/local-design'
 import type { Sdk } from '../sdk'
 
 export async function createDesignFromLocalDesign(
-  localDesign: ILocalDesign,
+  localDesign: LocalDesign,
   params: {
     sdk: Sdk
     sourceFilename?: string | null

@@ -13,13 +13,12 @@ import type {
   PageId,
   RgbaColor,
 } from '@opendesign/octopus-reader'
-import type { BlendingMode, Bounds } from '@opendesign/rendering'
-import type {
-  IArtboardFacade,
-} from './types/artboard-facade.iface'
+import type { BlendingMode, Bounds, LayerBounds } from '@opendesign/rendering'
+import type { IArtboardFacade } from './types/artboard-facade.iface'
 import type { DesignFacade } from './design-facade'
 import type { FontDescriptor } from './types/layer-facade.iface'
 import type { BitmapAssetDescriptor } from './types/local-design.iface'
+import type { PageFacade } from './page-facade'
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
 interface ArtboardOctopusData extends ArtboardOctopusDataType {}
@@ -136,7 +135,7 @@ export class ArtboardFacade implements IArtboardFacade {
   }
 
   /** @internal */
-  getArtboardEntity() {
+  getArtboardEntity(): IArtboard {
     return this._artboardEntity
   }
 
@@ -144,12 +143,12 @@ export class ArtboardFacade implements IArtboardFacade {
    * Returns the design object associated with the artboard object.
    * @category Reference
    */
-  getDesign() {
+  getDesign(): DesignFacade {
     return this._designFacade
   }
 
   /** @internal */
-  getManifest() {
+  getManifest(): ArtboardManifestData {
     return this._artboardEntity.getManifest()
   }
 
@@ -187,7 +186,7 @@ export class ArtboardFacade implements IArtboardFacade {
    * Returns the page object associated with the artboard object.
    * @category Reference
    */
-  getPage() {
+  getPage(): PageFacade | null {
     const pageId = this.pageId
     return pageId ? this._designFacade.getPageById(pageId) : null
   }
@@ -280,7 +279,7 @@ export class ArtboardFacade implements IArtboardFacade {
    *
    * @category Layer Lookup
    */
-  async getRootLayers() {
+  async getRootLayers(): Promise<DesignLayerCollectionFacade> {
     await this.load()
 
     const layerCollection = this._artboardEntity.getRootLayers()
@@ -299,7 +298,9 @@ export class ArtboardFacade implements IArtboardFacade {
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within the artboard to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in the artboard should be included.
    */
-  async getFlattenedLayers(options: { depth?: number } = {}) {
+  async getFlattenedLayers(
+    options: { depth?: number } = {}
+  ): Promise<DesignLayerCollectionFacade> {
     await this.load()
 
     const layerCollection = this._artboardEntity.getFlattenedLayers(options)
@@ -318,13 +319,13 @@ export class ArtboardFacade implements IArtboardFacade {
    * @category Layer Lookup
    * @param layerId A layer ID.
    */
-  async getLayerById(layerId: LayerId) {
+  async getLayerById(layerId: LayerId): Promise<LayerFacade | null> {
     await this.load()
     return this.getLayerFacadeById(layerId)
   }
 
   /** @internal */
-  getLayerFacadeById(layerId: LayerId) {
+  getLayerFacadeById(layerId: LayerId): LayerFacade | null {
     const prevLayerFacade = this._layerFacades.get(layerId)
     if (prevLayerFacade) {
       return prevLayerFacade
@@ -347,7 +348,10 @@ export class ArtboardFacade implements IArtboardFacade {
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    */
-  async findLayer(selector: LayerSelector, options: { depth?: number } = {}) {
+  async findLayer(
+    selector: LayerSelector,
+    options: { depth?: number } = {}
+  ): Promise<LayerFacade | null> {
     await this.load()
 
     const layerEntity = this._artboardEntity.findLayer(selector, options)
@@ -363,7 +367,10 @@ export class ArtboardFacade implements IArtboardFacade {
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    */
-  async findLayers(selector: LayerSelector, options: { depth?: number } = {}) {
+  async findLayers(
+    selector: LayerSelector,
+    options: { depth?: number } = {}
+  ): Promise<DesignLayerCollectionFacade> {
     await this.load()
 
     const layerCollection = this._artboardEntity.findLayers(selector, options)
@@ -380,7 +387,7 @@ export class ArtboardFacade implements IArtboardFacade {
    * @category Layer Lookup
    * @param layerId A layer ID.
    */
-  async getLayerDepth(layerId: LayerId) {
+  async getLayerDepth(layerId: LayerId): Promise<number | null> {
     await this.load()
 
     return this._artboardEntity.getLayerDepth(layerId)
@@ -495,7 +502,7 @@ export class ArtboardFacade implements IArtboardFacade {
    * @category Data
    * @param layerId The ID of the artboard layer to inspect.
    */
-  getLayerBounds(layerId: LayerId) {
+  getLayerBounds(layerId: LayerId): Promise<LayerBounds> {
     return this._designFacade.getArtboardLayerBounds(this.id, layerId)
   }
 
@@ -508,7 +515,7 @@ export class ArtboardFacade implements IArtboardFacade {
    * @param x The X coordinate in the coordinate system of the artboard where to look for a layer.
    * @param y The Y coordinate in the coordinate system of the artboard where to look for a layer.
    */
-  getLayerAtPosition(x: number, y: number) {
+  getLayerAtPosition(x: number, y: number): Promise<LayerFacade | null> {
     return this._designFacade.getArtboardLayerAtPosition(this.id, x, y)
   }
 
@@ -521,7 +528,10 @@ export class ArtboardFacade implements IArtboardFacade {
    * @param bounds The area in the corrdinate system of the artboard where to look for layers.
    * @param options.partialOverlap Whether to also return layers which are only partially contained within the specified area.
    */
-  getLayersInArea(bounds: Bounds, options: { partialOverlap?: boolean } = {}) {
+  getLayersInArea(
+    bounds: Bounds,
+    options: { partialOverlap?: boolean } = {}
+  ): Promise<Array<LayerFacade>> {
     return this._designFacade.getArtboardLayersInArea(this.id, bounds, options)
   }
 

@@ -3,13 +3,21 @@ import { inspect } from 'util'
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
 import type {
+  IBitmap,
+  IBitmapMask,
+  IEffects,
   ILayer,
+  IShape,
+  IText,
+  LayerId,
   LayerOctopusData as LayerOctopusDataType,
   LayerSelector,
 } from '@opendesign/octopus-reader'
-import type { BlendingMode, Bounds } from '@opendesign/rendering'
+import type { BlendingMode, Bounds, LayerBounds } from '@opendesign/rendering'
+import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
 import type { FontDescriptor, ILayerFacade } from './types/layer-facade.iface'
+import type { BitmapAssetDescriptor } from './types/local-design.iface'
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
 interface LayerOctopusData extends LayerOctopusDataType {}
@@ -86,13 +94,13 @@ export class LayerFacade implements ILayerFacade {
    * Returns the artboard object associated with the layer object.
    * @category Reference
    */
-  getArtboard() {
+  getArtboard(): ArtboardFacade | null {
     const artboardId = this.artboardId
     return artboardId ? this._designFacade.getArtboardById(artboardId) : null
   }
 
   /** @internal */
-  getLayerEntity() {
+  getLayerEntity(): ILayer {
     return this._layerEntity
   }
 
@@ -100,7 +108,7 @@ export class LayerFacade implements ILayerFacade {
    * Returns whether the layer is located at the first level within the layer tree of the artboard (i.e. it does not have a parent layer).
    * @category Layer Context
    */
-  isRootLayer() {
+  isRootLayer(): boolean {
     return this._layerEntity.isRootLayer()
   }
 
@@ -109,7 +117,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Context
    */
-  getDepth() {
+  getDepth(): number {
     return this._layerEntity.getDepth()
   }
 
@@ -118,7 +126,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    */
-  getParentLayer() {
+  getParentLayer(): LayerFacade | null {
     const layerEntity = this._layerEntity.getParentLayer()
     return layerEntity
       ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
@@ -130,7 +138,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    */
-  getParentLayers() {
+  getParentLayers(): DesignLayerCollectionFacade {
     const layerEntities = this._layerEntity.getParentLayers()
     return new DesignLayerCollectionFacade(layerEntities, {
       designFacade: this._designFacade,
@@ -142,7 +150,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    */
-  getParentLayerIds() {
+  getParentLayerIds(): Array<LayerId> {
     return this._layerEntity.getParentLayerIds()
   }
 
@@ -151,7 +159,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    */
-  findParentLayer(selector: LayerSelector) {
+  findParentLayer(selector: LayerSelector): LayerFacade | null {
     const layerEntity = this._layerEntity.findParentLayer(selector)
     return layerEntity
       ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
@@ -163,7 +171,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    */
-  findParentLayers(selector: LayerSelector) {
+  findParentLayers(selector: LayerSelector): DesignLayerCollectionFacade {
     const layerEntities = this._layerEntity.findParentLayers(selector)
     return new DesignLayerCollectionFacade(layerEntities, {
       designFacade: this._designFacade,
@@ -177,7 +185,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    */
-  hasNestedLayers() {
+  hasNestedLayers(): boolean {
     return this._layerEntity.hasNestedLayers()
   }
 
@@ -189,7 +197,9 @@ export class LayerFacade implements ILayerFacade {
    * @category Layer Lookup
    * @param options.depth The maximum nesting level within the layer to include in the collection. By default, only the immediate nesting level is included. `Infinity` can be specified to get all nesting levels.
    */
-  getNestedLayers(options: { depth?: number } = {}) {
+  getNestedLayers(
+    options: { depth?: number } = {}
+  ): DesignLayerCollectionFacade {
     const layerEntities = this._layerEntity.getNestedLayers(options)
     return new DesignLayerCollectionFacade(layerEntities, {
       designFacade: this._designFacade,
@@ -205,7 +215,10 @@ export class LayerFacade implements ILayerFacade {
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the layer to search. By default, all levels are searched. `0` also means "no limit"; `1` means only layers nested directly in the layer should be searched.
    */
-  findNestedLayer(selector: LayerSelector, options: { depth?: number } = {}) {
+  findNestedLayer(
+    selector: LayerSelector,
+    options: { depth?: number } = {}
+  ): LayerFacade | null {
     const layerEntity = this._layerEntity.findNestedLayer(selector, options)
     return layerEntity
       ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
@@ -221,7 +234,10 @@ export class LayerFacade implements ILayerFacade {
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the layer to search. By default, all levels are searched. `0` also means "no limit"; `1` means only layers nested directly in the layer should be searched.
    */
-  findNestedLayers(selector: LayerSelector, options: { depth?: number } = {}) {
+  findNestedLayers(
+    selector: LayerSelector,
+    options: { depth?: number } = {}
+  ): DesignLayerCollectionFacade {
     const layerEntities = this._layerEntity.findNestedLayers(selector, options)
     return new DesignLayerCollectionFacade(layerEntities, {
       designFacade: this._designFacade,
@@ -233,7 +249,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Context
    */
-  isMasked() {
+  isMasked(): boolean {
     return this._layerEntity.isMasked()
   }
 
@@ -242,7 +258,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    */
-  getMaskLayer() {
+  getMaskLayer(): LayerFacade | null {
     const layerEntity = this._layerEntity.getMaskLayer()
     return layerEntity
       ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
@@ -254,7 +270,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Lookup
    */
-  getMaskLayerId() {
+  getMaskLayerId(): LayerId | null {
     return this._layerEntity.getMaskLayerId()
   }
 
@@ -263,7 +279,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Context
    */
-  isInlineArtboard() {
+  isInlineArtboard(): boolean {
     return this._layerEntity.isInlineArtboard()
   }
 
@@ -272,7 +288,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Context
    */
-  isComponentInstance() {
+  isComponentInstance(): boolean {
     return this._layerEntity.isComponentInstance()
   }
 
@@ -285,7 +301,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Layer Context
    */
-  hasComponentOverrides() {
+  hasComponentOverrides(): boolean {
     return this._layerEntity.hasComponentOverrides()
   }
 
@@ -296,7 +312,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Reference
    */
-  getComponentArtboard() {
+  getComponentArtboard(): ArtboardFacade | null {
     const componentArtboardEntity = this._layerEntity.getComponentArtboard()
     return componentArtboardEntity
       ? this._designFacade.getArtboardById(componentArtboardEntity.id)
@@ -314,7 +330,7 @@ export class LayerFacade implements ILayerFacade {
    */
   getBitmapAssets(
     options: { depth?: number; includePrerendered?: boolean } = {}
-  ) {
+  ): Array<BitmapAssetDescriptor & { layerIds: Array<LayerId> }> {
     return this._layerEntity.getBitmapAssets(options)
   }
 
@@ -335,7 +351,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Asset
    */
-  getBitmap() {
+  getBitmap(): IBitmap | null {
     return (
       this._layerEntity.getBitmap() || this._layerEntity.getPrerenderedBitmap()
     )
@@ -346,7 +362,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Asset
    */
-  getBitmapMask() {
+  getBitmapMask(): IBitmapMask | null {
     return this._layerEntity.getBitmapMask()
   }
 
@@ -357,7 +373,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Asset
    */
-  isBitmapPrerendered() {
+  isBitmapPrerendered(): boolean {
     return Boolean(this._layerEntity.getPrerenderedBitmap())
   }
 
@@ -369,7 +385,7 @@ export class LayerFacade implements ILayerFacade {
    * @internal
    * @category Data
    */
-  getShape() {
+  getShape(): IShape | null {
     return this._layerEntity.getShape()
   }
 
@@ -380,7 +396,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Data
    */
-  getText() {
+  getText(): IText | null {
     return this._layerEntity.getText()
   }
 
@@ -393,7 +409,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Data
    */
-  getEffects() {
+  getEffects(): IEffects {
     return this._layerEntity.getEffects()
   }
 
@@ -448,7 +464,7 @@ export class LayerFacade implements ILayerFacade {
    *
    * @category Data
    */
-  async getBounds() {
+  async getBounds(): Promise<LayerBounds> {
     const artboardId = this.artboardId
     if (!artboardId) {
       throw new Error('Detached layers cannot be rendered')

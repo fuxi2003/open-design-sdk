@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid'
 
 import type {
   DesignImportFormatEnum,
+  IApiDesign,
   IApiDesignExport,
   IOpenDesignApi,
 } from '@opendesign/api'
@@ -452,7 +453,7 @@ export class Sdk implements ISdk {
   async saveDesignFileStream(
     filePath: string,
     designFileStream: NodeJS.ReadableStream
-  ) {
+  ): Promise<void> {
     const designFileManager = this._designFileManager
     if (!designFileManager) {
       throw new Error('Design file manager is not configured.')
@@ -537,7 +538,9 @@ export class Sdk implements ISdk {
     return openDesignApi ? { apiRoot: openDesignApi.getApiRoot() } : null
   }
 
-  private async _getApiDesignByLocalDesign(localDesign: ILocalDesign) {
+  private async _getApiDesignByLocalDesign(
+    localDesign: ILocalDesign
+  ): Promise<IApiDesign | null> {
     const apiDesignInfo = await localDesign.getApiDesignInfo()
     const designId = apiDesignInfo ? apiDesignInfo.designId : null
     if (!designId) {
