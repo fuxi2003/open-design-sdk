@@ -1,4 +1,5 @@
 import type { ArtboardId, PageId } from '@opendesign/octopus-reader'
+import type { CancelToken } from '@avocode/cancel-token'
 import type { components } from 'open-design-api-types'
 import type { OpenDesignApi } from './open-design-api'
 import type { IApiDesign } from './types/ifaces'
@@ -44,8 +45,12 @@ export class ApiDesign implements IApiDesign {
     return this._openDesignApi.getApiRoot()
   }
 
-  async getManifest() {
-    const summary = await this.getSummary()
+  async getManifest(
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    const summary = await this.getSummary(options)
     const {
       'artboards': artboardDataList,
       'pages': pageDataList,
@@ -89,37 +94,83 @@ export class ApiDesign implements IApiDesign {
     }
   }
 
-  getSummary() {
-    return this._openDesignApi.getDesignSummary(this.id)
+  getSummary(
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    return this._openDesignApi.getDesignSummary(this.id, options)
   }
 
-  getArtboardContent(artboardId: ArtboardId) {
-    return this._openDesignApi.getDesignArtboardContent(this.id, artboardId)
-  }
-
-  getArtboardContentJsonStream(artboardId: ArtboardId) {
-    return this._openDesignApi.getDesignArtboardContentJsonStream(
+  getArtboardContent(
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    return this._openDesignApi.getDesignArtboardContent(
       this.id,
-      artboardId
+      artboardId,
+      options
     )
   }
 
-  exportDesign(params: { format: DesignExportTargetFormatEnum }) {
+  getArtboardContentJsonStream(
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    return this._openDesignApi.getDesignArtboardContentJsonStream(
+      this.id,
+      artboardId,
+      options
+    )
+  }
+
+  exportDesign(params: {
+    format: DesignExportTargetFormatEnum
+    cancelToken?: CancelToken | null
+  }) {
     return this._openDesignApi.exportDesign(this.id, params)
   }
 
-  getDesignExportById(designExportId: DesignExportId) {
-    return this._openDesignApi.getDesignExportById(this.id, designExportId)
-  }
-
-  getDesignExportResultStream(designExportId: DesignExportId) {
-    return this._openDesignApi.getDesignExportResultStream(
+  getDesignExportById(
+    designExportId: DesignExportId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    return this._openDesignApi.getDesignExportById(
       this.id,
-      designExportId
+      designExportId,
+      options
     )
   }
 
-  getBitmapAssetStream(bitmapKey: string) {
-    return this._openDesignApi.getDesignBitmapAssetStream(this.id, bitmapKey)
+  getDesignExportResultStream(
+    designExportId: DesignExportId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    return this._openDesignApi.getDesignExportResultStream(
+      this.id,
+      designExportId,
+      options
+    )
+  }
+
+  getBitmapAssetStream(
+    bitmapKey: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    return this._openDesignApi.getDesignBitmapAssetStream(
+      this.id,
+      bitmapKey,
+      options
+    )
   }
 }

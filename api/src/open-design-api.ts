@@ -7,6 +7,7 @@ import { ApiDesign } from './api-design'
 import { ApiDesignExport } from './api-design-export'
 import { OpenDesignApiError } from './open-design-api-error'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type { ReadStream } from 'fs'
 import type { ArtboardId } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
@@ -45,7 +46,12 @@ export class OpenDesignApi implements IOpenDesignApi {
     return { token: this._token }
   }
 
-  async getDesignById(designId: DesignId): Promise<ApiDesign> {
+  async getDesignById(
+    designId: DesignId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<ApiDesign> {
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}',
@@ -53,7 +59,10 @@ export class OpenDesignApi implements IOpenDesignApi {
         'design_id': designId,
       },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        ...options,
+      }
     )
 
     // @ts-ignore
@@ -71,6 +80,8 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode === 202) {
       await sleep(1000)
+      options.cancelToken?.throwIfCancelled()
+
       return this.getDesignById(designId)
     }
 
@@ -81,7 +92,12 @@ export class OpenDesignApi implements IOpenDesignApi {
     return apiDesign
   }
 
-  async getDesignSummary(designId: DesignId): Promise<DesignSummary> {
+  async getDesignSummary(
+    designId: DesignId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<DesignSummary> {
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}/summary',
@@ -89,7 +105,10 @@ export class OpenDesignApi implements IOpenDesignApi {
         'design_id': designId,
       },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        ...options,
+      }
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
@@ -99,6 +118,8 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode === 202) {
       await sleep(1000)
+      options.cancelToken?.throwIfCancelled()
+
       return this.getDesignSummary(designId)
     }
 
@@ -107,7 +128,10 @@ export class OpenDesignApi implements IOpenDesignApi {
 
   async importDesignFile(
     designFileStream: ReadStream,
-    options: { format?: DesignImportFormatEnum } = {}
+    options: {
+      format?: DesignImportFormatEnum
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<ApiDesign> {
     const res = await postMultipart(
       this._apiRoot,
@@ -118,7 +142,10 @@ export class OpenDesignApi implements IOpenDesignApi {
         ...(options.format ? { 'format': options.format } : {}),
       },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        cancelToken: options.cancelToken || null,
+      }
     )
 
     if (res.statusCode !== 201) {
@@ -132,7 +159,10 @@ export class OpenDesignApi implements IOpenDesignApi {
 
   async importDesignLink(
     url: string,
-    options: { format?: DesignImportFormatEnum } = {}
+    options: {
+      format?: DesignImportFormatEnum
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<ApiDesign> {
     const res = await post(
       this._apiRoot,
@@ -143,7 +173,10 @@ export class OpenDesignApi implements IOpenDesignApi {
         ...(options.format ? { 'format': options.format } : {}),
       },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        cancelToken: options.cancelToken || null,
+      }
     )
 
     if (res.statusCode !== 201) {
@@ -160,6 +193,7 @@ export class OpenDesignApi implements IOpenDesignApi {
     figmaFileKey: string
     figmaIds?: Array<string> | null
     name?: string | null
+    cancelToken?: CancelToken | null
   }): Promise<ApiDesign> {
     const res = await post(
       this._apiRoot,
@@ -172,7 +206,10 @@ export class OpenDesignApi implements IOpenDesignApi {
         ...(params.name ? { 'design_name': params.name } : {}),
       },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        cancelToken: params.cancelToken || null,
+      }
     )
 
     if (res.statusCode !== 201) {
@@ -190,6 +227,7 @@ export class OpenDesignApi implements IOpenDesignApi {
     figmaIds?: Array<string> | null
     name?: string | null
     exports: Array<{ format: DesignExportTargetFormatEnum }>
+    cancelToken?: CancelToken | null
   }): Promise<{ designId: DesignId; exports: Array<ApiDesignExport> }> {
     const res = await post(
       this._apiRoot,
@@ -203,7 +241,10 @@ export class OpenDesignApi implements IOpenDesignApi {
         ...(params.name ? { 'design_name': params.name } : {}),
       },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        cancelToken: params.cancelToken || null,
+      }
     )
 
     if (res.statusCode !== 201) {
@@ -226,14 +267,20 @@ export class OpenDesignApi implements IOpenDesignApi {
 
   async getDesignArtboardContent(
     designId: DesignId,
-    artboardId: ArtboardId
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<OctopusDocument> {
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}/artboards/{artboard_id}/content',
       { 'design_id': designId, 'artboard_id': artboardId },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        ...options,
+      }
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
@@ -243,6 +290,8 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode === 202) {
       await sleep(1000)
+      options.cancelToken?.throwIfCancelled()
+
       return this.getDesignArtboardContent(designId, artboardId)
     }
 
@@ -251,14 +300,20 @@ export class OpenDesignApi implements IOpenDesignApi {
 
   async getDesignArtboardContentJsonStream(
     designId: DesignId,
-    artboardId: ArtboardId
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<NodeJS.ReadableStream> {
     const res = await getStream(
       this._apiRoot,
       '/designs/{design_id}/artboards/{artboard_id}/content',
       { 'design_id': designId, 'artboard_id': artboardId },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        ...options,
+      }
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
@@ -272,6 +327,8 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode === 202) {
       await sleep(1000)
+      options.cancelToken?.throwIfCancelled()
+
       return this.getDesignArtboardContentJsonStream(designId, artboardId)
     }
 
@@ -282,6 +339,7 @@ export class OpenDesignApi implements IOpenDesignApi {
     designId: DesignId,
     params: {
       format: DesignExportTargetFormatEnum
+      cancelToken?: CancelToken | null
     }
   ): Promise<ApiDesignExport> {
     const res = await post(
@@ -290,7 +348,10 @@ export class OpenDesignApi implements IOpenDesignApi {
       { 'design_id': designId },
       { 'format': params.format },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        cancelToken: params.cancelToken || null,
+      }
     )
 
     if (res.statusCode !== 201) {
@@ -313,14 +374,20 @@ export class OpenDesignApi implements IOpenDesignApi {
 
   async getDesignExportById(
     designId: DesignId,
-    designExportId: DesignExportId
+    designExportId: DesignExportId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<ApiDesignExport> {
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}/exports/{export_id}',
       { 'design_id': designId, 'export_id': designExportId },
       this._getAuthInfo(),
-      { console: this._console }
+      {
+        console: this._console,
+        ...options,
+      }
     )
 
     if (res.statusCode !== 200) {
@@ -343,22 +410,32 @@ export class OpenDesignApi implements IOpenDesignApi {
 
   async getDesignExportResultStream(
     designId: DesignId,
-    designExportId: DesignExportId
+    designExportId: DesignExportId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<NodeJS.ReadableStream> {
     const designExport = await this.getDesignExportById(
       designId,
-      designExportId
+      designExportId,
+      options
     )
     return designExport.getResultStream()
   }
 
-  async getDesignBitmapAssetStream(designId: DesignId, bitmapKey: string) {
+  async getDesignBitmapAssetStream(
+    designId: DesignId,
+    bitmapKey: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
     const absolute = /^https?:\/\//.test(bitmapKey)
     if (!absolute) {
       throw new Error('Relative asset paths are not supported')
     }
 
-    const res = await fetch(bitmapKey)
+    const res = await fetch(bitmapKey, options)
     if (res.status !== 200 || !res.body) {
       this._console.debug('ApiDesign#getBitmapAssetStream()', {
         bitmapKey,

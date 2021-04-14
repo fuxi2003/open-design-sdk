@@ -1,5 +1,6 @@
-import type { ReadStream } from 'fs'
 import type { ManifestData } from '@opendesign/octopus-reader'
+import type { CancelToken } from '@avocode/cancel-token'
+import type { ReadStream } from 'fs'
 import type { components } from 'open-design-api-types'
 
 type ArtboardId = components['schemas']['ArtboardId']
@@ -25,12 +26,18 @@ export interface IOpenDesignApi {
 
   importDesignFile(
     stream: ReadStream,
-    options?: { format?: DesignImportFormatEnum }
+    options?: {
+      format?: DesignImportFormatEnum
+      cancelToken?: CancelToken | null
+    }
   ): Promise<IApiDesign>
 
   importDesignLink(
     url: string,
-    options?: { format?: DesignImportFormatEnum }
+    options?: {
+      format?: DesignImportFormatEnum
+      cancelToken?: CancelToken | null
+    }
   ): Promise<IApiDesign>
 
   importFigmaDesignLink(params: {
@@ -38,6 +45,7 @@ export interface IOpenDesignApi {
     figmaFileKey: string
     figmaIds?: Array<string> | null
     name?: string | null
+    cancelToken?: CancelToken | null
   }): Promise<IApiDesign>
 
   importFigmaDesignLinkWithExports(params: {
@@ -46,6 +54,7 @@ export interface IOpenDesignApi {
     figmaIds?: Array<string> | null
     name?: string | null
     exports: Array<{ format: DesignExportTargetFormatEnum }>
+    cancelToken?: CancelToken | null
   }): Promise<{
     designId: DesignId
     exports: Array<IApiDesignExport>
@@ -55,35 +64,55 @@ export interface IOpenDesignApi {
 
   // - Design Structure
 
-  getDesignById(designId: DesignId): Promise<IApiDesign>
+  getDesignById(
+    designId: DesignId,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
+  ): Promise<IApiDesign>
 
   // - Design Contents
 
   getDesignArtboardContent(
     designId: DesignId,
-    artboardId: ArtboardId
+    artboardId: ArtboardId,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<OctopusDocument>
 
   getDesignArtboardContentJsonStream(
     designId: DesignId,
-    artboardId: ArtboardId
+    artboardId: ArtboardId,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<NodeJS.ReadableStream>
 
   // - Design Exports
 
   exportDesign(
     designId: DesignId,
-    params: { format: DesignExportTargetFormatEnum }
+    params: {
+      format: DesignExportTargetFormatEnum
+      cancelToken?: CancelToken | null
+    }
   ): Promise<IApiDesignExport>
 
   getDesignExportById(
     designId: DesignId,
-    designExportId: DesignExportId
+    designExportId: DesignExportId,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<IApiDesignExport>
 
   getDesignExportResultStream(
     designId: DesignId,
-    designExportId: DesignExportId
+    designExportId: DesignExportId,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<NodeJS.ReadableStream>
 }
 
@@ -99,30 +128,56 @@ export interface IApiDesign {
 
   getApiRoot(): string
 
-  getSummary(): Promise<DesignSummary>
-  getManifest(): Promise<ManifestData>
+  getSummary(options?: {
+    cancelToken?: CancelToken | null
+  }): Promise<DesignSummary>
+  getManifest(options?: {
+    cancelToken?: CancelToken | null
+  }): Promise<ManifestData>
 
   // Design Contents
 
-  getArtboardContent(artboardId: ArtboardId): Promise<OctopusDocument>
+  getArtboardContent(
+    artboardId: ArtboardId,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
+  ): Promise<OctopusDocument>
 
   getArtboardContentJsonStream(
-    artboardId: ArtboardId
+    artboardId: ArtboardId,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<NodeJS.ReadableStream>
 
   // Design Exports
 
   exportDesign(params: {
     format: DesignExportTargetFormatEnum
+    cancelToken?: CancelToken | null
   }): Promise<IApiDesignExport>
 
-  getDesignExportById(exportId: DesignExportId): Promise<IApiDesignExport>
+  getDesignExportById(
+    exportId: DesignExportId,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
+  ): Promise<IApiDesignExport>
 
   getDesignExportResultStream(
-    exportId: DesignExportId
+    exportId: DesignExportId,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<NodeJS.ReadableStream>
 
-  getBitmapAssetStream(bitmapKey: string): Promise<NodeJS.ReadableStream>
+  getBitmapAssetStream(
+    bitmapKey: string,
+    options?: {
+      cancelToken?: CancelToken | null
+    }
+  ): Promise<NodeJS.ReadableStream>
 }
 
 export interface IApiDesignExport {
@@ -139,7 +194,11 @@ export interface IApiDesignExport {
 
   // Design Export Results
 
-  getProcessedDesignExport(): Promise<IApiDesignExport>
+  getProcessedDesignExport(options?: {
+    cancelToken?: CancelToken | null
+  }): Promise<IApiDesignExport>
 
-  getResultStream(): Promise<NodeJS.ReadableStream>
+  getResultStream(options?: {
+    cancelToken?: CancelToken | null
+  }): Promise<NodeJS.ReadableStream>
 }

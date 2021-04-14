@@ -2,6 +2,7 @@ import { populatePathPattern, PathParams } from './paths'
 import fetchInternal, { Headers, RequestInit } from 'node-fetch'
 import FormData from 'form-data'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type { ReadStream } from 'fs'
 import type { OptionalKeys, RequiredKeys } from 'utility-types'
 import type { paths } from 'open-design-api-types'
@@ -20,25 +21,46 @@ type MethodPathPatterns<M> = {
 
 type AuthInfo = { token: string }
 
-const fetch = async (
+export async function fetch(
   url: string,
-  params: RequestInit & { console?: Console } = {}
-) => {
-  const { console: fetchConsole = console, ...requestInit } = params
+  params: Omit<RequestInit, 'signal'> & {
+    console?: Console
+    cancelToken?: CancelToken | null
+  } = {}
+) {
+  const {
+    console: fetchConsole = console,
+    cancelToken,
+    ...requestInit
+  } = params
 
   const method = requestInit.method?.toUpperCase() || 'GET'
   fetchConsole.debug('API:', method, url, '...')
 
-  const res = await fetchInternal(url, requestInit)
+  const signal = cancelToken?.signal
+  try {
+    const res = await fetchInternal(url, { ...requestInit, signal })
 
-  const logData = ['API:', method, url, '->', `${res.status} ${res.statusText}`]
-  if (res.status >= 400) {
-    fetchConsole.error(...logData)
-  } else {
-    fetchConsole.info(...logData)
+    const logData = [
+      'API:',
+      method,
+      url,
+      '->',
+      `${res.status} ${res.statusText}`,
+    ]
+    if (res.status >= 400) {
+      fetchConsole.error(...logData)
+    } else {
+      fetchConsole.info(...logData)
+    }
+
+    return res
+  } catch (err) {
+    if (err.type === 'AbortError' && cancelToken) {
+      cancelToken.throwIfCancelled()
+    }
+    throw err
   }
-
-  return res
 }
 
 // JSON
@@ -51,7 +73,10 @@ export async function get<
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
   authInfo: AuthInfo,
-  options: { console?: Console | null } = {}
+  options: {
+    console?: Console | null
+    cancelToken?: CancelToken | null
+  } = {}
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {
   return request('get', apiRoot, pathPattern, pathParams, {}, authInfo, options)
 }
@@ -65,7 +90,10 @@ export async function post<
   pathParams: PathParams<PathPattern>,
   data: OperationBodyParams<Operation, 'application/json'>,
   authInfo: AuthInfo | null = null,
-  options: { console?: Console | null } = {}
+  options: {
+    console?: Console | null
+    cancelToken?: CancelToken | null
+  } = {}
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {
   return request(
     'post',
@@ -93,7 +121,11 @@ export async function getStream<
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
   authInfo: AuthInfo,
-  options: { console?: Console | null } = {}
+  options: {
+    console?: Console | null
+
+    cancelToken?: CancelToken | null
+  } = {}
 ): Promise<{
   statusCode: Exclude<OperationStatusCodes<Operation>, 500>
   headers: Headers
@@ -104,6 +136,7 @@ export async function getStream<
     apiRoot,
     pathPattern,
     pathParams,
+    {},
     authInfo,
     options
   )
@@ -130,7 +163,10 @@ export async function postMultipart<
         | ReadStream
     },
   authInfo: AuthInfo,
-  options: { console?: Console | null } = {}
+  options: {
+    console?: Console | null
+    cancelToken?: CancelToken | null
+  } = {}
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {
   const path = populatePathPattern(pathPattern, pathParams)
 
@@ -146,8 +182,12 @@ export async function postMultipart<
       'Authorization': `Bearer ${authInfo.token}`,
     },
     console: options.console || console,
+    cancelToken: options.cancelToken || null,
   })
+  options.cancelToken?.throwIfCancelled()
+
   const body = await res.json()
+  options.cancelToken?.throwIfCancelled()
 
   if (res.status === 500) {
     throw new Error('Server Error')
@@ -172,10 +212,12 @@ async function request<
   pathParams: PathParams<PathPattern>,
   requestParams: Omit<RequestInit, 'method'> = {},
   authInfo: AuthInfo | null,
-  options: { console?: Console | null } = {}
+  options: {
+    console?: Console | null
+    cancelToken?: CancelToken | null
+  } = {}
 ) {
   const path = populatePathPattern(pathPattern, pathParams)
-
   const res = await fetch(`${apiRoot}${path}`, {
     method,
     ...requestParams,
@@ -184,8 +226,12 @@ async function request<
       ...(requestParams.headers || {}),
     },
     console: options.console || console,
+    cancelToken: options.cancelToken || null,
   })
+  options.cancelToken?.throwIfCancelled()
+
   const body = await res.json()
+  options.cancelToken?.throwIfCancelled()
 
   if (res.status === 500) {
     throw new Error('Server Error')
@@ -206,18 +252,26 @@ async function requestStream<
   apiRoot: string,
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
-  authInfo: AuthInfo,
-  options: { console?: Console | null } = {}
+  requestParams: Omit<RequestInit, 'method'> = {},
+  authInfo: AuthInfo | null,
+  options: {
+    console?: Console | null
+    cancelToken?: CancelToken | null
+  } = {}
 ) {
   const path = populatePathPattern(pathPattern, pathParams)
 
   const res = await fetch(`${apiRoot}${path}`, {
     method,
+    ...requestParams,
     headers: {
-      'Authorization': `Bearer ${authInfo.token}`,
+      ...(authInfo ? { 'Authorization': `Bearer ${authInfo.token}` } : {}),
+      ...(requestParams.headers || {}),
     },
     console: options.console || console,
+    cancelToken: options.cancelToken || null,
   })
+  options.cancelToken?.throwIfCancelled()
 
   if (res.status === 500) {
     throw new Error('Server Error')
