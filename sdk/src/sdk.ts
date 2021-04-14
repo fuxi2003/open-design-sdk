@@ -228,7 +228,7 @@ export class Sdk {
   }
 
   /**
-   * Opens a local design file.
+   * Imports a local design file (Photoshop, Sketch, Xd, Illustrator).
    *
    * The API has to be configured when using this method. This is also requires a file system (i.e. it is not available in the browser).
    *
@@ -264,7 +264,7 @@ export class Sdk {
   }
 
   /**
-   * Opens a design file located at the specified URL.
+   * Imports a design file located at the specified URL.
    *
    * The API has to be configured when using this method.
    *
@@ -293,7 +293,7 @@ export class Sdk {
   }
 
   /**
-   * Opens a Figma design.
+   * Imports a Figma design.
    *
    * The API has to be configured when using this method.
    *
@@ -328,7 +328,7 @@ export class Sdk {
   }
 
   /**
-   * Opens a Figma design while initiating a export to another design file format (currently only Sketch is available).
+   * Imports a Figma design while initiating an export to another design file format (currently only Sketch is available).
    *
    * The API has to be configured when using this method. A file system has to be available for downloading the converted design file from the API but downloading the result is not a required step as it can be done later from another client.
    *
@@ -371,7 +371,7 @@ export class Sdk {
   }
 
   /**
-   * Opens a server-side design file.
+   * Fetches a previously imported design from the API.
    *
    * The API has to be configured when using this method.
    *
