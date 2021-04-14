@@ -2,6 +2,7 @@ import type {
   AggregatedBitmapAssetDescriptor,
   AggregatedFontDescriptor,
   ArtboardId,
+  TextFontDescriptor as FontDescriptor,
   IBitmap,
   IEffects,
   ILayer,
@@ -11,13 +12,14 @@ import type {
   LayerSelector,
 } from '@opendesign/octopus-reader'
 import type {
-  BlendingMode,
   Bounds,
   LayerAttributesConfig,
   LayerBounds,
 } from '@opendesign/rendering'
 import type { IArtboardFacade } from './artboard-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
+
+export { FontDescriptor }
 
 export interface ILayerFacade {
   readonly id: LayerId

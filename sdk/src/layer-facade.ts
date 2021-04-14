@@ -9,7 +9,7 @@ import type {
 } from '@opendesign/octopus-reader'
 import type { BlendingMode, Bounds } from '@opendesign/rendering'
 import type { DesignFacade } from './design-facade'
-import type { ILayerFacade } from './types/layer-facade.iface'
+import type { FontDescriptor, ILayerFacade } from './types/layer-facade.iface'
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
 interface LayerOctopusData extends LayerOctopusDataType {}
@@ -324,7 +324,9 @@ export class LayerFacade implements ILayerFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to fonts used by nested layers being omitted altogether.
    */
-  getFonts(options: { depth?: number } = {}) {
+  getFonts(
+    options: { depth?: number } = {}
+  ): Array<FontDescriptor & { layerIds: Array<LayerId> }> {
     return this._layerEntity.getFonts(options)
   }
 

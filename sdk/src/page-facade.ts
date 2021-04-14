@@ -11,8 +11,8 @@ import type {
   LayerSelector,
 } from '@opendesign/octopus-reader'
 import type { ArtboardFacade } from './artboard-facade'
-import type { FontDescriptor } from './types/artboard-facade.iface'
 import type { DesignFacade } from './design-facade'
+import type { FontDescriptor } from './types/layer-facade.iface'
 import type { BitmapAssetDescriptor } from './types/local-design.iface'
 import type { IPageFacade } from './types/page-facade.iface'
 
@@ -225,7 +225,11 @@ export class PageFacade implements IPageFacade {
    */
   async getFonts(
     options: { depth?: number } = {}
-  ): Promise<Array<FontDescriptor>> {
+  ): Promise<
+    Array<
+      FontDescriptor & { artboardLayerIds: Record<ArtboardId, Array<LayerId>> }
+    >
+  > {
     await this.load()
 
     return this._pageEntity.getFonts(options)

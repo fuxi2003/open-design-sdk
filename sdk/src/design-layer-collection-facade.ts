@@ -10,9 +10,9 @@ import {
 } from '@opendesign/octopus-reader'
 import type { Bounds } from '@opendesign/rendering'
 import type { LayerAttributesConfig } from './artboard-facade'
-import type { FontDescriptor } from './types/artboard-facade.iface'
 import type { DesignFacade } from './design-facade'
 import type { LayerFacade } from './layer-facade'
+import type { FontDescriptor } from './types/layer-facade.iface'
 import type { BitmapAssetDescriptor } from './types/local-design.iface'
 import type { IDesignLayerCollectionFacade } from './types/design-layer-collection-facade.iface'
 
@@ -302,7 +302,11 @@ export class DesignLayerCollectionFacade
    * @category Asset
    * @param options.depth The maximum nesting level within the layer to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    */
-  getFonts(options: Partial<{ depth: number }> = {}): Array<FontDescriptor> {
+  getFonts(
+    options: Partial<{ depth: number }> = {}
+  ): Array<
+    FontDescriptor & { artboardLayerIds: Record<ArtboardId, Array<LayerId>> }
+  > {
     return this._layerCollection.getFonts(options)
   }
 

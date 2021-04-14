@@ -1,6 +1,6 @@
 import type {
   AggregatedFileBitmapAssetDescriptor,
-  AggregatedFileFontDescriptor as FontDescriptor,
+  AggregatedFileFontDescriptor,
   ArtboardId,
   ArtboardManifestData,
   ArtboardOctopusData,
@@ -19,8 +19,6 @@ import type { IDesignFacade } from './design-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
 import type { ILayerFacade } from './layer-facade.iface'
 import type { IPageFacade } from './page-facade.iface'
-
-export type { FontDescriptor }
 
 export interface IArtboardFacade {
   readonly id: ArtboardId
@@ -44,7 +42,9 @@ export interface IArtboardFacade {
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>
   ): Promise<Array<AggregatedFileBitmapAssetDescriptor>>
-  getFonts(options?: Partial<{ depth: number }>): Promise<Array<FontDescriptor>>
+  getFonts(
+    options?: Partial<{ depth: number }>
+  ): Promise<Array<AggregatedFileFontDescriptor>>
 
   getBackgroundColor(): Promise<RgbaColor | null>
 

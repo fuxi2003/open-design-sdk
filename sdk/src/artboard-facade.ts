@@ -15,10 +15,10 @@ import type {
 } from '@opendesign/octopus-reader'
 import type { BlendingMode, Bounds } from '@opendesign/rendering'
 import type {
-  FontDescriptor,
   IArtboardFacade,
 } from './types/artboard-facade.iface'
 import type { DesignFacade } from './design-facade'
+import type { FontDescriptor } from './types/layer-facade.iface'
 import type { BitmapAssetDescriptor } from './types/local-design.iface'
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
@@ -250,7 +250,11 @@ export class ArtboardFacade implements IArtboardFacade {
    */
   async getFonts(
     options: { depth?: number } = {}
-  ): Promise<Array<FontDescriptor>> {
+  ): Promise<
+    Array<
+      FontDescriptor & { artboardLayerIds: Record<ArtboardId, Array<LayerId>> }
+    >
+  > {
     await this.load()
 
     return this._artboardEntity.getFonts(options)

@@ -16,11 +16,11 @@ import type {
 import type { BlendingMode } from '@opendesign/rendering'
 
 import type { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
-import type { FontDescriptor } from './types/artboard-facade.iface'
 import type { DesignExportFacade } from './design-export-facade'
 import type { DesignFacade } from './design-facade'
 import type { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import type { LayerFacade } from './layer-facade'
+import type { FontDescriptor } from './types/layer-facade.iface'
 import type { BitmapAssetDescriptor } from './types/local-design.iface'
 import type { PageFacade } from './page-facade'
 import type { Sdk } from './sdk'

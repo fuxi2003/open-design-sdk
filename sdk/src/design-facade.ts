@@ -30,7 +30,6 @@ import type {
   BlendingMode,
 } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
-import type { FontDescriptor } from './types/artboard-facade.iface'
 import type { Sdk } from './sdk'
 import type {
   ILocalDesign,
@@ -38,6 +37,7 @@ import type {
 } from './types/local-design.iface'
 import type { IDesignFacade } from './types/design-facade.iface'
 import type { LayerFacade } from './layer-facade'
+import type { FontDescriptor } from './types/layer-facade.iface'
 
 type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 
@@ -568,7 +568,11 @@ export class DesignFacade implements IDesignFacade {
    */
   async getFonts(
     options: { depth?: number } = {}
-  ): Promise<Array<FontDescriptor>> {
+  ): Promise<
+    Array<
+      FontDescriptor & { artboardLayerIds: Record<ArtboardId, Array<LayerId>> }
+    >
+  > {
     await this.load()
 
     const entity = this._getDesignEntity()

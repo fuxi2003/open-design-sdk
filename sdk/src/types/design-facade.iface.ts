@@ -14,9 +14,9 @@ import type {
   LayerAttributesConfig,
   LayerBounds,
 } from '@opendesign/rendering'
-import type { FontDescriptor, IArtboardFacade } from './artboard-facade.iface'
+import type { IArtboardFacade } from './artboard-facade.iface'
 import type { IDesignLayerCollectionFacade } from './design-layer-collection-facade.iface'
-import type { ILayerFacade } from './layer-facade.iface'
+import type { FontDescriptor, ILayerFacade } from './layer-facade.iface'
 import type { IPageFacade } from './page-facade.iface'
 
 export interface IDesignFacade {
