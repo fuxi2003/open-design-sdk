@@ -1,9 +1,7 @@
 import { createReadStream, createWriteStream, ReadStream } from 'fs'
 import { resolve as resolvePath } from 'path'
 
-import type { IDesignFileManager } from '../types/design-file-manager.iface'
-
-export class DesignFileManager implements IDesignFileManager {
+export class DesignFileManager {
   private _workingDirectory: string | null = null
 
   getWorkingDirectory() {

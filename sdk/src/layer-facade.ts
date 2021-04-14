@@ -12,17 +12,19 @@ import type {
   LayerId,
   LayerOctopusData as LayerOctopusDataType,
   LayerSelector,
+  TextFontDescriptor as FontDescriptor,
 } from '@opendesign/octopus-reader'
 import type { BlendingMode, Bounds, LayerBounds } from '@opendesign/rendering'
 import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
-import type { FontDescriptor, ILayerFacade } from './types/layer-facade.iface'
-import type { BitmapAssetDescriptor } from './types/local-design.iface'
+import type { BitmapAssetDescriptor } from './local/local-design'
+
+export type { FontDescriptor }
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
 interface LayerOctopusData extends LayerOctopusDataType {}
 
-export class LayerFacade implements ILayerFacade {
+export class LayerFacade {
   private _layerEntity: ILayer
   private _designFacade: DesignFacade
 

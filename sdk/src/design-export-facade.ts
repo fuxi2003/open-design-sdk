@@ -1,10 +1,9 @@
 import { inspect } from 'util'
 
 import type { IApiDesignExport } from '@opendesign/api'
-import type { IDesignExportFacade } from './types/design-export-facade.iface'
 import type { Sdk } from './sdk'
 
-export class DesignExportFacade implements IDesignExportFacade {
+export class DesignExportFacade {
   private _sdk: Sdk
   private _designExport: IApiDesignExport
 

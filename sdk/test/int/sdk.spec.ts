@@ -15,7 +15,7 @@ import type {
   ArtboardOctopusData,
   ManifestData,
 } from '@opendesign/octopus-reader'
-import { ApiDesignInfo } from '../../src/types/local-design.iface'
+import { ApiDesignInfo } from '../../src/local/local-design'
 
 describe('DesignFacade', () => {
   describe('local files', () => {

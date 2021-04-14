@@ -14,10 +14,9 @@ import type {
   RgbaColor,
 } from '@opendesign/octopus-reader'
 import type { BlendingMode, Bounds, LayerBounds } from '@opendesign/rendering'
-import type { IArtboardFacade } from './types/artboard-facade.iface'
 import type { DesignFacade } from './design-facade'
-import type { FontDescriptor } from './types/layer-facade.iface'
-import type { BitmapAssetDescriptor } from './types/local-design.iface'
+import type { FontDescriptor } from './layer-facade'
+import type { BitmapAssetDescriptor } from './local/local-design'
 import type { PageFacade } from './page-facade'
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
@@ -36,7 +35,7 @@ export type LayerAttributesConfig = {
   opacity?: number
 }
 
-export class ArtboardFacade implements IArtboardFacade {
+export class ArtboardFacade {
   private _artboardEntity: IArtboard
   private _designFacade: DesignFacade
 

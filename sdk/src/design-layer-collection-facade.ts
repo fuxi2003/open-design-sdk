@@ -11,13 +11,10 @@ import {
 import type { Bounds } from '@opendesign/rendering'
 import type { LayerAttributesConfig } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
-import type { LayerFacade } from './layer-facade'
-import type { FontDescriptor } from './types/layer-facade.iface'
-import type { BitmapAssetDescriptor } from './types/local-design.iface'
-import type { IDesignLayerCollectionFacade } from './types/design-layer-collection-facade.iface'
+import type { FontDescriptor, LayerFacade } from './layer-facade'
+import type { BitmapAssetDescriptor } from './local/local-design'
 
-export class DesignLayerCollectionFacade
-  implements IDesignLayerCollectionFacade {
+export class DesignLayerCollectionFacade {
   private _layerCollection: ILayerCollection
   private _designFacade: DesignFacade;
 

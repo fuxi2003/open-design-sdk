@@ -1,9 +1,7 @@
 import { relative, resolve as resolvePath } from 'path'
 import { checkFile, readJsonFile, writeJsonFile } from '../utils/fs'
 
-import type { ILocalDesignCache } from '../types/local-design-cache.iface'
-
-export class LocalDesignCache implements ILocalDesignCache {
+export class LocalDesignCache {
   private _workingDirectory: string | null = null
   private _designOctopusFilenames: Record<string, string> | null = null
 

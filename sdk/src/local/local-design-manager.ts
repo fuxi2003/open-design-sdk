@@ -5,17 +5,15 @@ import { writeJsonFile } from '../utils/fs'
 import mkdirp from 'mkdirp'
 import { v4 as uuid } from 'uuid'
 
-import { LocalDesign } from './local-design'
+import { ApiDesignInfo, LocalDesign } from './local-design'
 
 import { MANIFEST_BASENAME } from './consts'
 
 import type { ManifestData } from '@opendesign/octopus-reader'
-import type { ApiDesignInfo } from '../types/local-design.iface'
-import type { ILocalDesignManager } from '../types/local-design-manager.iface'
 
 const statPromised = promisify(stat)
 
-export class LocalDesignManager implements ILocalDesignManager {
+export class LocalDesignManager {
   private _workingDirectory: string | null = null
 
   getWorkingDirectory() {

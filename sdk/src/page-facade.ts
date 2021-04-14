@@ -12,12 +12,10 @@ import type {
 } from '@opendesign/octopus-reader'
 import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
-import type { LayerFacade } from './layer-facade'
-import type { FontDescriptor } from './types/layer-facade.iface'
-import type { BitmapAssetDescriptor } from './types/local-design.iface'
-import type { IPageFacade } from './types/page-facade.iface'
+import type { FontDescriptor, LayerFacade } from './layer-facade'
+import type { BitmapAssetDescriptor } from './local/local-design'
 
-export class PageFacade implements IPageFacade {
+export class PageFacade {
   private _pageEntity: IPage
   private _designFacade: DesignFacade
 

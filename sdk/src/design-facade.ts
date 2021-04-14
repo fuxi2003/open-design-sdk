@@ -31,16 +31,13 @@ import type {
   LayerBounds,
 } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
-import type { IDesignFacade } from './types/design-facade.iface'
-import type { LayerFacade } from './layer-facade'
-import type { FontDescriptor } from './types/layer-facade.iface'
+import type { FontDescriptor, LayerFacade } from './layer-facade'
 import type { Sdk } from './sdk'
-import type { LocalDesign } from './local/local-design'
-import type { BitmapAssetDescriptor } from './types/local-design.iface'
+import type { BitmapAssetDescriptor, LocalDesign } from './local/local-design'
 
 type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 
-export class DesignFacade implements IDesignFacade {
+export class DesignFacade {
   /**
    * The absolute path of the original design file. This is not available for designs loaded from the API.
    * @category Identification

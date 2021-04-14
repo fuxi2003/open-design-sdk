@@ -29,15 +29,18 @@ import type {
   ManifestData,
   PageId,
 } from '@opendesign/octopus-reader'
-import type {
-  ApiDesignInfo,
-  BitmapAssetDescriptor,
-  BitmapMapping,
-  ILocalDesign,
-} from '../types/local-design.iface'
 import type { LocalDesignManager } from './local-design-manager'
 
-export class LocalDesign implements ILocalDesign {
+export type ApiDesignInfo = {
+  apiRoot?: string
+  designId?: string
+}
+
+export type BitmapAssetDescriptor = { name: string; prerendered: boolean }
+
+export type BitmapMapping = { [bitmapKey: string]: string }
+
+export class LocalDesign {
   _localDesignManager: LocalDesignManager
 
   _filename: string

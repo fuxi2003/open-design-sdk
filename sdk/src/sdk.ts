@@ -14,23 +14,28 @@ import type {
 } from '@opendesign/api'
 import type { IRenderingEngine } from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
-import type { FontMatchDescriptor, ISdk } from './types/sdk.iface'
 import type { DesignFacade } from './design-facade'
 import type { DesignFileManager } from './local/design-file-manager'
+import type { LocalDesign } from './local/local-design'
 import type { LocalDesignCache } from './local/local-design-cache'
 import type { LocalDesignManager } from './local/local-design-manager'
-import type { ILocalDesign } from './types/local-design.iface'
-import type { ISystemFontManager } from './types/system-font-manager.iface'
+import type { SystemFontManager } from './local/system-font-manager'
 
 type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 
-export class Sdk implements ISdk {
+export type FontMatchDescriptor = {
+  fontFilename: string
+  fontPostscriptName: string
+  fallback: boolean
+}
+
+export class Sdk {
   private _openDesignApi: IOpenDesignApi | null = null
   private _designFileManager: DesignFileManager | null = null
   private _localDesignCache: LocalDesignCache | null = null
   private _localDesignManager: LocalDesignManager | null = null
   private _renderingEngine: IRenderingEngine | null = null
-  private _systemFontManager: ISystemFontManager | null = null
+  private _systemFontManager: SystemFontManager | null = null
 
   private _destroyed: boolean = false
 
@@ -519,7 +524,7 @@ export class Sdk implements ISdk {
   }
 
   /** @internal */
-  useSystemFontManager(systemFontManager: ISystemFontManager): void {
+  useSystemFontManager(systemFontManager: SystemFontManager): void {
     this._systemFontManager = systemFontManager
   }
 
@@ -539,7 +544,7 @@ export class Sdk implements ISdk {
   }
 
   private async _getApiDesignByLocalDesign(
-    localDesign: ILocalDesign
+    localDesign: LocalDesign
   ): Promise<IApiDesign | null> {
     const apiDesignInfo = await localDesign.getApiDesignInfo()
     const designId = apiDesignInfo ? apiDesignInfo.designId : null
