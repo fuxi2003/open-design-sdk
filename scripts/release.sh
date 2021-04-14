@@ -34,6 +34,7 @@ checkRepositoryState() {
 }
 
 restoreCommit() {
+  echo ""
   log "Restoring original repository state…"
 
   git reset --hard HEAD \
@@ -41,6 +42,7 @@ restoreCommit() {
 }
 
 bumpPackageVersions() {
+  echo ""
   log "Bumping package versions…"
 
   ts-node ./scripts/bump-versions.ts || return 1
@@ -50,7 +52,7 @@ bumpPackageVersions() {
 
 buildPackages() {
   echo ""
-  log "Building packages bump…"
+  log "Building packages…"
 
   yarn build:octopus-reader || return 1
   yarn build:api || return 1
@@ -59,7 +61,7 @@ buildPackages() {
 }
 
 releasePackages() {
-  log "Releasing packages as version $VERSION…"
+  log "Releasing packages as version ${VERSION}…"
 
   yarn workspace @opendesign/octopus-reader publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
   yarn workspace @opendesign/api publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
@@ -67,7 +69,7 @@ releasePackages() {
   yarn workspace @opendesign/sdk publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
   yarn workspace @opendesign/sdk-docs-typedoc publish --access=public --new-version "$VERSION" --no-git-tag-version --ignore-scripts || return 1
 
-  logSuccess "Packages successfully released (fake, nothing has been released)"
+  logSuccess "Packages successfully released"
 }
 
 commitRelease() {
@@ -115,7 +117,7 @@ main() {
   }
 
   commitRelease || {
-    logWarning "The packages @opendesign/octopus-reader, @opendesign/api and @opendesign/sdk have already been released!"
+    logWarning "The packages @opendesign/sdk, @opendesign/octopus-reader, @opendesign/api, @opendesign/rendering and @opendesign/sdk-docs-typedoc have already been released!"
     logWarning "Not restoring the original repository state"
     return 1
   }
