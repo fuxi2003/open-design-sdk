@@ -307,7 +307,7 @@ export class Sdk {
    * @param params.designName A name override for the design. The original Figma design name is used by default.
    * @returns A design object which can be used for retrieving data from the Figma design using the API.
    */
-  async openFigmaDesign(params: {
+  async importFigmaDesign(params: {
     figmaToken: string
     figmaFileKey: string
     figmaIds?: Array<string>

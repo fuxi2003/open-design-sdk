@@ -399,7 +399,7 @@ describe('DesignFacade', () => {
       ok(token)
       tokenFromBefore = token
 
-      const designFacade = await sdk.openFigmaDesign({
+      const designFacade = await sdk.importFigmaDesign({
         figmaToken: process.env['E2E_FIGMA_TOKEN'] || '',
         figmaFileKey: process.env['E2E_FIGMA_FILE_KEY'] || '',
       })
