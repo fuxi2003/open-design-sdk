@@ -9,11 +9,12 @@ export class RenderingEngine implements IRenderingEngine {
   private _designs: Map<string, RenderingDesign> = new Map()
 
   // TODO: Move rendering process init to a factory.
-  constructor() {
-    const renderingProcess = new RenderingProcess()
-    renderingProcess.init()
+  constructor(params: { renderingProcess: RenderingProcess }) {
+    if (!params.renderingProcess) {
+      throw new Error('Rendering process not provided')
+    }
 
-    this._renderingProcess = renderingProcess
+    this._renderingProcess = params.renderingProcess
   }
 
   isDestroyed() {

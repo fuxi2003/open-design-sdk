@@ -1,5 +1,5 @@
 import { OpenDesignApi } from '@opendesign/api'
-import { RenderingEngine } from '@opendesign/rendering'
+import { createRenderingEngine } from '@opendesign/rendering'
 import { DesignFileManager } from './local/design-file-manager'
 import { LocalDesignCache } from './local/local-design-cache'
 import { LocalDesignManager } from './local/local-design-manager'
@@ -53,7 +53,7 @@ export function createSdk(params: {
   }
 
   if (params.rendering !== false) {
-    sdk.useRenderingEngine(new RenderingEngine())
+    sdk.useRenderingEngine(createRenderingEngine())
   }
 
   sdk.setWorkingDirectory(params.workingDirectory || null)

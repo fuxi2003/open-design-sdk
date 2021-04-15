@@ -34,7 +34,7 @@ export class Sdk {
   private _designFileManager: DesignFileManager | null = null
   private _localDesignCache: LocalDesignCache | null = null
   private _localDesignManager: LocalDesignManager | null = null
-  private _renderingEngine: IRenderingEngine | null = null
+  private _renderingEngine: Promise<IRenderingEngine | null> | null = null
   private _systemFontManager: SystemFontManager | null = null
 
   private _destroyed: boolean = false
@@ -87,8 +87,10 @@ export class Sdk {
   async destroy() {
     this._destroyed = true
 
-    if (this._renderingEngine && !this._renderingEngine.isDestroyed()) {
-      await this._renderingEngine.destroy()
+    const renderingEngine = await this._renderingEngine
+    if (renderingEngine && !renderingEngine.isDestroyed()) {
+      this._renderingEngine = null
+      await renderingEngine.destroy()
     }
   }
 
@@ -215,7 +217,7 @@ export class Sdk {
       sdk: this,
     })
 
-    const renderingEngine = this._renderingEngine
+    const renderingEngine = await this._renderingEngine
     if (renderingEngine) {
       const renderingDesign = await renderingEngine.createDesign(uuid(), {
         bitmapAssetDirectoryPath: localDesign.getBitmapAssetDirectory(),
@@ -441,7 +443,7 @@ export class Sdk {
 
       await designFacade.setLocalDesign(localDesign)
 
-      const renderingEngine = this._renderingEngine
+      const renderingEngine = await this._renderingEngine
       if (renderingEngine) {
         const renderingDesign = await renderingEngine.createDesign(uuid(), {
           bitmapAssetDirectoryPath: localDesign.getBitmapAssetDirectory(),
@@ -534,8 +536,14 @@ export class Sdk {
   }
 
   /** @internal */
-  useRenderingEngine(renderingEngine: IRenderingEngine): void {
-    this._renderingEngine = renderingEngine
+  useRenderingEngine(
+    renderingEngine: IRenderingEngine | Promise<IRenderingEngine>
+  ): void {
+    this._renderingEngine = Promise.resolve(renderingEngine).catch((err) => {
+      console.error('Rendering engine cound not be initialized', err)
+      this.destroy()
+      return null
+    })
   }
 
   private _getCommonApiDesignInfo() {

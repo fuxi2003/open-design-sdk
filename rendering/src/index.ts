@@ -1,4 +1,5 @@
 import { RenderingEngine } from './rendering-engine'
+import { RenderingProcess } from './rendering-process'
 
 import type { Bounds } from './types/bounds.type'
 import type { LayerAttributesConfig } from './types/layer-attributes.type'
@@ -14,8 +15,6 @@ import type {
 import type { IRenderingDesign } from './types/rendering-design.iface'
 import type { IRenderingEngine } from './types/rendering-engine.iface'
 
-export { RenderingEngine }
-
 export type {
   BlendingMode,
   Bounds,
@@ -26,4 +25,13 @@ export type {
   IRenderingArtboard,
   IRenderingDesign,
   IRenderingEngine,
+}
+
+export async function createRenderingEngine() {
+  const renderingProcess = new RenderingProcess()
+  renderingProcess.init()
+
+  const renderingEngine = new RenderingEngine({ renderingProcess })
+
+  return renderingEngine
 }
