@@ -111,6 +111,7 @@ export type RenderingCommand =
       'cmd': 'load-font'
       'design'?: string // defaults to "$last" if omitted
       'key': string // postscript name
+      'face-name'?: string // PostScript name of the face to load from the font file, if empty, the first (or the only) face from the file is loaded
       'file': string
     }
   | {
