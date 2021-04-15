@@ -72,7 +72,13 @@ export class RenderingDesign implements IRenderingDesign {
     return artboard
   }
 
-  async loadFont(postscriptName: string, filename: string): Promise<void> {
+  async loadFont(
+    postscriptName: string,
+    filename: string,
+    options: {
+      facePostscriptName?: string | null
+    }
+  ): Promise<void> {
     if (this._loadedFonts.has(postscriptName)) {
       return
     }
@@ -83,6 +89,9 @@ export class RenderingDesign implements IRenderingDesign {
       'design': this.id,
       'key': postscriptName,
       'file': filename,
+      ...(options.facePostscriptName
+        ? { 'face-name': options.facePostscriptName }
+        : {}),
     })
   }
 

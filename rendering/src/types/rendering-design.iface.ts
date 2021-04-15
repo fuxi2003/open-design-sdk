@@ -26,7 +26,13 @@ export interface IRenderingDesign {
 
   loadImage(bitmapKey: string, filename: string): Promise<void>
 
-  loadFont(postscriptName: string, filename: string): Promise<void>
+  loadFont(
+    postscriptName: string,
+    filename: string,
+    options: {
+      facePostscriptName?: string | null
+    }
+  ): Promise<void>
 
   renderArtboardToFile(
     artboardId: string,

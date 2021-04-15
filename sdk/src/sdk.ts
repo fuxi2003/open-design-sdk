@@ -495,7 +495,11 @@ export class Sdk {
     )
 
     return fontFilename
-      ? { fontFilename, fontPostscriptName: postscriptName, fallback: false }
+      ? {
+          fontFilename,
+          fontPostscriptName: postscriptName,
+          fallback: false,
+        }
       : null
   }
 

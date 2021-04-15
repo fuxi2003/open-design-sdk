@@ -1326,7 +1326,8 @@ export class DesignFacade {
       if (fontMatch) {
         await renderingDesign.loadFont(
           fontPostScriptName,
-          fontMatch.fontFilename
+          fontMatch.fontFilename,
+          { facePostscriptName: fontMatch.fontPostscriptName }
         )
       } else {
         console.warn(`Font not available: ${fontPostScriptName}`)
