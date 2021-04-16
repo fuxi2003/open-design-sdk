@@ -1,5 +1,6 @@
 import { get, getStream, post, postMultipart } from './utils/fetch'
 import { sleep } from './utils/sleep'
+import cplus from 'cplus'
 import fetch from 'node-fetch'
 
 import { ApiDesign } from './api-design'
@@ -19,12 +20,20 @@ export type DesignSummary = components['schemas']['DesignSummary']
 export type OctopusDocument = components['schemas']['OctopusDocument']
 
 export class OpenDesignApi implements IOpenDesignApi {
-  _apiRoot: string
-  _token: string
+  private _apiRoot: string
+  private _token: string
 
-  constructor(params: { apiRoot: string; token: string }) {
+  private _console: Console
+
+  constructor(params: {
+    apiRoot: string
+    token: string
+    console?: Console | null
+  }) {
     this._apiRoot = params.apiRoot
     this._token = params.token
+
+    this._console = params.console || cplus.create()
   }
 
   getApiRoot() {
@@ -42,16 +51,17 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         'design_id': designId,
       },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     // @ts-ignore
     if (res.statusCode === 401 || res.statusCode === 403) {
-      console.error('OpenDesignApi#getDesignById()', { designId }, res)
+      this._console.error('OpenDesignApi#getDesignById()', { designId }, res)
       throw new Error('Cannot fetch design due to missing permissions')
     }
     if (res.statusCode !== 200 && res.statusCode !== 202) {
-      console.error('OpenDesignApi#getDesignById()', { designId }, res)
+      this._console.error('OpenDesignApi#getDesignById()', { designId }, res)
       throw new Error('Cannot fetch design')
     }
 
@@ -74,11 +84,12 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         'design_id': designId,
       },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
-      console.error('OpenDesignApi#getDesignSummary()', { designId }, res)
+      this._console.error('OpenDesignApi#getDesignSummary()', { designId }, res)
       throw new Error('Cannot fetch design')
     }
 
@@ -102,11 +113,12 @@ export class OpenDesignApi implements IOpenDesignApi {
         'file': designFileStream,
         ...(options.format ? { 'format': options.format } : {}),
       },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     if (res.statusCode !== 201) {
-      console.error('OpenDesignApi#importDesignFile()', res)
+      this._console.error('OpenDesignApi#importDesignFile()', res)
       throw new Error('Cannot import design')
     }
 
@@ -126,11 +138,12 @@ export class OpenDesignApi implements IOpenDesignApi {
         'url': url,
         ...(options.format ? { 'format': options.format } : {}),
       },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     if (res.statusCode !== 201) {
-      console.error('OpenDesignApi#importDesignLink()', res)
+      this._console.error('OpenDesignApi#importDesignLink()', res)
       throw new Error('Cannot import design')
     }
 
@@ -154,11 +167,12 @@ export class OpenDesignApi implements IOpenDesignApi {
         ...(params.figmaIds ? { 'figma_ids': params.figmaIds } : {}),
         ...(params.name ? { 'design_name': params.name } : {}),
       },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     if (res.statusCode !== 201) {
-      console.error('OpenDesignApi#importDesignLink()', res)
+      this._console.error('OpenDesignApi#importDesignLink()', res)
       throw new Error('Cannot import design')
     }
 
@@ -184,11 +198,12 @@ export class OpenDesignApi implements IOpenDesignApi {
         ...(params.figmaIds ? { 'figma_ids': params.figmaIds } : {}),
         ...(params.name ? { 'design_name': params.name } : {}),
       },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     if (res.statusCode !== 201) {
-      console.error('OpenDesignApi#importDesignLink()', res)
+      this._console.error('OpenDesignApi#importDesignLink()', res)
       throw new Error('Cannot import design')
     }
 
@@ -213,11 +228,12 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._apiRoot,
       '/designs/{design_id}/artboards/{artboard_id}/content',
       { 'design_id': designId, 'artboard_id': artboardId },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
-      console.error('OpenDesignApi#getDesignById()', { designId }, res)
+      this._console.error('OpenDesignApi#getDesignById()', { designId }, res)
       throw new Error('Cannot fetch artboard content')
     }
 
@@ -237,11 +253,12 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._apiRoot,
       '/designs/{design_id}/artboards/{artboard_id}/content',
       { 'design_id': designId, 'artboard_id': artboardId },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
-      console.error(
+      this._console.error(
         'OpenDesignApi#getDesignArtboardContentJsonStream()',
         { designId },
         res
@@ -268,11 +285,12 @@ export class OpenDesignApi implements IOpenDesignApi {
       '/designs/{design_id}/exports',
       { 'design_id': designId },
       { 'format': params.format },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     if (res.statusCode !== 201) {
-      console.error(
+      this._console.error(
         'OpenDesignApi#exportDesign()',
         { designId, ...params },
         res
@@ -297,11 +315,16 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._apiRoot,
       '/designs/{design_id}/exports/{export_id}',
       { 'design_id': designId, 'export_id': designExportId },
-      this._getAuthInfo()
+      this._getAuthInfo(),
+      { console: this._console }
     )
 
     if (res.statusCode !== 200) {
-      console.error('OpenDesignApi#getDesignExportById()', { designId }, res)
+      this._console.error(
+        'OpenDesignApi#getDesignExportById()',
+        { designId },
+        res
+      )
       throw new Error('Cannot fetch design export info')
     }
     if (res.body['status'] === 'failed') {
@@ -333,7 +356,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     const res = await fetch(bitmapKey)
     if (res.status !== 200) {
-      console.log('ApiDesign#getBitmapAssetStream()', {
+      this._console.debug('ApiDesign#getBitmapAssetStream()', {
         bitmapKey,
         statusCode: res.status,
       })

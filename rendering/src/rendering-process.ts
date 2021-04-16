@@ -10,8 +10,14 @@ import type {
 } from './types/commands.type'
 
 export class RenderingProcess implements IRenderingProcess {
+  private _console: Console
+
   private _process: ChildProcess | null = null
   private _destroyed: boolean = false
+
+  constructor(params: { console?: Console | null } = {}) {
+    this._console = params.console || console
+  }
 
   isDestroyed() {
     return this._destroyed
@@ -27,17 +33,17 @@ export class RenderingProcess implements IRenderingProcess {
     this._process = spawnMonroeCli()
 
     this._process.on('error', (err) => {
-      console.error('Rendering: error>', err)
+      this._console.error('Rendering: error>', err)
     })
     this._process.on('close', () => {
       this._process = null
     })
 
     this._process.stdout?.on('data', (data) => {
-      console.debug('Rendering: stdout>', String(data))
+      this._console.debug('Rendering: stdout>', String(data))
     })
     this._process.stderr?.on('data', (data) => {
-      console.error('Rendering: stderr>', String(data))
+      this._console.error('Rendering: stderr>', String(data))
     })
   }
 
@@ -94,7 +100,7 @@ export class RenderingProcess implements IRenderingProcess {
       renderingProcess.once('error', handleError)
 
       const cmdJson = JSON.stringify({ 'cmd': cmdName, ...data })
-      console.log('Rendering: stdin>', cmdJson)
+      this._console.debug('Rendering: stdin>', cmdJson)
       stdin.write(`${cmdJson}\n`)
     })
   }

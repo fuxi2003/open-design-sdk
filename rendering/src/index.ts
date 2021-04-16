@@ -1,6 +1,8 @@
 import { RenderingEngine } from './rendering-engine'
 import { RenderingProcess } from './rendering-process'
 
+import cplus from 'cplus'
+
 import type { Bounds } from './types/bounds.type'
 import type { LayerAttributesConfig } from './types/layer-attributes.type'
 import type {
@@ -27,11 +29,20 @@ export type {
   IRenderingEngine,
 }
 
-export async function createRenderingEngine() {
-  const renderingProcess = new RenderingProcess()
-  renderingProcess.init()
+export async function createRenderingEngine(
+  params: { console?: Console | null } = {}
+) {
+  const renderingConsole = params.console || cplus.create()
 
-  const renderingEngine = new RenderingEngine({ renderingProcess })
+  const renderingProcess = new RenderingProcess({
+    console: renderingConsole,
+  })
+  const renderingEngine = new RenderingEngine({
+    renderingProcess,
+    console: renderingConsole,
+  })
+
+  renderingProcess.init()
 
   return renderingEngine
 }

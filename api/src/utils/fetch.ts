@@ -20,17 +20,22 @@ type MethodPathPatterns<M> = {
 
 type AuthInfo = { token: string }
 
-const fetch = async (url: string, init: RequestInit = {}) => {
-  const method = init.method?.toUpperCase() || 'GET'
-  console.debug('API:', method, url, '...')
+const fetch = async (
+  url: string,
+  params: RequestInit & { console?: Console } = {}
+) => {
+  const { console: fetchConsole = console, ...requestInit } = params
 
-  const res = await fetchInternal(url, init)
+  const method = requestInit.method?.toUpperCase() || 'GET'
+  fetchConsole.debug('API:', method, url, '...')
+
+  const res = await fetchInternal(url, requestInit)
 
   const logData = ['API:', method, url, '->', `${res.status} ${res.statusText}`]
   if (res.status >= 400) {
-    console.error(...logData)
+    fetchConsole.error(...logData)
   } else {
-    console.info(...logData)
+    fetchConsole.info(...logData)
   }
 
   return res
@@ -45,9 +50,10 @@ export async function get<
   apiRoot: string,
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
-  authInfo: AuthInfo
+  authInfo: AuthInfo,
+  options: { console?: Console | null } = {}
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {
-  return request('get', apiRoot, pathPattern, pathParams, {}, authInfo)
+  return request('get', apiRoot, pathPattern, pathParams, {}, authInfo, options)
 }
 
 export async function post<
@@ -58,7 +64,8 @@ export async function post<
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
   data: OperationBodyParams<Operation, 'application/json'>,
-  authInfo: AuthInfo | null = null
+  authInfo: AuthInfo | null = null,
+  options: { console?: Console | null } = {}
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {
   return request(
     'post',
@@ -71,7 +78,8 @@ export async function post<
         'Content-Type': 'application/json',
       },
     },
-    authInfo
+    authInfo,
+    options
   )
 }
 
@@ -84,13 +92,21 @@ export async function getStream<
   apiRoot: string,
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
-  authInfo: AuthInfo
+  authInfo: AuthInfo,
+  options: { console?: Console | null } = {}
 ): Promise<{
   statusCode: Exclude<OperationStatusCodes<Operation>, 500>
   headers: Headers
   stream: NodeJS.ReadableStream
 }> {
-  return requestStream('get', apiRoot, pathPattern, pathParams, authInfo)
+  return requestStream(
+    'get',
+    apiRoot,
+    pathPattern,
+    pathParams,
+    authInfo,
+    options
+  )
 }
 
 // MultipartFilePart
@@ -113,7 +129,8 @@ export async function postMultipart<
         | MultipartBody[K]
         | ReadStream
     },
-  authInfo: AuthInfo
+  authInfo: AuthInfo,
+  options: { console?: Console | null } = {}
 ): Promise<Exclude<OperationResponse<Operation>, { statusCode: 500 }>> {
   const path = populatePathPattern(pathPattern, pathParams)
 
@@ -128,6 +145,7 @@ export async function postMultipart<
     headers: {
       'Authorization': `Bearer ${authInfo.token}`,
     },
+    console: options.console || console,
   })
   const body = await res.json()
 
@@ -153,7 +171,8 @@ async function request<
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
   requestParams: Omit<RequestInit, 'method'> = {},
-  authInfo: AuthInfo | null
+  authInfo: AuthInfo | null,
+  options: { console?: Console | null } = {}
 ) {
   const path = populatePathPattern(pathPattern, pathParams)
 
@@ -164,6 +183,7 @@ async function request<
       ...(authInfo ? { 'Authorization': `Bearer ${authInfo.token}` } : {}),
       ...(requestParams.headers || {}),
     },
+    console: options.console || console,
   })
   const body = await res.json()
 
@@ -186,7 +206,8 @@ async function requestStream<
   apiRoot: string,
   pathPattern: PathPattern,
   pathParams: PathParams<PathPattern>,
-  authInfo: AuthInfo
+  authInfo: AuthInfo,
+  options: { console?: Console | null } = {}
 ) {
   const path = populatePathPattern(pathPattern, pathParams)
 
@@ -195,6 +216,7 @@ async function requestStream<
     headers: {
       'Authorization': `Bearer ${authInfo.token}`,
     },
+    console: options.console || console,
   })
 
   if (res.status === 500) {

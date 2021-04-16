@@ -46,8 +46,12 @@ export class Sdk {
     'Courier',
   ]
 
+  private _console: Console
+
   /** @internal */
-  constructor() {}
+  constructor(params: { console?: Console | null } = {}) {
+    this._console = params.console || console
+  }
 
   /** @internal */
   toString() {
@@ -180,6 +184,7 @@ export class Sdk {
     })
     const designFacade = await createDesignFromLocalDesign(localDesign, {
       sdk: this,
+      console: this._console,
     })
 
     const apiDesign = await this._getApiDesignByLocalDesign(localDesign)
@@ -215,6 +220,7 @@ export class Sdk {
     const localDesign = await localDesignManager.createOctopusFile(filePath)
     const designFacade = await createDesignFromLocalDesign(localDesign, {
       sdk: this,
+      console: this._console,
     })
 
     const renderingEngine = await this._renderingEngine
@@ -406,6 +412,7 @@ export class Sdk {
     const apiDesign = await openDesignApi.getDesignById(designId)
     const designFacade = await createDesignFromOpenDesignApiDesign(apiDesign, {
       sdk: this,
+      console: this._console,
       sourceFilename: params.sourceFilename || null,
       exports: params.exports || null,
     })
@@ -546,7 +553,7 @@ export class Sdk {
     renderingEngine: IRenderingEngine | Promise<IRenderingEngine>
   ): void {
     this._renderingEngine = Promise.resolve(renderingEngine).catch((err) => {
-      console.error('Rendering engine cound not be initialized', err)
+      this._console.error('Rendering engine cound not be initialized', err)
       this.destroy()
       return null
     })
@@ -568,7 +575,7 @@ export class Sdk {
 
     const openDesignApi = this._openDesignApi
     if (!openDesignApi) {
-      console.warn(
+      this._console.warn(
         'The local design references an API design but the API is not configured.'
       )
       return null
@@ -577,7 +584,7 @@ export class Sdk {
     try {
       return await openDesignApi.getDesignById(designId)
     } catch (err) {
-      console.warn(
+      this._console.warn(
         'API design referenced by the opened local design is not available'
       )
       return null

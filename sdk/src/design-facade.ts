@@ -45,6 +45,7 @@ export class DesignFacade {
   readonly sourceFilename: string | null
 
   private _sdk: Sdk
+  private _console: Console
 
   private _designEntity: IFile | null = null
   private _localDesign: LocalDesign | null = null
@@ -65,10 +66,15 @@ export class DesignFacade {
   private _fallbackFontPostscriptNames: Array<string> = []
 
   /** @internal */
-  constructor(params: { sdk: Sdk; sourceFilename?: string | null }) {
+  constructor(params: {
+    sdk: Sdk
+    console?: Console | null
+    sourceFilename?: string | null
+  }) {
     this.sourceFilename = params.sourceFilename || null
 
     this._sdk = params.sdk
+    this._console = params.console || console
   }
 
   /**
@@ -1005,7 +1011,9 @@ export class DesignFacade {
     }
 
     if (!artboard.isLoaded()) {
-      console.warn('Trying to unload an artboard which has not been loaded.')
+      this._console.warn(
+        'Trying to unload an artboard which has not been loaded.'
+      )
       return
     }
 
@@ -1330,7 +1338,7 @@ export class DesignFacade {
           { facePostscriptName: fontMatch.fontPostscriptName }
         )
       } else {
-        console.warn(`Font not available: ${fontPostScriptName}`)
+        this._console.warn(`Font not available: ${fontPostScriptName}`)
       }
     })
   }

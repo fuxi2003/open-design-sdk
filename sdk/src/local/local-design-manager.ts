@@ -14,7 +14,12 @@ import type { ManifestData } from '@opendesign/octopus-reader'
 const statPromised = promisify(stat)
 
 export class LocalDesignManager {
+  private _console: Console
   private _workingDirectory: string | null = null
+
+  constructor(params: { console?: Console | null } = {}) {
+    this._console = params.console || console
+  }
 
   getWorkingDirectory() {
     return this._workingDirectory || resolvePath('.')
@@ -82,7 +87,7 @@ export class LocalDesignManager {
   ): Promise<LocalDesign> {
     const filename = await this._createTempLocation(options.name || null)
     const localDesign = await this.createOctopusFile(filename)
-    console.debug('Cache:', filename)
+    this._console.debug('Cache:', filename)
 
     await localDesign.saveManifest(manifest)
 

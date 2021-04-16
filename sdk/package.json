@@ -32,6 +32,7 @@
     "@opendesign/api": "0.1.2",
     "@opendesign/octopus-reader": "0.1.2",
     "@opendesign/rendering": "0.1.2",
+    "cplus": "2.0.1",
     "fs-extra": "^9.1.0",
     "mkdirp": "1.0.4",
     "node-fetch": "2.6.1",

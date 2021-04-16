@@ -12,8 +12,10 @@ export class RenderingArtboard implements IRenderingArtboard {
   readonly id: string
   readonly symbolId: string | null
 
-  private _designId: string
   private _renderingProcess: RenderingProcess
+  private _console: Console
+
+  private _designId: string
   private _pageId: string | null
 
   private _ready: boolean
@@ -23,6 +25,7 @@ export class RenderingArtboard implements IRenderingArtboard {
     id: string,
     params: {
       renderingProcess: RenderingProcess
+      console?: Console | null
       designId: string
       symbolId?: string | null
       pageId?: string | null
@@ -33,8 +36,10 @@ export class RenderingArtboard implements IRenderingArtboard {
     this.id = id
     this.symbolId = params.symbolId || null
 
-    this._designId = params.designId
     this._renderingProcess = params.renderingProcess
+    this._console = params.console || console
+
+    this._designId = params.designId
     this._pageId = params.pageId || null
 
     this._pendingSymbolIds = params.pendingSymbolIds || []
@@ -147,7 +152,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       ...(options.bounds ? { 'bounds': serializeBounds(options.bounds) } : {}),
     })
     if (!result['ok']) {
-      console.error('Rendering:', 'render-artboard', '->', result)
+      this._console.error('Rendering:', 'render-artboard', '->', result)
       throw new Error('Failed to render artboard')
     }
   }
@@ -180,7 +185,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       ...serializeLayerAttributes(options),
     })
     if (!result['ok']) {
-      console.error('Rendering:', 'render-layer', '->', result)
+      this._console.error('Rendering:', 'render-layer', '->', result)
       throw new Error('Failed to render artboard layer')
     }
   }
@@ -225,7 +230,12 @@ export class RenderingArtboard implements IRenderingArtboard {
       }
     )
     if (!result['ok']) {
-      console.error('Rendering: render-artboard-', 'omposi', '->ion:', result)
+      this._console.error(
+        'Rendering: render-artboard-',
+        'omposi',
+        '->ion:',
+        result
+      )
       throw new Error('Failed to render artboard layers')
     }
   }
@@ -241,7 +251,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       'layer': layerId,
     })
     if (!result['ok']) {
-      console.error('Rendering:', 'get-layer', '->', result)
+      this._console.error('Rendering:', 'get-layer', '->', result)
       throw new Error('Failed to retrieve artboard layer info')
     }
 
@@ -265,7 +275,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       'position': [x, y],
     })
     if (!result['ok']) {
-      console.error('Rendering:', 'identify-layer', '->', result)
+      this._console.error('Rendering:', 'identify-layer', '->', result)
       throw new Error('Failed to retrieve artboard layer info')
     }
 
@@ -287,7 +297,7 @@ export class RenderingArtboard implements IRenderingArtboard {
       'policy': options.partialOverlap ? 'partial' : 'partial-external',
     })
     if (!result['ok']) {
-      console.error('Rendering:', 'identify-layers', '->', result)
+      this._console.error('Rendering:', 'identify-layers', '->', result)
       throw new Error('Failed to retrieve artboard layer info')
     }
 
@@ -307,7 +317,7 @@ export class RenderingArtboard implements IRenderingArtboard {
     })
 
     if (!result['ok']) {
-      console.error('Rendering:', 'unload-artboard', '-', result)
+      this._console.error('Rendering:', 'unload-artboard', '-', result)
       throw new Error('Failed to unload artboard')
     }
   }

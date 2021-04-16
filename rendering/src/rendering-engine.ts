@@ -5,16 +5,21 @@ import type { IRenderingEngine } from './types/rendering-engine.iface'
 
 export class RenderingEngine implements IRenderingEngine {
   private _renderingProcess: RenderingProcess
+  private _console: Console
 
   private _designs: Map<string, RenderingDesign> = new Map()
 
   // TODO: Move rendering process init to a factory.
-  constructor(params: { renderingProcess: RenderingProcess }) {
+  constructor(params: {
+    renderingProcess: RenderingProcess
+    console?: Console | null
+  }) {
     if (!params.renderingProcess) {
       throw new Error('Rendering process not provided')
     }
 
     this._renderingProcess = params.renderingProcess
+    this._console = params.console || console
   }
 
   isDestroyed() {
@@ -42,6 +47,7 @@ export class RenderingEngine implements IRenderingEngine {
     const design = new RenderingDesign({
       id: designId,
       renderingProcess: this._renderingProcess,
+      console: this._console,
       bitmapAssetDirectoryPath: params.bitmapAssetDirectoryPath || null,
       fontDirectoryPath: params.fontDirectoryPath || null,
     })

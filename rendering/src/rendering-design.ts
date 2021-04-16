@@ -14,6 +14,8 @@ export class RenderingDesign implements IRenderingDesign {
   readonly fontDirectoryPath: string | null
 
   private _renderingProcess: RenderingProcess
+  private _console: Console
+
   private _artboards: Map<string, RenderingArtboard> = new Map()
   private _loadedBitmaps: Set<string> = new Set()
   private _loadedFonts: Set<string> = new Set()
@@ -23,12 +25,14 @@ export class RenderingDesign implements IRenderingDesign {
     bitmapAssetDirectoryPath: string | null
     fontDirectoryPath: string | null
     renderingProcess: RenderingProcess
+    console?: Console | null
   }) {
     this.id = params.id
     this.bitmapAssetDirectoryPath = params.bitmapAssetDirectoryPath || null
     this.fontDirectoryPath = params.fontDirectoryPath || null
 
     this._renderingProcess = params.renderingProcess
+    this._console = params.console || console
   }
 
   isArtboardLoaded(artboardId: string): boolean {
@@ -57,6 +61,7 @@ export class RenderingDesign implements IRenderingDesign {
     const artboard = new RenderingArtboard(artboardId, {
       designId: this.id,
       renderingProcess: this._renderingProcess,
+      console: this._console,
       pageId: params.pageId || null,
       symbolId: params.symbolId || null,
       ready: false,
@@ -144,7 +149,7 @@ export class RenderingDesign implements IRenderingDesign {
       ...(options.bounds ? { 'bounds': serializeBounds(options.bounds) } : {}),
     })
     if (!result['ok']) {
-      console.error('Rendering:', 'render-page', '->', result)
+      this._console.error('Rendering:', 'render-page', '->', result)
       throw new Error('Failed to render page')
     }
   }
@@ -242,7 +247,7 @@ export class RenderingDesign implements IRenderingDesign {
     })
 
     if (!result['ok']) {
-      console.error('Rendering:', 'unload-design', '->', result)
+      this._console.error('Rendering:', 'unload-design', '->', result)
       throw new Error('Failed to destroy design')
     }
   }

@@ -1,5 +1,6 @@
 import { OpenDesignApi } from '@opendesign/api'
 import { createRenderingEngine } from '@opendesign/rendering'
+import { ConsoleConfig, getConsole } from './utils/console'
 import { DesignFileManager } from './local/design-file-manager'
 import { LocalDesignCache } from './local/local-design-cache'
 import { LocalDesignManager } from './local/local-design-manager'
@@ -31,16 +32,24 @@ export function createSdk(params: {
   cached?: boolean
   rendering?: boolean
   systemFonts?: boolean
+  console?: ConsoleConfig | null
 }) {
-  const sdk = new Sdk()
+  const sdkConsole = getConsole(params.console || null)
+
+  const sdk = new Sdk({ console: sdkConsole })
 
   sdk.useDesignFileManager(new DesignFileManager())
-  sdk.useLocalDesignManager(new LocalDesignManager())
+  sdk.useLocalDesignManager(
+    new LocalDesignManager({
+      console: sdkConsole,
+    })
+  )
 
   sdk.useOpenDesignApi(
     createOpenDesignApi({
       token: params.token,
       apiRoot: params.apiRoot || null,
+      console: sdkConsole,
     })
   )
 
@@ -53,7 +62,11 @@ export function createSdk(params: {
   }
 
   if (params.rendering !== false) {
-    sdk.useRenderingEngine(createRenderingEngine())
+    sdk.useRenderingEngine(
+      createRenderingEngine({
+        console: sdkConsole,
+      })
+    )
   }
 
   sdk.setWorkingDirectory(params.workingDirectory || null)
@@ -64,6 +77,7 @@ export function createSdk(params: {
 function createOpenDesignApi(params: {
   token: string
   apiRoot?: string | null
+  console: Console
 }) {
   const apiRoot = params.apiRoot || 'https://opendesign.avocode.com/api'
   const token = params.token
@@ -74,6 +88,7 @@ function createOpenDesignApi(params: {
   const openDesignApi = new OpenDesignApi({
     apiRoot,
     token,
+    console: params.console,
   })
 
   return openDesignApi

@@ -1,5 +1,6 @@
 import { OpenDesignApi } from '@opendesign/api'
 import { Sdk } from './sdk'
+import { ConsoleConfig, getConsole } from './utils/console'
 
 /**
  * Creates an SDK instance with the API configured.
@@ -10,15 +11,22 @@ import { Sdk } from './sdk'
  * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication).
  * @param params.apiRoot The URL base for Open Design API calls. By default, production Avocode Open Design API servers are used.
  */
-export function createSdk(params: { token: string; apiRoot?: string | null }) {
-  const sdk = new Sdk()
-  configureOnlineServices(sdk, params)
+export function createSdk(params: {
+  token: string
+  apiRoot?: string | null
+  console?: ConsoleConfig | null
+}) {
+  const sdkConsole = getConsole(params.console || null)
+  const sdk = new Sdk({ console: sdkConsole })
+
+  configureOnlineServices(sdk, { ...params, console: sdkConsole })
+
   return sdk
 }
 
 function configureOnlineServices(
   sdk: Sdk,
-  params: { token: string; apiRoot?: string | null }
+  params: { token: string; apiRoot?: string | null; console: Console }
 ) {
   sdk.useOpenDesignApi(createOpenDesignApi(params))
   return sdk
@@ -27,6 +35,7 @@ function configureOnlineServices(
 function createOpenDesignApi(params: {
   token: string
   apiRoot?: string | null
+  console: Console
 }) {
   const apiRoot = params.apiRoot || 'https://opendesign.avocode.com/api'
   const token = params.token
@@ -37,6 +46,7 @@ function createOpenDesignApi(params: {
   const openDesignApi = new OpenDesignApi({
     apiRoot,
     token,
+    console: params.console,
   })
 
   return openDesignApi
