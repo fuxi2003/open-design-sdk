@@ -25,7 +25,13 @@ const fetch = async (url: string, init: RequestInit = {}) => {
   console.debug('API:', method, url, '...')
 
   const res = await fetchInternal(url, init)
-  console.log('API:', method, url, '->', `${res.status} ${res.statusText}`)
+
+  const logData = ['API:', method, url, '->', `${res.status} ${res.statusText}`]
+  if (res.status >= 400) {
+    console.error(...logData)
+  } else {
+    console.info(...logData)
+  }
 
   return res
 }
