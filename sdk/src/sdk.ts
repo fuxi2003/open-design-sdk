@@ -412,15 +412,16 @@ export class Sdk {
 
     const localDesignManager = this._localDesignManager
     if (localDesignManager) {
-      const localDesignCache = this._localDesignCache
-      const cachedOctopusFilename = localDesignCache
-        ? await localDesignCache.getDesignOctopusFilename(designId)
-        : null
-
+      const apiRoot = apiDesign.getApiRoot()
       const apiDesignInfo = {
-        apiRoot: apiDesign.getApiRoot(),
+        apiRoot,
         designId: apiDesign.id,
       }
+
+      const localDesignCache = this._localDesignCache
+      const cachedOctopusFilename = localDesignCache
+        ? await localDesignCache.getDesignOctopusFilename(apiRoot, designId)
+        : null
 
       const localDesign = cachedOctopusFilename
         ? await localDesignManager.openOctopusFile(cachedOctopusFilename, {
@@ -436,6 +437,7 @@ export class Sdk {
 
       if (localDesignCache && !cachedOctopusFilename) {
         localDesignCache.setDesignOctopusFilename(
+          apiRoot,
           designId,
           localDesign.filename
         )
