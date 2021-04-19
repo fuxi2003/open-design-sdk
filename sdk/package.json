@@ -7,7 +7,7 @@
     "build": "yarn run clean-build && yarn run build:node && yarn run build:browser",
     "build:node": "tsc --outDir dist --sourceMap --declaration --project ./tsconfig-build.json",
     "build:browser": "node ./scripts/browser-bundle.js",
-    "clean-build": "rm -rf dist",
+    "clean-build": "rm -rf dist dist-browser",
     "docs": "typedoc --options ./typedoc.json",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\" }' mocha",
     "test:coverage": "nyc --reporter=lcov --reporter=text-summary yarn run test"
