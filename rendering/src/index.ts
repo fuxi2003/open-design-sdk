@@ -42,7 +42,7 @@ export async function createRenderingEngine(
     console: renderingConsole,
   })
 
-  renderingProcess.init()
+  await renderingProcess.init()
 
   return renderingEngine
 }

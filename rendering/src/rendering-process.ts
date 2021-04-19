@@ -24,27 +24,71 @@ export class RenderingProcess implements IRenderingProcess {
   }
 
   async destroy() {
+    if (!this._process) {
+      return
+    }
+
     const quitPromise = this._execCommand('quit', {})
     this._destroyed = true
     await quitPromise
   }
 
-  init() {
-    this._process = spawnMonroeCli()
+  async init(): Promise<void> {
+    const process = spawnMonroeCli()
 
-    this._process.on('error', (err) => {
+    this._registerOutputListeners(process)
+
+    return new Promise((resolve, reject) => {
+      const handleData = (initialJson: Buffer | string) => {
+        process.removeListener('close', handleClose)
+
+        const initialMessage = JSON.parse(String(initialJson))
+        if (!('ok' in initialMessage) || !initialMessage['ok']) {
+          reject(
+            new Error(
+              `Rendering process did not start correctly: ${initialMessage}`
+            )
+          )
+          return
+        }
+
+        this._console.debug('Rendering: Initialized successfully')
+        resolve()
+      }
+
+      const handleClose = (code: number | null) => {
+        process.removeListener('data', handleData)
+
+        reject(new Error(`Rendering process exited with code ${code}`))
+      }
+
+      if (!process.stdout) {
+        reject(new Error('Rendering: Process stdout not available'))
+        return
+      }
+
+      process.stdout.once('data', handleData)
+      process.once('close', handleClose)
+    })
+  }
+
+  _registerOutputListeners(process: ChildProcess) {
+    process.on('error', (err) => {
       this._console.error('Rendering: error>', err)
     })
-    this._process.on('close', () => {
+    process.once('close', (code) => {
       this._process = null
+      this._console.debug(`Rendering: closed with code: ${code}`)
     })
 
-    this._process.stdout?.on('data', (data) => {
-      this._console.debug('Rendering: stdout>', String(data))
+    process.stdout?.on('data', (data) => {
+      this._console.debug('Rendering: stdout>', String(data).replace(/\n$/, ''))
     })
-    this._process.stderr?.on('data', (data) => {
-      this._console.error('Rendering: stderr>', String(data))
+    process.stderr?.on('data', (data) => {
+      this._console.error('Rendering: stderr>', String(data).replace(/\n$/, ''))
     })
+
+    this._process = process
   }
 
   execCommand = createQueue(
