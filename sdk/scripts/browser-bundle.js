@@ -31,6 +31,7 @@ require('esbuild')
     entryPoints: [path.resolve(__dirname, '../src/index-browser.ts')],
     tsconfig: path.resolve(__dirname, '../tsconfig-build.json'),
     bundle: true,
+    inject: [path.resolve(__dirname, '../src/inject/process.ts')],
     outfile: path.resolve(__dirname, '../dist-browser/bundle.js'),
     plugins: [fetchPlugin],
     sourcemap: true,
@@ -38,6 +39,7 @@ require('esbuild')
     logLimit: 0,
     target: 'esnext',
     format: 'esm',
+    platform: 'browser',
   })
   .catch(() => {
     process.exit(1)
