@@ -26,6 +26,8 @@ export interface IRenderingArtboard {
 
   markAsReady(): Promise<void>
 
+  setPage(nextPageId: string | null): Promise<void>
+
   renderToFile(
     filePath: string,
     options?: { scale?: number; bounds?: Bounds }
