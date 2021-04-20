@@ -615,6 +615,7 @@ export class DesignFacade {
    * @category Rendering
    * @param artboardId The ID of the artboard to render.
    * @param filePath The target location of the produced PNG image file.
+   * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    */
   async renderArtboardToFile(
     artboardId: ArtboardId,
@@ -648,6 +649,7 @@ export class DesignFacade {
    * @category Rendering
    * @param pageId The ID of the page to render.
    * @param filePath The target location of the produced PNG image file.
+   * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    */
   async renderPageToFile(
     pageId: PageId,
