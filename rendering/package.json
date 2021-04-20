@@ -8,7 +8,7 @@
     "clean-build": "rm -rf dist"
   },
   "dependencies": {
-    "@avocode/monroe-cli": "0.1.0-alpha.7",
+    "@avocode/monroe-cli": "0.1.0-alpha.8",
     "cplus": "2.0.1"
   },
   "devDependencies": {
