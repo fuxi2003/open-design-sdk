@@ -68,21 +68,11 @@ export class RenderingArtboard implements IRenderingArtboard {
         'assetpath': params.bitmapAssetDirectoryPath,
         'fontpath': params.fontDirectoryPath,
         'page': this._pageId,
+        ...(this.symbolId ? { 'symbol': this.symbolId } : {}),
       }
     )
 
-    const symbolLoadResult = this.symbolId
-      ? await this._renderingProcess.execCommand('load-artboard', {
-          'design': this._designId,
-          'symbol': this.symbolId,
-          'file': params.octopusFilename,
-          'assetpath': params.bitmapAssetDirectoryPath,
-          'fontpath': params.fontDirectoryPath,
-          'page': this._pageId,
-        })
-      : { 'ok': true }
-
-    if (!loadResult['ok'] || !symbolLoadResult['ok']) {
+    if (!loadResult['ok']) {
       throw new Error('Failed to load design artboard')
     }
 
