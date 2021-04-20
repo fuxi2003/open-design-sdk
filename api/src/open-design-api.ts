@@ -5,6 +5,7 @@ import fetch from 'node-fetch'
 
 import { ApiDesign } from './api-design'
 import { ApiDesignExport } from './api-design-export'
+import { OpenDesignApiError } from './open-design-api-error'
 
 import type { ReadStream } from 'fs'
 import type { ArtboardId } from '@opendesign/octopus-reader'
@@ -58,11 +59,14 @@ export class OpenDesignApi implements IOpenDesignApi {
     // @ts-ignore
     if (res.statusCode === 401 || res.statusCode === 403) {
       this._console.error('OpenDesignApi#getDesignById()', { designId }, res)
-      throw new Error('Cannot fetch design due to missing permissions')
+      throw new OpenDesignApiError(
+        res,
+        'Cannot fetch design due to missing permissions'
+      )
     }
     if (res.statusCode !== 200 && res.statusCode !== 202) {
       this._console.error('OpenDesignApi#getDesignById()', { designId }, res)
-      throw new Error('Cannot fetch design')
+      throw new OpenDesignApiError(res, 'Cannot fetch design')
     }
 
     if (res.statusCode === 202) {
@@ -90,7 +94,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
       this._console.error('OpenDesignApi#getDesignSummary()', { designId }, res)
-      throw new Error('Cannot fetch design')
+      throw new OpenDesignApiError(res, 'Cannot fetch design')
     }
 
     if (res.statusCode === 202) {
@@ -119,7 +123,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode !== 201) {
       this._console.error('OpenDesignApi#importDesignFile()', res)
-      throw new Error('Cannot import design')
+      throw new OpenDesignApiError(res, 'Cannot import design')
     }
 
     const designId = res.body['design']['id']
@@ -144,7 +148,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode !== 201) {
       this._console.error('OpenDesignApi#importDesignLink()', res)
-      throw new Error('Cannot import design')
+      throw new OpenDesignApiError(res, 'Cannot import design')
     }
 
     const designId = res.body['design']['id']
@@ -173,7 +177,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode !== 201) {
       this._console.error('OpenDesignApi#importDesignLink()', res)
-      throw new Error('Cannot import design')
+      throw new OpenDesignApiError(res, 'Cannot import design')
     }
 
     const designId = res.body['design']['id']
@@ -204,7 +208,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode !== 201) {
       this._console.error('OpenDesignApi#importDesignLink()', res)
-      throw new Error('Cannot import design')
+      throw new OpenDesignApiError(res, 'Cannot import design')
     }
 
     const designId = res.body['design']['id']
@@ -234,7 +238,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
       this._console.error('OpenDesignApi#getDesignById()', { designId }, res)
-      throw new Error('Cannot fetch artboard content')
+      throw new OpenDesignApiError(res, 'Cannot fetch artboard content')
     }
 
     if (res.statusCode === 202) {
@@ -263,7 +267,7 @@ export class OpenDesignApi implements IOpenDesignApi {
         { designId },
         res
       )
-      throw new Error('Cannot fetch artboard content')
+      throw new OpenDesignApiError(res, 'Cannot fetch artboard content')
     }
 
     if (res.statusCode === 202) {
@@ -295,10 +299,10 @@ export class OpenDesignApi implements IOpenDesignApi {
         { designId, ...params },
         res
       )
-      throw new Error('Cannot convert the design')
+      throw new OpenDesignApiError(res, 'Cannot convert the design')
     }
     if (res.body['status'] === 'failed') {
-      throw new Error('Design export failed')
+      throw new OpenDesignApiError(res, 'Design export failed')
     }
 
     return new ApiDesignExport(res.body, {
@@ -325,10 +329,10 @@ export class OpenDesignApi implements IOpenDesignApi {
         { designId },
         res
       )
-      throw new Error('Cannot fetch design export info')
+      throw new OpenDesignApiError(res, 'Cannot fetch design export info')
     }
     if (res.body['status'] === 'failed') {
-      throw new Error('Design export failed')
+      throw new OpenDesignApiError(res, 'Design export failed')
     }
 
     return new ApiDesignExport(res.body, {
