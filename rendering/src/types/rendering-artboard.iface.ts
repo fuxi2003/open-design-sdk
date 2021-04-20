@@ -20,6 +20,7 @@ export interface IRenderingArtboard {
     octopusFilename: string
     bitmapAssetDirectoryPath?: string | null
     fontDirectoryPath?: string | null
+    offset?: { x: number; y: number } | null
   }): Promise<void>
 
   unload(): Promise<void>
@@ -27,6 +28,8 @@ export interface IRenderingArtboard {
   markAsReady(): Promise<void>
 
   setPage(nextPageId: string | null): Promise<void>
+
+  setOffset(nextOffset: { x: number; y: number }): Promise<void>
 
   renderToFile(
     filePath: string,

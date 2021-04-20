@@ -14,6 +14,7 @@ export interface IRenderingDesign {
       octopusFilename: string
       symbolId?: string | null
       pageId?: string | null
+      offset?: { x: number; y: number } | null
     }
   ): Promise<{ ready: boolean; pendingSymbolIds: Array<string> }>
 

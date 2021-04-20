@@ -51,6 +51,7 @@ export class RenderingDesign implements IRenderingDesign {
       octopusFilename: string
       symbolId?: string | null
       pageId?: string | null
+      offset?: { x: number; y: number } | null
     }
   ): Promise<RenderingArtboard> {
     const prevArtboard = this._artboards.get(artboardId)
@@ -72,6 +73,7 @@ export class RenderingDesign implements IRenderingDesign {
       octopusFilename: params.octopusFilename,
       bitmapAssetDirectoryPath: this.bitmapAssetDirectoryPath,
       fontDirectoryPath: this.fontDirectoryPath,
+      offset: params.offset || null,
     })
 
     return artboard

@@ -58,6 +58,7 @@ export class RenderingArtboard implements IRenderingArtboard {
     octopusFilename: string
     bitmapAssetDirectoryPath?: string | null
     fontDirectoryPath?: string | null
+    offset?: { x: number; y: number } | null
   }) {
     const loadResult = await this._renderingProcess.execCommand(
       'load-artboard',
@@ -94,6 +95,20 @@ export class RenderingArtboard implements IRenderingArtboard {
     }
 
     this._pageId = nextPageId
+  }
+
+  async setOffset(nextOffset: { x: number; y: number }) {
+    const setOffsetResult = await this._renderingProcess.execCommand(
+      'set-artboard-offset',
+      {
+        'design': this._designId,
+        'artboard': this.id,
+        'offset': [nextOffset.x, nextOffset.y],
+      }
+    )
+    if (!setOffsetResult['ok']) {
+      throw new Error('Failed to update artboard offset')
+    }
   }
 
   async _getPendingArtboardDependencies(): Promise<Array<string>> {
