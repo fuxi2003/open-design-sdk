@@ -616,11 +616,15 @@ export class DesignFacade {
    * @param artboardId The ID of the artboard to render.
    * @param filePath The target location of the produced PNG image file.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
+   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default artboard area.
    */
   async renderArtboardToFile(
     artboardId: ArtboardId,
     filePath: string,
-    options: { scale?: number } = {}
+    options: {
+      scale?: number
+      bounds?: Bounds
+    } = {}
   ): Promise<void> {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {
@@ -650,11 +654,15 @@ export class DesignFacade {
    * @param pageId The ID of the page to render.
    * @param filePath The target location of the produced PNG image file.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
+   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default page area.
    */
   async renderPageToFile(
     pageId: PageId,
     filePath: string,
-    options: { scale?: number } = {}
+    options: {
+      scale?: number
+      bounds?: Bounds
+    } = {}
   ): Promise<void> {
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
