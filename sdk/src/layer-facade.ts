@@ -1,4 +1,5 @@
 import { inspect } from 'util'
+import { enumerablizeWithPrototypeGetters } from './utils/object'
 
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
@@ -32,6 +33,8 @@ export class LayerFacade {
   constructor(layerEntity: ILayer, params: { designFacade: DesignFacade }) {
     this._layerEntity = layerEntity
     this._designFacade = params.designFacade
+
+    enumerablizeWithPrototypeGetters(this)
   }
 
   /**
@@ -90,7 +93,7 @@ export class LayerFacade {
 
   /** @internal */
   toJSON() {
-    return this.octopus
+    return { ...this }
   }
 
   /**

@@ -1,4 +1,5 @@
 import { inspect } from 'util'
+import { enumerablizeWithPrototypeGetters } from './utils/object'
 
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { LayerFacade } from './layer-facade'
@@ -48,6 +49,8 @@ export class ArtboardFacade {
   ) {
     this._artboardEntity = artboardEntity
     this._designFacade = params.designFacade
+
+    enumerablizeWithPrototypeGetters(this)
   }
 
   /**
@@ -121,10 +124,7 @@ export class ArtboardFacade {
   /** @internal */
   toJSON() {
     return {
-      id: this.id,
-      pageId: this.pageId,
-      componentId: this.componentId,
-      name: this.name,
+      ...this,
     }
   }
 

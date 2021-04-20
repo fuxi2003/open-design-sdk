@@ -22,6 +22,7 @@ import {
 import { sequence } from './utils/async'
 import { memoize } from './utils/memoize'
 import { getDesignFormatByFileName } from './utils/design-format-utils'
+import { enumerablizeWithPrototypeGetters } from './utils/object'
 
 import type { IApiDesign } from '@opendesign/api'
 import type {
@@ -75,6 +76,11 @@ export class DesignFacade {
 
     this._sdk = params.sdk
     this._console = params.console || console
+
+    enumerablizeWithPrototypeGetters(this, {
+      enumerableOwnKeys: ['sourceFilename'],
+      omittedPrototypeKeys: ['octopusFilename'],
+    })
   }
 
   /**
@@ -109,10 +115,7 @@ export class DesignFacade {
 
   /** @internal */
   toJSON() {
-    return {
-      id: this.id,
-      sourceFilename: this.sourceFilename,
-    }
+    return { ...this }
   }
 
   /** @internal */

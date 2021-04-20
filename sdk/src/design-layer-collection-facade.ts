@@ -1,5 +1,6 @@
 import { inspect } from 'util'
 import { memoize } from './utils/memoize'
+import { enumerablizeWithPrototypeGetters } from './utils/object'
 
 import {
   ILayerCollection,
@@ -30,6 +31,7 @@ export class DesignLayerCollectionFacade {
     this._layerCollection = layerCollection
     this._designFacade = params.designFacade
 
+    enumerablizeWithPrototypeGetters(this)
     this._registerArrayIndexes()
   }
 
