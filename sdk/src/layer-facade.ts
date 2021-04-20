@@ -79,7 +79,8 @@ export class LayerFacade {
 
   /** @internal */
   toString() {
-    return `Layer ${inspect(this.octopus)}`
+    const layerInfo = this.toJSON()
+    return `Layer ${inspect(layerInfo)}`
   }
 
   /** @internal */
