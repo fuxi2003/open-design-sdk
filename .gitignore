@@ -7,3 +7,6 @@ docs/
 node_modules/
 yarn-error.log
 .env
+
+# dev
+test.js
