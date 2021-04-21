@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@avocode/fontkit": "1.7.7-avocode.6",
-    "@avocode/system-font-families": "0.4.0-avocode.8",
+    "@avocode/system-font-families": "0.5.0-rc.6",
     "@opendesign/api": "0.1.2",
     "@opendesign/octopus-reader": "0.1.2",
     "@opendesign/rendering": "0.1.2",
