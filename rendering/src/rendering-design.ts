@@ -11,8 +11,8 @@ import { sequence } from './utils/async'
 export class RenderingDesign implements IRenderingDesign {
   readonly id: string
   readonly bitmapAssetDirectoryPath: string | null
-  readonly fontDirectoryPath: string | null
 
+  private _fontDirectoryPath: string | null
   private _renderingProcess: RenderingProcess
   private _console: Console
 
@@ -29,10 +29,18 @@ export class RenderingDesign implements IRenderingDesign {
   }) {
     this.id = params.id
     this.bitmapAssetDirectoryPath = params.bitmapAssetDirectoryPath || null
-    this.fontDirectoryPath = params.fontDirectoryPath || null
 
+    this._fontDirectoryPath = params.fontDirectoryPath || null
     this._renderingProcess = params.renderingProcess
     this._console = params.console || console
+  }
+
+  get fontDirectoryPath() {
+    return this._fontDirectoryPath
+  }
+
+  setFontDirectory(fontDirectoryPath: string | null) {
+    this._fontDirectoryPath = fontDirectoryPath
   }
 
   isArtboardLoaded(artboardId: string): boolean {
