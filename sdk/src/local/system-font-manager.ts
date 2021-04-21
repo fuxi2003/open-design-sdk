@@ -3,25 +3,97 @@ import SystemFontFamilies from '@avocode/system-font-families'
 import { extname } from 'path'
 import { readFile } from 'fs'
 import { promisify } from 'util'
+import { FontSource } from './font-source'
+import { mapFind } from '../utils/async'
 
 const readFilePromised = promisify(readFile)
+
+export type FontMatchDescriptor = {
+  fontFilename: string
+  fontPostscriptName: string
+  fallback: boolean
+}
 
 export class SystemFontManager {
   // NOTE: Record<postscriptName, filename>
   _systemFonts: Record<string, string> | null = null
 
+  _console: Console
   _systemFontFamilies: SystemFontFamilies
   _fontkit: Fontkit
 
-  constructor() {
+  private _globalFallbackFonts: Array<string> = [
+    'Roboto',
+    'Helvetica',
+    'Arial',
+    'Courier',
+  ]
+
+  constructor(params: { console?: Console | null } = {}) {
+    this._console = params.console || console
+
     this._systemFontFamilies = new SystemFontFamilies()
     this._fontkit = createFontkit()
   }
 
-  async getSystemFontPath(postscriptName: string): Promise<string | null> {
-    const systemFonts = await this._loadSystemFontLocations()
+  setGlobalFallbackFonts(fallbackFonts: Array<string>) {
+    this._globalFallbackFonts = fallbackFonts
+  }
 
-    return systemFonts[postscriptName] || null
+  createFontSource(
+    params: {
+      fallbackFonts?: Array<string>
+    } = {}
+  ) {
+    return new FontSource(this, params)
+  }
+
+  async resolveFontPath(
+    font: string,
+    options: {
+      fallbackFonts?: Array<string>
+    } = {}
+  ): Promise<{
+    fontFilename: string
+    fontPostscriptName: string
+    fallback: boolean
+  } | null> {
+    const fontMatch = await this._getMatchingFont(font)
+    if (fontMatch) {
+      return { ...fontMatch, fallback: false }
+    }
+
+    const fallbackFontMatch = await this._getMatchingFallbackFont(options)
+    if (fallbackFontMatch) {
+      return { ...fallbackFontMatch, fallback: true }
+    }
+
+    return null
+  }
+
+  async _getMatchingFont(
+    font: string
+  ): Promise<{ fontFilename: string; fontPostscriptName: string } | null> {
+    const fontFilename = await this._getFontPathByPostscriptName(font)
+    return fontFilename ? { fontFilename, fontPostscriptName: font } : null
+  }
+
+  _getMatchingFallbackFont(options: { fallbackFonts?: Array<string> }) {
+    const fallbackFonts = [
+      ...(options.fallbackFonts || []),
+      ...this._globalFallbackFonts,
+    ]
+
+    return mapFind(fallbackFonts, (fallbackFont) => {
+      return this._getMatchingFont(fallbackFont)
+    })
+  }
+
+  async _getFontPathByPostscriptName(
+    postscriptName: string
+  ): Promise<string | null> {
+    const systemFontFilenames = await this._loadSystemFontLocations()
+    return systemFontFilenames[postscriptName] || null
   }
 
   async _loadSystemFontLocations() {

@@ -34,6 +34,7 @@ import type {
 import type { components } from 'open-design-api-types'
 import type { FontDescriptor, LayerFacade } from './layer-facade'
 import type { Sdk } from './sdk'
+import type { FontSource } from './local/font-source'
 import type { BitmapAssetDescriptor, LocalDesign } from './local/local-design'
 
 type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
@@ -52,6 +53,7 @@ export class DesignFacade {
   private _localDesign: LocalDesign | null = null
   private _apiDesign: IApiDesign | null = null
   private _renderingDesign: IRenderingDesign | null = null
+  private _fontSource: FontSource | null = null
 
   private _artboardFacades: Map<ArtboardId, ArtboardFacade> = new Map()
   private _pageFacades: Map<PageId, PageFacade> = new Map()
@@ -63,8 +65,6 @@ export class DesignFacade {
     DesignExportTargetFormatEnum,
     DesignExportFacade
   > = new Map()
-
-  private _fallbackFontPostscriptNames: Array<string> = []
 
   /** @internal */
   constructor(params: {
@@ -592,18 +592,25 @@ export class DesignFacade {
     return entity.getFonts(options)
   }
 
+  setFontSource(fontSource: FontSource | null) {
+    this._fontSource = fontSource
+  }
+
   /**
    * Sets the fonts which should be used as a fallback in case the actual fonts needed for rendering text layers are not available.
    *
    * The first font from this list which is available in the system is used for all text layers with missing actual fonts. If none of the fonts are available, the text layers are not rendered.
    *
-   * This configuration overrides/extends the global configuration set via {@link Sdk.setFallbackFonts}. Fonts specified here are preferred over the global config.
+   * This configuration overrides/extends the global configuration set via {@link Sdk.setGlobalFallbackFonts}. Fonts specified here are preferred over the global config.
    *
    * @category Configuration
-   * @param fallbackFontPostscriptNames An ordered list of font postscript names.
+   * @param fallbackFonts An ordered list of font postscript names or font file paths.
    */
-  setFallbackFonts(fallbackFontPostscriptNames: Array<string>) {
-    this._fallbackFontPostscriptNames = fallbackFontPostscriptNames
+  setFallbackFonts(fallbackFonts: Array<string>) {
+    const fontSource = this._fontSource
+    if (fontSource) {
+      fontSource.setFallbackFonts(fallbackFonts)
+    }
   }
 
   /**
@@ -733,7 +740,7 @@ export class DesignFacade {
     await this.downloadBitmapAssets(bitmapAssetDescs)
 
     const fonts = layer.getFonts()
-    await this._loadSystemFontsToRendering(fonts)
+    await this._loadFontsToRendering(fonts)
 
     await renderingDesign.markArtboardAsReady(artboardId)
 
@@ -821,7 +828,7 @@ export class DesignFacade {
 
     await Promise.all([
       this.downloadBitmapAssets(bitmapAssetDescs),
-      this._loadSystemFontsToRendering(fonts),
+      this._loadFontsToRendering(fonts),
     ])
 
     await renderingDesign.markArtboardAsReady(artboardId)
@@ -865,7 +872,7 @@ export class DesignFacade {
     await this._loadRenderingDesignArtboard(artboardId, { loadAssets: false })
 
     const fonts = layer.getFonts()
-    await this._loadSystemFontsToRendering(fonts)
+    await this._loadFontsToRendering(fonts)
 
     return renderingDesign.getArtboardLayerBounds(artboardId, layerId)
   }
@@ -1321,7 +1328,7 @@ export class DesignFacade {
 
       await Promise.all([
         this.downloadBitmapAssets(bitmapAssetDescs),
-        this._loadSystemFontsToRendering(fonts),
+        this._loadFontsToRendering(fonts),
       ])
     }
 
@@ -1332,18 +1339,21 @@ export class DesignFacade {
     }
   }
 
-  private async _loadSystemFontsToRendering(
+  private async _loadFontsToRendering(
     fonts: Array<{ fontPostScriptName: string }>
   ) {
+    const fontSource = this._fontSource
+    if (!fontSource) {
+      return
+    }
+
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
     }
 
     await sequence(fonts, async ({ fontPostScriptName }) => {
-      const fontMatch = await this._sdk.getSystemFont(fontPostScriptName, {
-        fallbacks: this._fallbackFontPostscriptNames,
-      })
+      const fontMatch = await fontSource.resolveFontPath(fontPostScriptName)
       if (fontMatch) {
         await renderingDesign.loadFont(
           fontPostScriptName,

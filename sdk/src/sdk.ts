@@ -2,7 +2,6 @@ import {
   createDesignFromLocalDesign,
   createDesignFromOpenDesignApiDesign,
 } from './utils/design-factories'
-import { mapFind } from './utils/async'
 import { inspect } from 'util'
 import { v4 as uuid } from 'uuid'
 
@@ -23,12 +22,6 @@ import type { SystemFontManager } from './local/system-font-manager'
 
 type DesignExportTargetFormatEnum = components['schemas']['DesignExportTargetFormatEnum']
 
-export type FontMatchDescriptor = {
-  fontFilename: string
-  fontPostscriptName: string
-  fallback: boolean
-}
-
 export class Sdk {
   private _openDesignApi: IOpenDesignApi | null = null
   private _designFileManager: DesignFileManager | null = null
@@ -38,13 +31,6 @@ export class Sdk {
   private _systemFontManager: SystemFontManager | null = null
 
   private _destroyed: boolean = false
-
-  private _fallbackFontPostscriptNames: Array<string> = [
-    'Roboto',
-    'Helvetica',
-    'Arial',
-    'Courier',
-  ]
 
   private _console: Console
 
@@ -151,10 +137,15 @@ export class Sdk {
    * This configuration can be overriden/extended for each individual design via {@link DesignFacade.setFallbackFonts}. Fonts provided to an individual design are preferred over fonts specified here.
    *
    * @category Configuration
-   * @param fallbackFontPostscriptNames An ordered list of font postscript names.
+   * @param fallbackFonts An ordered list of font postscript names.
    */
-  setFallbackFonts(fallbackFontPostscriptNames: Array<string>) {
-    this._fallbackFontPostscriptNames = fallbackFontPostscriptNames
+  setFallbackFonts(fallbackFonts: Array<string>) {
+    const systemFontManager = this._systemFontManager
+    if (!systemFontManager) {
+      throw new Error('Font management is not configured.')
+    }
+
+    systemFontManager.setGlobalFallbackFonts(fallbackFonts)
   }
 
   /**
@@ -452,6 +443,14 @@ export class Sdk {
 
       await designFacade.setLocalDesign(localDesign)
 
+      const systemFontManager = this._systemFontManager
+      const fontSource = systemFontManager
+        ? systemFontManager.createFontSource(/* fontDirectoryPath */)
+        : null
+      if (fontSource) {
+        designFacade.setFontSource(fontSource)
+      }
+
       const renderingEngine = await this._renderingEngine
       if (renderingEngine) {
         const renderingDesign = await renderingEngine.createDesign(uuid(), {
@@ -476,51 +475,6 @@ export class Sdk {
     }
 
     return designFileManager.saveDesignFileStream(filePath, designFileStream)
-  }
-
-  /** @internal */
-  async getSystemFont(
-    postscriptName: string,
-    options: {
-      fallbacks?: Array<string>
-    } = {}
-  ): Promise<FontMatchDescriptor | null> {
-    const match =
-      (await this._getMatchingSystemFont(postscriptName)) ||
-      (await this._getFallbackFont(options.fallbacks || []))
-    return match
-  }
-
-  private async _getMatchingSystemFont(
-    postscriptName: string
-  ): Promise<FontMatchDescriptor | null> {
-    const systemFontManager = this._systemFontManager
-    if (!systemFontManager) {
-      return null
-    }
-
-    const fontFilename = await systemFontManager.getSystemFontPath(
-      postscriptName
-    )
-
-    return fontFilename
-      ? {
-          fontFilename,
-          fontPostscriptName: postscriptName,
-          fallback: false,
-        }
-      : null
-  }
-
-  private async _getFallbackFont(
-    fallbackFontPostscriptNames: Array<string>
-  ): Promise<FontMatchDescriptor | null> {
-    return mapFind(
-      fallbackFontPostscriptNames.concat(this._fallbackFontPostscriptNames),
-      (postscriptName: string) => {
-        return this._getMatchingSystemFont(postscriptName)
-      }
-    )
   }
 
   /** @internal */
