@@ -4,6 +4,8 @@ import type { LayerBounds } from './rendering-artboard.iface'
 
 export interface IRenderingDesign {
   readonly id: string
+  readonly bitmapAssetDirectoryPath: string | null
+  readonly fontDirectoryPath: string | null
 
   isArtboardLoaded(artboardId: string): boolean
   isArtboardReady(artboardId: string): boolean
