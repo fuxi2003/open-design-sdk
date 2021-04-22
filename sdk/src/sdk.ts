@@ -99,6 +99,7 @@ export class Sdk {
       this._localDesignCache?.getWorkingDirectory() ||
       this._localDesignManager?.getWorkingDirectory() ||
       this._designFileManager?.getWorkingDirectory() ||
+      this._systemFontManager?.getWorkingDirectory() ||
       null
     )
   }
@@ -117,8 +118,14 @@ export class Sdk {
     const localDesignCache = this._localDesignCache
     const localDesignManager = this._localDesignManager
     const designFileManager = this._designFileManager
+    const systemFontManager = this._systemFontManager
 
-    if (!localDesignCache && !localDesignManager && !designFileManager) {
+    if (
+      !localDesignCache &&
+      !localDesignManager &&
+      !designFileManager &&
+      !systemFontManager
+    ) {
       throw new Error(
         'Offline services are not configured. Cannot set the working directory.'
       )
@@ -127,6 +134,7 @@ export class Sdk {
     localDesignCache?.setWorkingDirectory(workingDirectory)
     localDesignManager?.setWorkingDirectory(workingDirectory)
     designFileManager?.setWorkingDirectory(workingDirectory)
+    systemFontManager?.setWorkingDirectory(workingDirectory)
   }
 
   /**
@@ -137,7 +145,7 @@ export class Sdk {
    * This configuration can be overriden/extended for each individual design via {@link DesignFacade.setFallbackFonts}. Fonts provided to an individual design are preferred over fonts specified here.
    *
    * @category Configuration
-   * @param fallbackFonts An ordered list of font postscript names.
+   * @param fallbackFonts An ordered list of font postscript names or font file paths.
    */
   setFallbackFonts(fallbackFonts: Array<string>) {
     const systemFontManager = this._systemFontManager

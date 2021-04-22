@@ -1,6 +1,6 @@
 import { create as createFontkit, Fontkit } from '@avocode/fontkit'
-import SystemFontFamilies from '@avocode/system-font-families'
-import { extname } from 'path'
+import SystemFontFamilies, { getFontInfo } from '@avocode/system-font-families'
+import { extname, resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
 import { promisify } from 'util'
 import { FontSource } from './font-source'
@@ -17,6 +17,7 @@ export type FontMatchDescriptor = {
 export class SystemFontManager {
   // NOTE: Record<postscriptName, filename>
   _systemFonts: Record<string, string> | null = null
+  private _workingDirectory: string | null = null
 
   _console: Console
   _systemFontFamilies: SystemFontFamilies
@@ -34,6 +35,16 @@ export class SystemFontManager {
 
     this._systemFontFamilies = new SystemFontFamilies()
     this._fontkit = createFontkit()
+  }
+
+  getWorkingDirectory() {
+    return this._workingDirectory || resolvePath('.')
+  }
+
+  setWorkingDirectory(workingDirectory: string | null) {
+    this._workingDirectory = workingDirectory
+      ? resolvePath(workingDirectory)
+      : null
   }
 
   setGlobalFallbackFonts(fallbackFonts: Array<string>) {
@@ -74,6 +85,29 @@ export class SystemFontManager {
   async _getMatchingFont(
     font: string
   ): Promise<{ fontFilename: string; fontPostscriptName: string } | null> {
+    const ext = extname(font)
+    if (ext === '.ttf' || ext === '.otf') {
+      try {
+        const fontFilename = this._resolvePath(font)
+        const fontInfo = await getFontInfo(fontFilename)
+        if (fontInfo) {
+          return { fontFilename, fontPostscriptName: fontInfo.postscript }
+        }
+      } catch (err) {
+        this._console.warn(
+          'Font file path not resolved as a font file',
+          font,
+          err
+        )
+      }
+    }
+    if (ext === '.ttc') {
+      console.error(
+        'TrueTypeCollection (.ttc) font files cannot be used directly',
+        font
+      )
+    }
+
     const fontFilename = await this._getFontPathByPostscriptName(font)
     return fontFilename ? { fontFilename, fontPostscriptName: font } : null
   }
@@ -161,5 +195,9 @@ export class SystemFontManager {
     )
 
     return filenames
+  }
+
+  _resolvePath(filePath: string) {
+    return resolvePath(this._workingDirectory || '.', `${filePath}`)
   }
 }
