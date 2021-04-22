@@ -597,6 +597,27 @@ export class DesignFacade {
   }
 
   /**
+   * Sets the directory where fonts should be looked up when rendering the design.
+   *
+   * Fonts are matched based on their postscript names, not the file basenames.
+   */
+  setFontDirectory(fontDirectoryPath: string) {
+    const renderingDesign = this._renderingDesign
+    if (!renderingDesign) {
+      throw new Error(
+        'Cannot set the font directory when the rendering engine is not configured'
+      )
+    }
+
+    renderingDesign.setFontDirectory(fontDirectoryPath)
+
+    const fontSource = this._fontSource
+    if (fontSource) {
+      fontSource.setFontDirectory(fontDirectoryPath)
+    }
+  }
+
+  /**
    * Sets the fonts which should be used as a fallback in case the actual fonts needed for rendering text layers are not available.
    *
    * The first font from this list which is available in the system is used for all text layers with missing actual fonts. If none of the fonts are available, the text layers are not rendered.

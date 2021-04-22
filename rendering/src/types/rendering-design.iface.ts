@@ -29,6 +29,8 @@ export interface IRenderingDesign {
 
   loadImage(bitmapKey: string, filename: string): Promise<void>
 
+  setFontDirectory(nextDirname: string): void
+
   loadFont(
     postscriptName: string,
     filename: string,

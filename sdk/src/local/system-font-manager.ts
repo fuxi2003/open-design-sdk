@@ -53,15 +53,24 @@ export class SystemFontManager {
 
   createFontSource(
     params: {
+      fontDirname?: string | null
       fallbackFonts?: Array<string>
     } = {}
   ) {
     return new FontSource(this, params)
   }
 
+  getFontFamilies(fontDirname: string): SystemFontFamilies {
+    return new SystemFontFamilies({
+      customDirs: [fontDirname],
+      ignoreSystemFonts: true,
+    })
+  }
+
   async resolveFontPath(
     font: string,
     options: {
+      fontFamilies?: SystemFontFamilies | null
       fallbackFonts?: Array<string>
     } = {}
   ): Promise<{
@@ -69,7 +78,8 @@ export class SystemFontManager {
     fontPostscriptName: string
     fallback: boolean
   } | null> {
-    const fontMatch = await this._getMatchingFont(font)
+    const fontFamilies = options.fontFamilies || null
+    const fontMatch = await this._getMatchingFont(font, fontFamilies)
     if (fontMatch) {
       return { ...fontMatch, fallback: false }
     }
@@ -83,7 +93,8 @@ export class SystemFontManager {
   }
 
   async _getMatchingFont(
-    font: string
+    font: string,
+    fontFamilies: SystemFontFamilies | null
   ): Promise<{ fontFilename: string; fontPostscriptName: string } | null> {
     const ext = extname(font)
     if (ext === '.ttf' || ext === '.otf') {
@@ -108,24 +119,39 @@ export class SystemFontManager {
       )
     }
 
-    const fontFilename = await this._getFontPathByPostscriptName(font)
+    const fontFilename = await this._getFontPathByPostscriptName(
+      font,
+      fontFamilies
+    )
     return fontFilename ? { fontFilename, fontPostscriptName: font } : null
   }
 
-  _getMatchingFallbackFont(options: { fallbackFonts?: Array<string> }) {
+  _getMatchingFallbackFont(options: {
+    fontFamilies?: SystemFontFamilies | null
+    fallbackFonts?: Array<string>
+  }) {
     const fallbackFonts = [
       ...(options.fallbackFonts || []),
       ...this._globalFallbackFonts,
     ]
 
     return mapFind(fallbackFonts, (fallbackFont) => {
-      return this._getMatchingFont(fallbackFont)
+      return this._getMatchingFont(fallbackFont, options.fontFamilies || null)
     })
   }
 
   async _getFontPathByPostscriptName(
-    postscriptName: string
+    postscriptName: string,
+    fontFamilies: SystemFontFamilies | null
   ): Promise<string | null> {
+    if (fontFamilies) {
+      const customFontFilenames = await this._getFontLocations(fontFamilies)
+      const customFontFilename = customFontFilenames[postscriptName]
+      if (customFontFilename) {
+        return customFontFilename
+      }
+    }
+
     const systemFontFilenames = await this._loadSystemFontLocations()
     return systemFontFilenames[postscriptName] || null
   }
@@ -135,17 +161,21 @@ export class SystemFontManager {
       return this._systemFonts
     }
 
-    const systemFonts = {
-      ...(await this._parseRegularSystemFonts()),
-      ...(await this._parseSystemFontCollections()),
-    }
+    const systemFonts = await this._getFontLocations(this._systemFontFamilies)
     this._systemFonts = systemFonts
 
     return systemFonts
   }
 
-  async _parseRegularSystemFonts() {
-    const fontDescs = await this._systemFontFamilies.getFontsExtended()
+  async _getFontLocations(fontFamilies: SystemFontFamilies) {
+    return {
+      ...(await this._parseRegularFonts(fontFamilies)),
+      ...(await this._parseFontCollections(fontFamilies)),
+    }
+  }
+
+  async _parseRegularFonts(fontFamilies: SystemFontFamilies) {
+    const fontDescs = await fontFamilies.getFontsExtended()
     const supportedFormats = ['.otf', '.ttf']
 
     const filenames: Record<string, string> = {}
@@ -165,9 +195,9 @@ export class SystemFontManager {
     return filenames
   }
 
-  async _parseSystemFontCollections() {
+  async _parseFontCollections(fontFamilies: SystemFontFamilies) {
     try {
-      const filenames = this._systemFontFamilies.getAllFontFilesSync()
+      const filenames = fontFamilies.getAllFontFilesSync()
       const fontCollectionFilenames = filenames.filter((filename) => {
         const ext = extname(filename).toLowerCase()
         return ext === '.ttc'
