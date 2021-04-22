@@ -131,6 +131,8 @@ export interface IApiDesignExport {
   resultFormat: DesignExportData['result_format']
   resultUrl: DesignExportData['result_url']
 
+  refresh(): Promise<IApiDesignExport>
+
   // Design Structure
 
   designId: DesignData['id']
