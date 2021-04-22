@@ -443,7 +443,7 @@ export class DesignFacade {
    * @param options.depth The maximum nesting level of layers within pages and artboards to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in artboards should be included.
    */
   async getFlattenedLayers(
-    options: Partial<{ depth: number }> = {}
+    options: { depth?: number } = {}
   ): Promise<DesignLayerCollectionFacade> {
     await this.load()
 

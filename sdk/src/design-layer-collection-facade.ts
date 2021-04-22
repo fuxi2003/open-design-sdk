@@ -124,7 +124,7 @@ export class DesignLayerCollectionFacade {
    */
   findLayer(
     selector: FileLayerSelector,
-    options: Partial<{ depth: number }> = {}
+    options: { depth?: number } = {}
   ): LayerFacade | null {
     const layerEntity = this._layerCollection.findLayer(selector, options)
     return layerEntity ? this._resolveArtboardLayer(layerEntity) : null
@@ -143,7 +143,7 @@ export class DesignLayerCollectionFacade {
    */
   findLayers(
     selector: FileLayerSelector,
-    options: Partial<{ depth: number }> = {}
+    options: { depth?: number } = {}
   ): DesignLayerCollectionFacade {
     const layerCollection = this._layerCollection.findLayers(selector, options)
     return new DesignLayerCollectionFacade(layerCollection, {
@@ -284,7 +284,7 @@ export class DesignLayerCollectionFacade {
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    */
   getBitmapAssets(
-    options: Partial<{ depth: number; includePrerendered: boolean }> = {}
+    options: { depth?: number; includePrerendered?: boolean } = {}
   ): Array<
     BitmapAssetDescriptor & {
       artboardLayerIds: Record<ArtboardId, Array<LayerId>>
@@ -302,7 +302,7 @@ export class DesignLayerCollectionFacade {
    * @param options.depth The maximum nesting level within the layer to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    */
   getFonts(
-    options: Partial<{ depth: number }> = {}
+    options: { depth?: number } = {}
   ): Array<
     FontDescriptor & { artboardLayerIds: Record<ArtboardId, Array<LayerId>> }
   > {

@@ -37,9 +37,9 @@ export class LocalDesignManager {
 
   async openOctopusFile(
     filePath: string,
-    options: Partial<{
-      apiDesignInfo: ApiDesignInfo | null
-    }> = {}
+    options: {
+      apiDesignInfo?: ApiDesignInfo | null
+    } = {}
   ): Promise<LocalDesign> {
     const filename = this.resolvePath(filePath)
     this._checkOctopusFileName(filename)
@@ -80,10 +80,10 @@ export class LocalDesignManager {
 
   async createOctopusFileFromManifest(
     manifest: ManifestData,
-    options: Partial<{
-      name: string | null
-      apiDesignInfo: ApiDesignInfo | null
-    }> = {}
+    options: {
+      name?: string | null
+      apiDesignInfo?: ApiDesignInfo | null
+    } = {}
   ): Promise<LocalDesign> {
     const filename = await this._createTempLocation(options.name || null)
     const localDesign = await this.createOctopusFile(filename)
