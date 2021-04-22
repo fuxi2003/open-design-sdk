@@ -100,7 +100,7 @@ export interface IFile {
 
   /** @category Asset */
   getBitmapAssets(
-    options?: Partial<{ includePrerendered: boolean }>
+    options?: Partial<{ depth: number; includePrerendered: boolean }>
   ): Array<AggregatedFileBitmapAssetDescriptor>
   /** @category Asset */
   getFonts(
