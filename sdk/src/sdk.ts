@@ -370,9 +370,8 @@ export class Sdk {
       designId,
       exports,
     } = await openDesignApi.importFigmaDesignLinkWithExports(params)
-    const apiDesign = await openDesignApi.getDesignById(designId)
 
-    return this._fetchDesignById(apiDesign.id, {
+    return this._fetchDesignById(designId, {
       exports,
     })
   }
