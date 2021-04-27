@@ -9,6 +9,7 @@ import { ApiDesignInfo, LocalDesign } from './local-design'
 
 import { MANIFEST_BASENAME } from './consts'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type { ManifestData } from '@opendesign/octopus-reader'
 
 const statPromised = promisify(stat)
@@ -39,6 +40,7 @@ export class LocalDesignManager {
     filePath: string,
     options: {
       apiDesignInfo?: ApiDesignInfo | null
+      cancelToken?: CancelToken | null
     } = {}
   ): Promise<LocalDesign> {
     const filename = this.resolvePath(filePath)
@@ -58,7 +60,9 @@ export class LocalDesignManager {
     const localDesign = new LocalDesign({ filename, localDesignManager: this })
     if (
       options.apiDesignInfo &&
-      !(await this._checkApiDesignInfo(localDesign, options.apiDesignInfo))
+      !(await this._checkApiDesignInfo(localDesign, options.apiDesignInfo, {
+        cancelToken: options.cancelToken || null,
+      }))
     ) {
       throw new Error('Incompatible API design entity info')
     }
@@ -66,14 +70,24 @@ export class LocalDesignManager {
     return localDesign
   }
 
-  async createOctopusFile(filePath: string): Promise<LocalDesign> {
+  async createOctopusFile(
+    filePath: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<LocalDesign> {
     const filename = this.resolvePath(filePath)
     this._checkOctopusFileName(filename)
 
     await this._createDirectory(filename)
+    options.cancelToken?.throwIfCancelled()
 
     const emptyManifest = { 'artboards': [], 'pages': {} }
-    await writeJsonFile(`${filename}/${MANIFEST_BASENAME}`, emptyManifest)
+    await writeJsonFile(
+      `${filename}/${MANIFEST_BASENAME}`,
+      emptyManifest,
+      options
+    )
 
     return new LocalDesign({ filename, localDesignManager: this })
   }
@@ -83,16 +97,20 @@ export class LocalDesignManager {
     options: {
       name?: string | null
       apiDesignInfo?: ApiDesignInfo | null
+      cancelToken?: CancelToken | null
     } = {}
   ): Promise<LocalDesign> {
     const filename = await this._createTempLocation(options.name || null)
-    const localDesign = await this.createOctopusFile(filename)
-    this._console.debug('Cache:', filename)
+    options.cancelToken?.throwIfCancelled()
 
-    await localDesign.saveManifest(manifest)
+    const localDesign = await this.createOctopusFile(filename, options)
+    this._console.debug('Cache:', filename)
+    options.cancelToken?.throwIfCancelled()
+
+    await localDesign.saveManifest(manifest, options)
 
     if (options.apiDesignInfo) {
-      await localDesign.saveApiDesignInfo(options.apiDesignInfo)
+      await localDesign.saveApiDesignInfo(options.apiDesignInfo, options)
     }
 
     return localDesign
@@ -139,9 +157,12 @@ export class LocalDesignManager {
 
   async _checkApiDesignInfo(
     localDesign: LocalDesign,
-    nextApiDesignInfo: ApiDesignInfo
+    nextApiDesignInfo: ApiDesignInfo,
+    options: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<boolean> {
-    const prevApiDesignInfo = await localDesign.getApiDesignInfo()
+    const prevApiDesignInfo = await localDesign.getApiDesignInfo(options)
     if (!prevApiDesignInfo) {
       return true
     }

@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@avocode/cancel-token@1.4.0-rc.14":
-  version "1.4.0-rc.14"
-  resolved "https://registry.yarnpkg.com/@avocode/cancel-token/-/cancel-token-1.4.0-rc.14.tgz#dda3646065877581647f7fa802f5a6de6a38f100"
-  integrity sha512-myRAFqptb47FAY/DefSsN7PXiKzqBHazLU6+MCg5vdfRIh4S3QNhfRpTiuwTb+IGeIhuTEB+NtVOJS600lKLEA==
+"@avocode/cancel-token@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@avocode/cancel-token/-/cancel-token-1.4.0.tgz#a0d9fcbf9062d8035f59bd85db43d9118082f77e"
+  integrity sha512-5xDaoVqYKmE2n55brwGDQfKS/n7z2Ugci0UCm4PAOsYaRugo/82jQHOL/UmENaqOylJGW80v6vbNH3Uu8wOlMA==
   dependencies:
     abort-controller "3.0.0"
 

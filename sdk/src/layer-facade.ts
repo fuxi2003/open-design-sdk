@@ -3,6 +3,7 @@ import { enumerablizeWithPrototypeGetters } from './utils/object'
 
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type {
   IBitmap,
   IBitmapMask,
@@ -437,6 +438,7 @@ export class LayerFacade {
    * @param options.opacity The opacity to use for the layer instead of its default opacity.
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
    */
   async renderToFile(
     filePath: string,
@@ -448,6 +450,7 @@ export class LayerFacade {
       opacity?: number
       bounds?: Bounds
       scale?: number
+      cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
     const artboardId = this.artboardId
@@ -469,13 +472,22 @@ export class LayerFacade {
    * The rendering engine and the local cache have to be configured when using this method.
    *
    * @category Data
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
    */
-  async getBounds(): Promise<LayerBounds> {
+  async getBounds(
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<LayerBounds> {
     const artboardId = this.artboardId
     if (!artboardId) {
       throw new Error('Detached layers cannot be rendered')
     }
 
-    return this._designFacade.getArtboardLayerBounds(artboardId, this.id)
+    return this._designFacade.getArtboardLayerBounds(
+      artboardId,
+      this.id,
+      options
+    )
   }
 }

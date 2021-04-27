@@ -2,6 +2,7 @@ import { inspect } from 'util'
 import { memoize } from './utils/memoize'
 import { enumerablizeWithPrototypeGetters } from './utils/object'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import {
   ILayerCollection,
   FileLayerSelector,
@@ -332,14 +333,16 @@ export class DesignLayerCollectionFacade {
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
    */
   async renderToFile(
     filePath: string,
-    options?: {
+    options: {
       layerAttributes?: Record<string, LayerAttributesConfig>
       scale?: number
       bounds?: Bounds
-    }
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
     const layerIds = this.getLayers().map((layer) => {
       return layer.id

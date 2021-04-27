@@ -53,7 +53,7 @@ describe('DesignFacade', () => {
       const designFacade = await sdk.openOctopusFile(originalFilename)
 
       const copyFilename = await createTempFileTarget('copy.octopus')
-      await designFacade.saveOctopusFile(copyFilename)
+      await designFacade.saveOctopusFile({ filePath: copyFilename })
 
       deepStrictEqual(
         JSON.parse(readFileSync(`${copyFilename}/manifest.json`, 'utf8')),
@@ -71,7 +71,7 @@ describe('DesignFacade', () => {
       const designFacade = await sdk.openOctopusFile(originalFilename)
 
       const copyFilename = await createTempFileTarget('copy.octopus')
-      await designFacade.saveOctopusFile(copyFilename)
+      await designFacade.saveOctopusFile({ filePath: copyFilename })
 
       deepStrictEqual(
         JSON.parse(
@@ -93,7 +93,7 @@ describe('DesignFacade', () => {
       const designFacade = await sdk.openOctopusFile(originalFilename)
 
       const copyFilename = await createTempFileTarget('copy.octopus')
-      await designFacade.saveOctopusFile(copyFilename)
+      await designFacade.saveOctopusFile({ filePath: copyFilename })
 
       deepStrictEqual(
         JSON.parse(readFileSync(`${copyFilename}/bitmaps.json`, 'utf8')),
@@ -220,7 +220,7 @@ describe('DesignFacade', () => {
       const designFacade = await sdk.fetchDesignById(designId)
 
       const filename = await createTempFileTarget('file.octopus')
-      await designFacade.saveOctopusFile(filename)
+      await designFacade.saveOctopusFile({ filePath: filename })
 
       const manifest: ManifestData = JSON.parse(
         readFileSync(`${filename}/manifest.json`, 'utf8')
@@ -253,7 +253,7 @@ describe('DesignFacade', () => {
       const designFacade = await sdk.fetchDesignById(designId)
 
       const filename = await createTempFileTarget('file.octopus')
-      await designFacade.saveOctopusFile(filename)
+      await designFacade.saveOctopusFile({ filePath: filename })
 
       const apiDesignInfo: ApiDesignInfo = JSON.parse(
         readFileSync(`${filename}/api-design.json`, 'utf8')

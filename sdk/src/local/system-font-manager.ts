@@ -5,6 +5,7 @@ import { readFile } from 'fs'
 import { promisify } from 'util'
 import { FontSource } from './font-source'
 import { mapFind } from '../utils/async'
+import { CancelToken } from '@avocode/cancel-token'
 
 const readFilePromised = promisify(readFile)
 
@@ -72,6 +73,7 @@ export class SystemFontManager {
     options: {
       fontFamilies?: SystemFontFamilies | null
       fallbackFonts?: Array<string>
+      cancelToken?: CancelToken | null
     } = {}
   ): Promise<{
     fontFilename: string
@@ -79,7 +81,7 @@ export class SystemFontManager {
     fallback: boolean
   } | null> {
     const fontFamilies = options.fontFamilies || null
-    const fontMatch = await this._getMatchingFont(font, fontFamilies)
+    const fontMatch = await this._getMatchingFont(font, fontFamilies, options)
     if (fontMatch) {
       return { ...fontMatch, fallback: false }
     }
@@ -94,13 +96,18 @@ export class SystemFontManager {
 
   async _getMatchingFont(
     font: string,
-    fontFamilies: SystemFontFamilies | null
+    fontFamilies: SystemFontFamilies | null,
+    options: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<{ fontFilename: string; fontPostscriptName: string } | null> {
     const ext = extname(font)
     if (ext === '.ttf' || ext === '.otf') {
       try {
         const fontFilename = this._resolvePath(font)
         const fontInfo = await getFontInfo(fontFilename)
+        options.cancelToken?.throwIfCancelled()
+
         if (fontInfo) {
           return { fontFilename, fontPostscriptName: fontInfo.postscript }
         }
@@ -121,7 +128,8 @@ export class SystemFontManager {
 
     const fontFilename = await this._getFontPathByPostscriptName(
       font,
-      fontFamilies
+      fontFamilies,
+      options
     )
     return fontFilename ? { fontFilename, fontPostscriptName: font } : null
   }
@@ -129,6 +137,7 @@ export class SystemFontManager {
   _getMatchingFallbackFont(options: {
     fontFamilies?: SystemFontFamilies | null
     fallbackFonts?: Array<string>
+    cancelToken?: CancelToken | null
   }) {
     const fallbackFonts = [
       ...(options.fallbackFonts || []),
@@ -136,48 +145,72 @@ export class SystemFontManager {
     ]
 
     return mapFind(fallbackFonts, (fallbackFont) => {
-      return this._getMatchingFont(fallbackFont, options.fontFamilies || null)
+      return this._getMatchingFont(fallbackFont, options.fontFamilies || null, {
+        cancelToken: options.cancelToken || null,
+      })
     })
   }
 
   async _getFontPathByPostscriptName(
     postscriptName: string,
-    fontFamilies: SystemFontFamilies | null
+    fontFamilies: SystemFontFamilies | null,
+    options: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<string | null> {
     if (fontFamilies) {
-      const customFontFilenames = await this._getFontLocations(fontFamilies)
+      const customFontFilenames = await this._getFontLocations(
+        fontFamilies,
+        options
+      )
       const customFontFilename = customFontFilenames[postscriptName]
       if (customFontFilename) {
         return customFontFilename
       }
     }
 
-    const systemFontFilenames = await this._loadSystemFontLocations()
+    const systemFontFilenames = await this._loadSystemFontLocations(options)
     return systemFontFilenames[postscriptName] || null
   }
 
-  async _loadSystemFontLocations() {
+  async _loadSystemFontLocations(options: {
+    cancelToken?: CancelToken | null
+  }) {
     if (this._systemFonts) {
       return this._systemFonts
     }
 
-    const systemFonts = await this._getFontLocations(this._systemFontFamilies)
+    const systemFonts = await this._getFontLocations(
+      this._systemFontFamilies,
+      options
+    )
     this._systemFonts = systemFonts
 
     return systemFonts
   }
 
-  async _getFontLocations(fontFamilies: SystemFontFamilies) {
+  async _getFontLocations(
+    fontFamilies: SystemFontFamilies,
+    options: {
+      cancelToken?: CancelToken | null
+    }
+  ) {
     return {
-      ...(await this._parseRegularFonts(fontFamilies)),
-      ...(await this._parseFontCollections(fontFamilies)),
+      ...(await this._parseRegularFonts(fontFamilies, options)),
+      ...(await this._parseFontCollections(fontFamilies, options)),
     }
   }
 
-  async _parseRegularFonts(fontFamilies: SystemFontFamilies) {
+  async _parseRegularFonts(
+    fontFamilies: SystemFontFamilies,
+    options: {
+      cancelToken?: CancelToken | null
+    }
+  ) {
     const fontDescs = await fontFamilies.getFontsExtended()
-    const supportedFormats = ['.otf', '.ttf']
+    options.cancelToken?.throwIfCancelled()
 
+    const supportedFormats = ['.otf', '.ttf']
     const filenames: Record<string, string> = {}
 
     fontDescs.forEach((fontDesc) => {
@@ -195,7 +228,12 @@ export class SystemFontManager {
     return filenames
   }
 
-  async _parseFontCollections(fontFamilies: SystemFontFamilies) {
+  async _parseFontCollections(
+    fontFamilies: SystemFontFamilies,
+    options: {
+      cancelToken?: CancelToken | null
+    }
+  ) {
     try {
       const filenames = fontFamilies.getAllFontFilesSync()
       const fontCollectionFilenames = filenames.filter((filename) => {
@@ -203,19 +241,27 @@ export class SystemFontManager {
         return ext === '.ttc'
       })
 
-      return this._parseCollectionFontFiles(fontCollectionFilenames)
+      return this._parseCollectionFontFiles(fontCollectionFilenames, options)
     } catch (err) {
       return {}
     }
   }
 
-  async _parseCollectionFontFiles(fontCollectionFilenames: Array<string>) {
+  async _parseCollectionFontFiles(
+    fontCollectionFilenames: Array<string>,
+    options: {
+      cancelToken?: CancelToken | null
+    }
+  ) {
     const filenames: Record<string, string> = {}
 
     await Promise.all(
       fontCollectionFilenames.map(async (fontCollectionFilename) => {
         const fontData = await readFilePromised(fontCollectionFilename)
+        options.cancelToken?.throwIfCancelled()
+
         const fontCollection = await this._fontkit.create(fontData)
+        options.cancelToken?.throwIfCancelled()
 
         fontCollection.fonts.forEach((fontInfo) => {
           const postscriptName = fontInfo.postscriptName

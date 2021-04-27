@@ -1,3 +1,4 @@
+import type { CancelToken } from '@avocode/cancel-token'
 import type SystemFontFamilies from '@avocode/system-font-families'
 import type { SystemFontManager } from './system-font-manager'
 
@@ -37,10 +38,16 @@ export class FontSource {
     this._fallbackFonts = fallbackFonts
   }
 
-  resolveFontPath(font: string) {
+  resolveFontPath(
+    font: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
     return this._systemFontManager.resolveFontPath(font, {
       fontFamilies: this._fontFamilies,
       fallbackFonts: this._fallbackFonts,
+      ...options,
     })
   }
 }

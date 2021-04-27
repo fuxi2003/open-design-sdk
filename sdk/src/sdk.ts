@@ -5,6 +5,7 @@ import {
 import { inspect } from 'util'
 import { v4 as uuid } from 'uuid'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type {
   DesignImportFormatEnum,
   IApiDesign,
@@ -166,9 +167,15 @@ export class Sdk {
    * @internal
    * @category Local Design File Usage
    * @param filePath An absolute `.octopus` file path or a path relative to the current working directory.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted. A cancellation token can be created via {@link createCancelToken}.
    * @returns A design object which can be used for retrieving data from the local `.octopus` file or a referenced server-side design (see above).
    */
-  async openOctopusFile(filePath: string): Promise<DesignFacade> {
+  async openOctopusFile(
+    filePath: string,
+    options: {
+      cancelToken?: CancelToken | null
+    }
+  ): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
     }
@@ -180,15 +187,20 @@ export class Sdk {
 
     const localDesign = await localDesignManager.openOctopusFile(filePath, {
       apiDesignInfo: this._getCommonApiDesignInfo(),
+      ...options,
     })
     const designFacade = await createDesignFromLocalDesign(localDesign, {
       sdk: this,
       console: this._console,
+      ...options,
     })
 
-    const apiDesign = await this._getApiDesignByLocalDesign(localDesign)
+    const apiDesign = await this._getApiDesignByLocalDesign(
+      localDesign,
+      options
+    )
     if (apiDesign) {
-      await designFacade.setApiDesign(apiDesign)
+      await designFacade.setApiDesign(apiDesign, options)
     }
 
     return designFacade
@@ -204,9 +216,15 @@ export class Sdk {
    * @internal
    * @category Local Design File Usage
    * @param filePath An absolute `.octopus` file path or a path relative to the current working directory.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted. A cancellation token can be created via {@link createCancelToken}.
    * @returns A design object which can be used for creating `.octopus` file content.
    */
-  async createOctopusFile(filePath: string): Promise<DesignFacade> {
+  async createOctopusFile(
+    filePath: string,
+    options: {
+      cancelToken?: CancelToken | null
+    }
+  ): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
     }
@@ -216,7 +234,10 @@ export class Sdk {
       throw new Error('Local design manager is not configured.')
     }
 
-    const localDesign = await localDesignManager.createOctopusFile(filePath)
+    const localDesign = await localDesignManager.createOctopusFile(
+      filePath,
+      options
+    )
     const designFacade = await createDesignFromLocalDesign(localDesign, {
       sdk: this,
       console: this._console,
@@ -243,9 +264,15 @@ export class Sdk {
    *
    * @category Local Design File Usage
    * @param filePath An absolute design file path or a path relative to the current working directory.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the design is not deleted from the server when the token is cancelled during processing; the server still finishes the processing but the SDK stops watching its progress and does not download the result). A cancellation token can be created via {@link createCancelToken}.
    * @returns A design object which can be used for retrieving data from the local design file using the API.
    */
-  async importDesignFile(filePath: string): Promise<DesignFacade> {
+  async importDesignFile(
+    filePath: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
     }
@@ -261,9 +288,13 @@ export class Sdk {
     }
 
     const designFileStream = await designFileManager.readDesignFileStream(
-      filePath
+      filePath,
+      options
     )
-    const apiDesign = await openDesignApi.importDesignFile(designFileStream)
+    const apiDesign = await openDesignApi.importDesignFile(
+      designFileStream,
+      options
+    )
 
     return this._fetchDesignById(apiDesign.id, {
       sourceFilename: String(designFileStream.path),
@@ -279,11 +310,15 @@ export class Sdk {
    *
    * @category Local Design File Usage
    * @param filePath An absolute design file path or a path relative to the current working directory.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the design is not deleted from the server when the token is cancelled during processing; the server still finishes the processing but the SDK stops watching its progress and does not download the result). A cancellation token can be created via {@link createCancelToken}.
    * @returns A design object which can be used for retrieving data from the local design file using the API.
    */
   async importDesignLink(
     url: string,
-    options: { format?: DesignImportFormatEnum } = {}
+    options: {
+      format?: DesignImportFormatEnum
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
@@ -296,7 +331,9 @@ export class Sdk {
 
     const apiDesign = await openDesignApi.importDesignLink(url, options)
 
-    return this.fetchDesignById(apiDesign.id)
+    return this.fetchDesignById(apiDesign.id, {
+      cancelToken: options.cancelToken || null,
+    })
   }
 
   /**
@@ -312,6 +349,7 @@ export class Sdk {
    * @param params.figmaFileKey A Figma design "file key" from the design URL (i.e. `abc` from `https://www.figma.com/file/abc/Sample-File`).
    * @param params.figmaIds A listing of Figma design frames to use.
    * @param params.designName A name override for the design. The original Figma design name is used by default.
+   * @param params.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the design is not deleted from the server when the token is cancelled during processing; the server still finishes the processing but the SDK stops watching its progress and does not download the result). A cancellation token can be created via {@link createCancelToken}.
    * @returns A design object which can be used for retrieving data from the Figma design using the API.
    */
   async importFigmaDesign(params: {
@@ -319,6 +357,7 @@ export class Sdk {
     figmaFileKey: string
     figmaIds?: Array<string>
     designName?: string | null
+    cancelToken?: CancelToken | null
   }): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
@@ -348,6 +387,7 @@ export class Sdk {
    * @param params.figmaIds A listing of Figma design frames to use.
    * @param params.designName A name override for the design. The original Figma design name is used by default.
    * @param params.exports Design file export configurations. Only a single export to the `"sketch"` (Sketch) file format is available currently.
+   * @param params.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the design is not deleted from the server when the token is cancelled during processing; the server still finishes the processing but the SDK stops watching its progress and does not download the result). A cancellation token can be created via {@link createCancelToken}.
    * @returns A design object which can be used for retrieving data from the Figma design or downloading the exported design file using the API.
    */
   async convertFigmaDesign(params: {
@@ -356,6 +396,7 @@ export class Sdk {
     figmaIds?: Array<string>
     designName?: string | null
     exports: Array<{ format: DesignExportTargetFormatEnum }>
+    cancelToken?: CancelToken | null
   }): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
@@ -369,10 +410,14 @@ export class Sdk {
     const {
       designId,
       exports,
-    } = await openDesignApi.importFigmaDesignLinkWithExports(params)
+    } = await openDesignApi.importFigmaDesignLinkWithExports({
+      ...params,
+      cancelToken: params.cancelToken || null,
+    })
 
     return this._fetchDesignById(designId, {
       exports,
+      cancelToken: params.cancelToken || null,
     })
   }
 
@@ -385,10 +430,16 @@ export class Sdk {
    *
    * @category Server Side Design File Usage
    * @param designId An ID of a server-side design assigned during import (via `importDesignFile()`, `openFigmaDesign()` or `convertFigmaDesign()`).
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the local cache is not cleared once created). A cancellation token can be created via {@link createCancelToken}.
    * @returns A design object which can be used for retrieving data from the design using the API.
    */
-  async fetchDesignById(designId: string): Promise<DesignFacade> {
-    return this._fetchDesignById(designId, {})
+  async fetchDesignById(
+    designId: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<DesignFacade> {
+    return this._fetchDesignById(designId, options)
   }
 
   private async _fetchDesignById(
@@ -396,6 +447,7 @@ export class Sdk {
     params: {
       sourceFilename?: string | null
       exports?: Array<IApiDesignExport> | null
+      cancelToken?: CancelToken | null
     }
   ): Promise<DesignFacade> {
     if (this.isDestroyed()) {
@@ -407,12 +459,17 @@ export class Sdk {
       throw new Error('Open Design API is not configured.')
     }
 
-    const apiDesign = await openDesignApi.getDesignById(designId)
+    const cancelToken = params.cancelToken || null
+
+    const apiDesign = await openDesignApi.getDesignById(designId, {
+      cancelToken,
+    })
     const designFacade = await createDesignFromOpenDesignApiDesign(apiDesign, {
       sdk: this,
       console: this._console,
       sourceFilename: params.sourceFilename || null,
       exports: params.exports || null,
+      cancelToken,
     })
 
     const localDesignManager = this._localDesignManager
@@ -425,18 +482,22 @@ export class Sdk {
 
       const localDesignCache = this._localDesignCache
       const cachedOctopusFilename = localDesignCache
-        ? await localDesignCache.getDesignOctopusFilename(apiRoot, designId)
+        ? await localDesignCache.getDesignOctopusFilename(apiRoot, designId, {
+            cancelToken,
+          })
         : null
 
       const localDesign = cachedOctopusFilename
         ? await localDesignManager.openOctopusFile(cachedOctopusFilename, {
             apiDesignInfo,
+            cancelToken,
           })
         : await localDesignManager.createOctopusFileFromManifest(
             designFacade.getManifest(),
             {
               name: apiDesign.name,
               apiDesignInfo,
+              cancelToken,
             }
           )
 
@@ -448,7 +509,9 @@ export class Sdk {
         )
       }
 
-      await designFacade.setLocalDesign(localDesign)
+      await designFacade.setLocalDesign(localDesign, {
+        cancelToken,
+      })
 
       const systemFontManager = this._systemFontManager
       const fontSource = systemFontManager
@@ -459,11 +522,14 @@ export class Sdk {
       }
 
       const renderingEngine = await this._renderingEngine
+      params.cancelToken?.throwIfCancelled()
+
       if (renderingEngine) {
         const renderingDesign = await renderingEngine.createDesign(uuid(), {
           bitmapAssetDirectoryPath: localDesign.getBitmapAssetDirectory(),
           // fontDirectoryPath: localDesign.getFontDirectory(),
         })
+        params.cancelToken?.throwIfCancelled()
         designFacade.setRenderingDesign(renderingDesign)
       }
     }
@@ -474,14 +540,21 @@ export class Sdk {
   /** @internal */
   async saveDesignFileStream(
     filePath: string,
-    designFileStream: NodeJS.ReadableStream
+    designFileStream: NodeJS.ReadableStream,
+    options: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<void> {
     const designFileManager = this._designFileManager
     if (!designFileManager) {
       throw new Error('Design file manager is not configured.')
     }
 
-    return designFileManager.saveDesignFileStream(filePath, designFileStream)
+    return designFileManager.saveDesignFileStream(
+      filePath,
+      designFileStream,
+      options
+    )
   }
 
   /** @internal */
@@ -526,9 +599,12 @@ export class Sdk {
   }
 
   private async _getApiDesignByLocalDesign(
-    localDesign: LocalDesign
+    localDesign: LocalDesign,
+    options: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<IApiDesign | null> {
-    const apiDesignInfo = await localDesign.getApiDesignInfo()
+    const apiDesignInfo = await localDesign.getApiDesignInfo(options)
     const designId = apiDesignInfo ? apiDesignInfo.designId : null
     if (!designId) {
       return null
@@ -543,7 +619,7 @@ export class Sdk {
     }
 
     try {
-      return await openDesignApi.getDesignById(designId)
+      return await openDesignApi.getDesignById(designId, options)
     } catch (err) {
       this._console.warn(
         'API design referenced by the opened local design is not available'

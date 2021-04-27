@@ -1,6 +1,8 @@
 import { relative, resolve as resolvePath } from 'path'
 import { checkFile, readJsonFile, writeJsonFile } from '../utils/fs'
 
+import type { CancelToken } from '@avocode/cancel-token'
+
 const VERSION = 1
 
 type DesignCacheInfo = {
@@ -24,9 +26,12 @@ export class LocalDesignCache {
 
   async getDesignOctopusFilename(
     apiRoot: string,
-    designId: string
+    designId: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<string | null> {
-    const octopusFilenames = await this._loadOctopusFilenames(apiRoot)
+    const octopusFilenames = await this._loadOctopusFilenames(apiRoot, options)
     const optimizedFilename = octopusFilenames[designId] || null
 
     return optimizedFilename ? this._resolvePath(optimizedFilename) : null
@@ -35,9 +40,12 @@ export class LocalDesignCache {
   async setDesignOctopusFilename(
     apiRoot: string,
     designId: string,
-    octopusFilename: string
+    octopusFilename: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ) {
-    const octopusFilenames = await this._loadOctopusFilenames(apiRoot)
+    const octopusFilenames = await this._loadOctopusFilenames(apiRoot, options)
 
     const optimizedFilename = this._getRelativePath(octopusFilename)
     octopusFilenames[designId] = optimizedFilename
@@ -45,19 +53,28 @@ export class LocalDesignCache {
     await this._saveOctopusFilenames(apiRoot, octopusFilenames)
   }
 
-  async _loadOctopusFilenames(apiRoot: string) {
-    const cacheInfo = await this._loadCacheInfo()
+  async _loadOctopusFilenames(
+    apiRoot: string,
+    options: {
+      cancelToken?: CancelToken | null
+    }
+  ) {
+    const cacheInfo = await this._loadCacheInfo(options)
     return cacheInfo['design_cache'][apiRoot] || {}
   }
 
-  async _loadCacheInfo(): Promise<DesignCacheInfo> {
+  async _loadCacheInfo(options: {
+    cancelToken?: CancelToken | null
+  }): Promise<DesignCacheInfo> {
     if (this._cacheInfo) {
       return this._cacheInfo
     }
 
     const cacheFilename = this._getCacheFilename()
-    const cacheExists = await checkFile(cacheFilename)
-    const cacheInfoData = cacheExists ? await readJsonFile(cacheFilename) : null
+    const cacheExists = await checkFile(cacheFilename, options)
+    const cacheInfoData = cacheExists
+      ? await readJsonFile(cacheFilename, options)
+      : null
 
     const cacheInfoCandidate =
       typeof cacheInfoData === 'object' &&

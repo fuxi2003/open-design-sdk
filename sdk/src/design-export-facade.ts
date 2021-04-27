@@ -1,5 +1,6 @@
 import { inspect } from 'util'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type { IApiDesignExport } from '@opendesign/api'
 import type { Sdk } from './sdk'
 
@@ -68,9 +69,16 @@ export class DesignExportFacade {
   /**
    * Returns the URL of the produced design file.
    * @category Serialization
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected. A cancellation token can be created via {@link createCancelToken}.
    */
-  async getResultUrl() {
-    const processedDesignExport = await this._designExport.getProcessedDesignExport()
+  async getResultUrl(
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    const processedDesignExport = await this._designExport.getProcessedDesignExport(
+      options
+    )
 
     const resultUrl = processedDesignExport.resultUrl
     if (!resultUrl) {
@@ -85,9 +93,14 @@ export class DesignExportFacade {
   /**
    * Returns a readable binary stream of the produced design file.
    * @category Serialization
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected. A cancellation token can be created via {@link createCancelToken}.
    */
-  async getResultStream() {
-    return this._designExport.getResultStream()
+  async getResultStream(
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    return this._designExport.getResultStream(options)
   }
 
   /**
@@ -97,11 +110,18 @@ export class DesignExportFacade {
    *
    * @category Serialization
    * @param filePath An absolute path to which to save the design file or a path relative to the current working directory.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. a partially downloaded file is not deleted). A cancellation token can be created via {@link createCancelToken}.
    */
-  async exportDesignFile(filePath: string) {
+  async exportDesignFile(
+    filePath: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
     return this._sdk.saveDesignFileStream(
       filePath,
-      await this.getResultStream()
+      await this.getResultStream(options),
+      options
     )
   }
 }

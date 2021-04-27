@@ -23,6 +23,7 @@ import {
   PAGE_DIRECTORY_BASENAME,
 } from './consts'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type {
   ArtboardId,
   ArtboardOctopusData,
@@ -67,40 +68,74 @@ export class LocalDesign {
     return this._filename
   }
 
-  async saveAs(nextFilePath: string) {
+  async saveAs(
+    nextFilePath: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
     const nextFilename = this._localDesignManager.resolvePath(nextFilePath)
     const prevFilename = this._filename
     await copyDirectory(prevFilename, nextFilename)
+    options.cancelToken?.throwIfCancelled()
+
     this._filename = nextFilename
   }
 
-  async move(nextFilePath: string) {
+  async move(
+    nextFilePath: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
     const nextFilename = this._localDesignManager.resolvePath(nextFilePath)
     const prevFilename = this._filename
     await moveDirectory(prevFilename, nextFilename)
+    options.cancelToken?.throwIfCancelled()
+
     this._filename = nextFilename
   }
 
-  async getManifest(): Promise<ManifestData> {
+  async getManifest(
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<ManifestData> {
     const manifestFilename = this._getManifestFilename()
-    const manifest = (await readJsonFile(manifestFilename)) as ManifestData
+    const manifest = (await readJsonFile(
+      manifestFilename,
+      options
+    )) as ManifestData
     return manifest
   }
 
-  async saveManifest(manifest: ManifestData): Promise<void> {
+  async saveManifest(
+    manifest: ManifestData,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<void> {
     const manifestFilename = this._getManifestFilename()
-    await writeJsonFile(manifestFilename, manifest)
+    await writeJsonFile(manifestFilename, manifest, options)
   }
 
-  async hasArtboardContent(artboardId: ArtboardId): Promise<boolean> {
+  async hasArtboardContent(
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<boolean> {
     const contentFilename = this._getArtboardContentFilename(artboardId)
-    return checkFile(contentFilename)
+    return checkFile(contentFilename, options)
   }
 
   async getArtboardContentFilename(
-    artboardId: ArtboardId
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<string | null> {
-    if (!this.hasArtboardContent(artboardId)) {
+    if (!this.hasArtboardContent(artboardId, options)) {
       return null
     }
 
@@ -108,10 +143,16 @@ export class LocalDesign {
   }
 
   async getArtboardContent(
-    artboardId: ArtboardId
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<ArtboardOctopusData> {
     const contentFilename = this._getArtboardContentFilename(artboardId)
-    const content = (await readJsonFile(contentFilename)) as ArtboardOctopusData
+    const content = (await readJsonFile(
+      contentFilename,
+      options
+    )) as ArtboardOctopusData
     return content
   }
 
@@ -124,28 +165,47 @@ export class LocalDesign {
 
   async saveArtboardContent(
     artboardId: ArtboardId,
-    content: ArtboardOctopusData
+    content: ArtboardOctopusData,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
     const contentFilename = this._getArtboardContentFilename(artboardId)
-    await writeJsonFile(contentFilename, content)
+    await writeJsonFile(contentFilename, content, options)
   }
 
   async saveArtboardContentJsonStream(
     artboardId: ArtboardId,
-    contentStream: NodeJS.ReadableStream
+    contentStream: NodeJS.ReadableStream,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
     const contentFilename = this._getArtboardContentFilename(artboardId)
-    await writeJsonFileStream(contentFilename, contentStream)
+    await writeJsonFileStream(contentFilename, contentStream, options)
   }
 
-  async hasPageContent(pageId: PageId): Promise<boolean> {
+  async hasPageContent(
+    pageId: PageId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<boolean> {
     const contentFilename = this._getPageContentFilename(pageId)
-    return checkFile(contentFilename)
+    return checkFile(contentFilename, options)
   }
 
-  async getPageContent(pageId: PageId): Promise<ArtboardOctopusData> {
+  async getPageContent(
+    pageId: PageId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<ArtboardOctopusData> {
     const contentFilename = this._getPageContentFilename(pageId)
-    const content = (await readJsonFile(contentFilename)) as ArtboardOctopusData
+    const content = (await readJsonFile(
+      contentFilename,
+      options
+    )) as ArtboardOctopusData
     return content
   }
 
@@ -158,24 +218,36 @@ export class LocalDesign {
 
   async savePageContent(
     pageId: PageId,
-    content: ArtboardOctopusData
+    content: ArtboardOctopusData,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
     const contentFilename = this._getPageContentFilename(pageId)
-    await writeJsonFile(contentFilename, content)
+    await writeJsonFile(contentFilename, content, options)
   }
 
   async savePageContentJsonStream(
     pageId: PageId,
-    contentStream: NodeJS.ReadableStream
+    contentStream: NodeJS.ReadableStream,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
     const contentFilename = this._getPageContentFilename(pageId)
-    await writeJsonFileStream(contentFilename, contentStream)
+    await writeJsonFileStream(contentFilename, contentStream, options)
   }
 
   async hasBitmapAsset(
-    bitmapAssetDesc: BitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<boolean> {
-    const { available } = await this.resolveBitmapAsset(bitmapAssetDesc)
+    const { available } = await this.resolveBitmapAsset(
+      bitmapAssetDesc,
+      options
+    )
     return available
   }
 
@@ -184,12 +256,15 @@ export class LocalDesign {
   }
 
   async getBitmapAssetStream(
-    bitmapAssetDesc: BitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<NodeJS.ReadableStream> {
     const {
       filename: bitmapAssetFilename,
       available,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
     if (!available) {
       throw new Error('No such asset')
     }
@@ -198,12 +273,15 @@ export class LocalDesign {
   }
 
   async getBitmapAssetBlob(
-    bitmapAssetDesc: BitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<Buffer> {
     const {
       filename: bitmapAssetFilename,
       available,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
     if (!available) {
       throw new Error('No such asset')
     }
@@ -213,69 +291,91 @@ export class LocalDesign {
 
   async saveBitmapAsset(
     bitmapAssetDesc: BitmapAssetDescriptor,
-    content: ArtboardOctopusData
+    content: ArtboardOctopusData,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
-    await this._loadBitmapMapping()
+    await this._loadBitmapMapping(options)
 
     const {
       filename: bitmapAssetFilename,
       basename,
       mapped,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
     await writeJsonFile(bitmapAssetFilename, content)
 
     if (mapped) {
-      await this.saveBitmapMapping({
-        ...(this._bitmapMapping || {}),
-        [bitmapAssetDesc.name]: basename,
-      })
+      await this.saveBitmapMapping(
+        {
+          ...(this._bitmapMapping || {}),
+          [bitmapAssetDesc.name]: basename,
+        },
+        options
+      )
     }
   }
 
   async saveBitmapAssetStream(
     bitmapAssetDesc: BitmapAssetDescriptor,
-    contentStream: NodeJS.ReadableStream
+    contentStream: NodeJS.ReadableStream,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
-    await this._loadBitmapMapping()
+    await this._loadBitmapMapping(options)
 
     const {
       filename: bitmapAssetFilename,
       basename,
       mapped,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc)
-    await writeJsonFileStream(bitmapAssetFilename, contentStream)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
+    await writeJsonFileStream(bitmapAssetFilename, contentStream, options)
 
     if (mapped) {
-      await this.saveBitmapMapping({
-        ...(this._bitmapMapping || {}),
-        [bitmapAssetDesc.name]: basename,
-      })
+      await this.saveBitmapMapping(
+        {
+          ...(this._bitmapMapping || {}),
+          [bitmapAssetDesc.name]: basename,
+        },
+        options
+      )
     }
   }
 
   async saveBitmapAssetBlob(
     bitmapAssetDesc: BitmapAssetDescriptor,
-    bitmapAssetBlob: Buffer
+    bitmapAssetBlob: Buffer,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
-    await this._loadBitmapMapping()
+    await this._loadBitmapMapping(options)
 
     const {
       filename: bitmapAssetFilename,
       basename,
       mapped,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc)
-    await writeFileBlob(bitmapAssetFilename, bitmapAssetBlob)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
+    await writeFileBlob(bitmapAssetFilename, bitmapAssetBlob, options)
 
     if (mapped) {
-      await this.saveBitmapMapping({
-        ...(this._bitmapMapping || {}),
-        [bitmapAssetDesc.name]: basename,
-      })
+      await this.saveBitmapMapping(
+        {
+          ...(this._bitmapMapping || {}),
+          [bitmapAssetDesc.name]: basename,
+        },
+        options
+      )
     }
   }
 
-  async getBitmapMapping(): Promise<BitmapMapping> {
-    await this._loadBitmapMapping()
+  async getBitmapMapping(
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<BitmapMapping> {
+    await this._loadBitmapMapping(options)
 
     if (!this._bitmapMapping) {
       throw new Error('Bitmap mapping is not available')
@@ -284,20 +384,23 @@ export class LocalDesign {
     return this._bitmapMapping
   }
 
-  async _loadBitmapMapping() {
+  async _loadBitmapMapping(options: { cancelToken?: CancelToken | null }) {
     if (this._bitmapMapping) {
       return
     }
 
     const bitmapMappingFilename = this._getBitmapMappingFilename()
-    if (!(await checkFile(bitmapMappingFilename))) {
+
+    const bitmapMappingExists = await checkFile(bitmapMappingFilename)
+    options.cancelToken?.throwIfCancelled()
+
+    if (!bitmapMappingExists) {
       this._bitmapMapping = {}
       return
     }
 
-    this._bitmapMapping = (await readJsonFile(
-      bitmapMappingFilename
-    )) as BitmapMapping
+    this._bitmapMapping = (await readJsonFile(bitmapMappingFilename),
+    options) as BitmapMapping
   }
 
   unload() {
@@ -308,41 +411,68 @@ export class LocalDesign {
     this._bitmapMapping = null
   }
 
-  async saveBitmapMapping(bitmapMapping: BitmapMapping): Promise<void> {
+  async saveBitmapMapping(
+    bitmapMapping: BitmapMapping,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<void> {
+    const prevBitmapMapping = this._bitmapMapping
     this._bitmapMapping = bitmapMapping
 
+    const unregisterCanceller = options.cancelToken?.onCancelled(() => {
+      if (this._bitmapMapping === bitmapMapping) {
+        this._bitmapMapping = prevBitmapMapping
+      }
+    })
+
     const bitmapMappingFilename = this._getBitmapMappingFilename()
-    await writeJsonFile(bitmapMappingFilename, bitmapMapping)
+    await writeJsonFile(bitmapMappingFilename, bitmapMapping, options)
+
+    unregisterCanceller?.()
   }
 
-  async getApiDesignInfo(): Promise<ApiDesignInfo | null> {
-    await this._loadApiDesignInfo()
+  async getApiDesignInfo(
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<ApiDesignInfo | null> {
+    await this._loadApiDesignInfo(options)
 
     return this._apiDesignInfo
   }
 
-  async _loadApiDesignInfo() {
+  async _loadApiDesignInfo(options: { cancelToken?: CancelToken | null }) {
     if (this._apiDesignInfo) {
       return
     }
 
     const apiDesignInfoFilename = this._getApiDesignInfoFilename()
-    if (!(await checkFile(apiDesignInfoFilename))) {
+    const apiDesignInfoExists = await checkFile(apiDesignInfoFilename)
+    options.cancelToken?.throwIfCancelled()
+
+    if (!apiDesignInfoExists) {
       this._apiDesignInfo = null
       return
     }
 
     this._apiDesignInfo = (await readJsonFile(
-      apiDesignInfoFilename
+      apiDesignInfoFilename,
+      options
     )) as ApiDesignInfo
   }
 
-  async saveApiDesignInfo(apiDesignInfo: ApiDesignInfo | null): Promise<void> {
+  async saveApiDesignInfo(
+    apiDesignInfo: ApiDesignInfo | null,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<void> {
     this._apiDesignInfo = apiDesignInfo
 
     const apiDesignInfoFilename = this._getApiDesignInfoFilename()
     if (apiDesignInfo) {
-      await writeJsonFile(apiDesignInfoFilename, apiDesignInfo)
+      await writeJsonFile(apiDesignInfoFilename, apiDesignInfo, options)
     } else {
       await deleteFile(apiDesignInfoFilename)
     }
@@ -379,7 +509,10 @@ export class LocalDesign {
   }
 
   async resolveBitmapAsset(
-    bitmapAssetDesc: BitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<{
     basename: string
     mapped: boolean
@@ -387,7 +520,8 @@ export class LocalDesign {
     available: boolean
   }> {
     const { basename, mapped } = await this._getBitmapAssetBasename(
-      bitmapAssetDesc
+      bitmapAssetDesc,
+      options
     )
     const filename = joinPaths(
       this._filename,
@@ -399,14 +533,17 @@ export class LocalDesign {
       basename,
       mapped,
       filename,
-      available: await checkFile(filename),
+      available: await checkFile(filename, options),
     }
   }
 
   async _getBitmapAssetBasename(
-    bitmapAssetDesc: BitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor,
+    options: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<{ basename: string; mapped: boolean }> {
-    await this._loadBitmapMapping()
+    await this._loadBitmapMapping(options)
 
     const bitmapMapping = this._bitmapMapping || {}
     const mappedBasename = bitmapMapping[bitmapAssetDesc.name]

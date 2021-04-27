@@ -2,6 +2,7 @@ import { inspect } from 'util'
 
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type {
   ArtboardId,
   ArtboardSelector,
@@ -85,11 +86,11 @@ export class PageFacade {
   }
 
   /** @internal */
-  async load(): Promise<void> {
+  async load(options: { cancelToken?: CancelToken | null }): Promise<void> {
     const artboards = this.getArtboards()
     await Promise.all(
       artboards.map((artboard) => {
-        return artboard.load()
+        return artboard.load(options)
       })
     )
   }
@@ -199,9 +200,14 @@ export class PageFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async getBitmapAssets(
-    options: { depth?: number; includePrerendered?: boolean } = {}
+    options: {
+      depth?: number
+      includePrerendered?: boolean
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<
     Array<
       BitmapAssetDescriptor & {
@@ -209,9 +215,11 @@ export class PageFacade {
       }
     >
   > {
-    await this.load()
+    const { cancelToken = null, ...bitmapOptions } = options
 
-    return this._pageEntity.getBitmapAssets(options)
+    await this.load({ cancelToken })
+
+    return this._pageEntity.getBitmapAssets(bitmapOptions)
   }
 
   /**
@@ -221,17 +229,23 @@ export class PageFacade {
    *
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async getFonts(
-    options: { depth?: number } = {}
+    options: {
+      depth?: number
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<
     Array<
       FontDescriptor & { artboardLayerIds: Record<ArtboardId, Array<LayerId>> }
     >
   > {
-    await this.load()
+    const { cancelToken = null, ...fontOptions } = options
 
-    return this._pageEntity.getFonts(options)
+    await this.load({ cancelToken })
+
+    return this._pageEntity.getFonts(fontOptions)
   }
 
   /**
@@ -243,13 +257,19 @@ export class PageFacade {
    *
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within the artboards to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in the artboard should be included.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async getFlattenedLayers(
-    options: { depth?: number } = {}
+    options: {
+      depth?: number
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<DesignLayerCollectionFacade> {
-    await this.load()
+    const { cancelToken = null, ...layerOptions } = options
 
-    const layerCollection = this._pageEntity.getFlattenedLayers(options)
+    await this.load({ cancelToken })
+
+    const layerCollection = this._pageEntity.getFlattenedLayers(layerOptions)
     return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
@@ -265,14 +285,20 @@ export class PageFacade {
    * @category Layer Lookup
    * @param layerId A layer ID.
    * @param options.depth The maximum nesting level within artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayerById(
     layerId: LayerId,
-    options: { depth?: number } = {}
+    options: {
+      depth?: number
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<LayerFacade | null> {
-    await this.load()
+    const { cancelToken = null, ...layerOptions } = options
 
-    const layerEntity = this._pageEntity.findLayerById(layerId, options)
+    await this.load({ cancelToken })
+
+    const layerEntity = this._pageEntity.findLayerById(layerId, layerOptions)
     const layerFacade =
       layerEntity && layerEntity.artboardId
         ? this._designFacade.getArtboardLayerFacade(
@@ -294,14 +320,23 @@ export class PageFacade {
    * @category Layer Lookup
    * @param layerId A layer ID.
    * @param options.depth The maximum nesting level within artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayersById(
     layerId: LayerId,
-    options: { depth?: number } = {}
+    options: {
+      depth?: number
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<DesignLayerCollectionFacade> {
-    await this.load()
+    const { cancelToken = null, ...layerOptions } = options
 
-    const layerCollection = this._pageEntity.findLayersById(layerId, options)
+    await this.load({ cancelToken })
+
+    const layerCollection = this._pageEntity.findLayersById(
+      layerId,
+      layerOptions
+    )
     return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
@@ -315,14 +350,20 @@ export class PageFacade {
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayer(
     selector: LayerSelector,
-    options: { depth?: number } = {}
+    options: {
+      depth?: number
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<LayerFacade | null> {
-    await this.load()
+    const { cancelToken = null, ...layerOptions } = options
 
-    const layerEntity = this._pageEntity.findLayer(selector, options)
+    await this.load({ cancelToken })
+
+    const layerEntity = this._pageEntity.findLayer(selector, layerOptions)
     const layerFacade =
       layerEntity && layerEntity.artboardId
         ? this._designFacade.getArtboardLayerFacade(
@@ -342,14 +383,20 @@ export class PageFacade {
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayers(
     selector: LayerSelector,
-    options: { depth?: number } = {}
+    options: {
+      depth?: number
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<DesignLayerCollectionFacade> {
-    await this.load()
+    const { cancelToken = null, ...layerOptions } = options
 
-    const layerCollection = this._pageEntity.findLayers(selector, options)
+    await this.load({ cancelToken })
+
+    const layerCollection = this._pageEntity.findLayers(selector, layerOptions)
     return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })
@@ -366,8 +413,14 @@ export class PageFacade {
    *
    * @category Rendering
    * @param filePath The target location of the produced PNG image file.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
    */
-  renderToFile(filePath: string) {
-    return this._designFacade.renderPageToFile(this.id, filePath)
+  renderToFile(
+    filePath: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ) {
+    return this._designFacade.renderPageToFile(this.id, filePath, options)
   }
 }

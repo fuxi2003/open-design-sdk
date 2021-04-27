@@ -24,6 +24,7 @@ import { memoize } from './utils/memoize'
 import { getDesignFormatByFileName } from './utils/design-format-utils'
 import { enumerablizeWithPrototypeGetters } from './utils/object'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type { IApiDesign } from '@opendesign/api'
 import type {
   Bounds,
@@ -161,21 +162,31 @@ export class DesignFacade {
   }
 
   /** @internal */
-  async setLocalDesign(localDesign: LocalDesign) {
-    this._localDesign = localDesign
-
-    if (!this._manifestLoaded) {
-      this.setManifest(await localDesign.getManifest())
+  async setLocalDesign(
+    localDesign: LocalDesign,
+    options: {
+      cancelToken?: CancelToken | null
     }
+  ) {
+    if (!this._manifestLoaded) {
+      this.setManifest(await localDesign.getManifest(options))
+    }
+
+    this._localDesign = localDesign
   }
 
   /** @internal */
-  async setApiDesign(apiDesign: IApiDesign) {
-    this._apiDesign = apiDesign
-
-    if (!this._manifestLoaded) {
-      this.setManifest(await apiDesign.getManifest())
+  async setApiDesign(
+    apiDesign: IApiDesign,
+    options: {
+      cancelToken?: CancelToken | null
     }
+  ) {
+    if (!this._manifestLoaded) {
+      this.setManifest(await apiDesign.getManifest(options))
+    }
+
+    this._apiDesign = apiDesign
   }
 
   /** @internal */
@@ -441,14 +452,17 @@ export class DesignFacade {
    *
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within pages and artboards to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in artboards should be included.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async getFlattenedLayers(
-    options: { depth?: number } = {}
+    options: { depth?: number; cancelToken?: CancelToken | null } = {}
   ): Promise<DesignLayerCollectionFacade> {
-    await this.load()
+    await this.load({ cancelToken: options.cancelToken || null })
 
     const entity = this._getDesignEntity()
-    const layerCollection = entity.getFlattenedLayers(options)
+    const layerCollection = entity.getFlattenedLayers({
+      depth: options.depth || 0,
+    })
 
     return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this,
@@ -464,9 +478,15 @@ export class DesignFacade {
    *
    * @category Layer Lookup
    * @param layerId A layer ID.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
-  async findLayerById(layerId: LayerId): Promise<LayerFacade | null> {
-    await this.load()
+  async findLayerById(
+    layerId: LayerId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<LayerFacade | null> {
+    await this.load(options)
 
     const entity = this._getDesignEntity()
     const layerEntity = entity.findLayerById(layerId)
@@ -487,9 +507,15 @@ export class DesignFacade {
    *
    * @category Layer Lookup
    * @param layerId A layer ID.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
-  async findLayersById(layerId: LayerId): Promise<DesignLayerCollectionFacade> {
-    await this.load()
+  async findLayersById(
+    layerId: LayerId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<DesignLayerCollectionFacade> {
+    await this.load(options)
 
     const entity = this._getDesignEntity()
     const layerCollection = entity.findLayersById(layerId)
@@ -507,15 +533,18 @@ export class DesignFacade {
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayer(
     selector: FileLayerSelector,
-    options: { depth?: number } = {}
+    options: { depth?: number; cancelToken?: CancelToken | null } = {}
   ): Promise<LayerFacade | null> {
-    await this.load()
+    await this.load({ cancelToken: options.cancelToken || null })
 
     const entity = this._getDesignEntity()
-    const layerEntity = entity.findLayer(selector, options)
+    const layerEntity = entity.findLayer(selector, {
+      depth: options.depth || 0,
+    })
     const artboardId = layerEntity ? layerEntity.artboardId : null
     if (!layerEntity || !artboardId) {
       return null
@@ -532,15 +561,18 @@ export class DesignFacade {
    * @category Layer Lookup
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayers(
     selector: FileLayerSelector,
-    options: { depth?: number } = {}
+    options: { depth?: number; cancelToken?: CancelToken | null } = {}
   ): Promise<DesignLayerCollectionFacade> {
-    await this.load()
+    await this.load({ cancelToken: options.cancelToken || null })
 
     const entity = this._getDesignEntity()
-    const layerCollection = entity.findLayers(selector, options)
+    const layerCollection = entity.findLayers(selector, {
+      depth: options.depth || 0,
+    })
 
     return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this,
@@ -555,9 +587,14 @@ export class DesignFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async getBitmapAssets(
-    options: { depth?: number; includePrerendered?: boolean } = {}
+    options: {
+      depth?: number
+      includePrerendered?: boolean
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<
     Array<
       BitmapAssetDescriptor & {
@@ -565,10 +602,13 @@ export class DesignFacade {
       }
     >
   > {
-    await this.load()
+    await this.load({ cancelToken: options.cancelToken || null })
 
     const entity = this._getDesignEntity()
-    return entity.getBitmapAssets(options)
+    return entity.getBitmapAssets({
+      depth: options.depth || 0,
+      includePrerendered: options.includePrerendered !== false,
+    })
   }
 
   /**
@@ -578,18 +618,19 @@ export class DesignFacade {
    *
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async getFonts(
-    options: { depth?: number } = {}
+    options: { depth?: number; cancelToken?: CancelToken | null } = {}
   ): Promise<
     Array<
       FontDescriptor & { artboardLayerIds: Record<ArtboardId, Array<LayerId>> }
     >
   > {
-    await this.load()
+    await this.load({ cancelToken: options.cancelToken || null })
 
     const entity = this._getDesignEntity()
-    return entity.getFonts(options)
+    return entity.getFonts({ depth: options.depth || 0 })
   }
 
   setFontSource(fontSource: FontSource | null) {
@@ -648,6 +689,7 @@ export class DesignFacade {
    * @param filePath The target location of the produced PNG image file.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default artboard area.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async renderArtboardToFile(
     artboardId: ArtboardId,
@@ -655,6 +697,7 @@ export class DesignFacade {
     options: {
       scale?: number
       bounds?: Bounds
+      cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
     const artboard = this.getArtboardById(artboardId)
@@ -667,7 +710,10 @@ export class DesignFacade {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: true })
+    await this._loadRenderingDesignArtboard(artboardId, {
+      loadAssets: true,
+      cancelToken: options.cancelToken || null,
+    })
 
     return renderingDesign.renderArtboardToFile(artboardId, filePath, options)
   }
@@ -686,6 +732,7 @@ export class DesignFacade {
    * @param filePath The target location of the produced PNG image file.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default page area.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async renderPageToFile(
     pageId: PageId,
@@ -693,6 +740,7 @@ export class DesignFacade {
     options: {
       scale?: number
       bounds?: Bounds
+      cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
     const renderingDesign = this._renderingDesign
@@ -725,6 +773,7 @@ export class DesignFacade {
    * @param options.opacity The opacity to use for the layer instead of its default opacity.
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async renderArtboardLayerToFile(
     artboardId: ArtboardId,
@@ -738,6 +787,7 @@ export class DesignFacade {
       opacity?: number
       bounds?: Bounds
       scale?: number
+      cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
     const artboard = this.getArtboardById(artboardId)
@@ -755,20 +805,25 @@ export class DesignFacade {
       throw new Error('No such layer')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: false })
+    const { bounds, scale, cancelToken = null, ...layerAttributes } = options
+
+    await this._loadRenderingDesignArtboard(artboardId, {
+      loadAssets: false,
+      cancelToken,
+    })
 
     const bitmapAssetDescs = layer.getBitmapAssets()
     await this.downloadBitmapAssets(bitmapAssetDescs)
 
     const fonts = layer.getFonts()
-    await this._loadFontsToRendering(fonts)
+    await this._loadFontsToRendering(fonts, { cancelToken })
 
     await renderingDesign.markArtboardAsReady(artboardId)
 
-    const { bounds, scale, ...layerAttributes } = options
     const resolvedLayerIds = await this._resolveVisibleArtboardLayerSubtree(
       artboardId,
-      layerId
+      layerId,
+      { cancelToken }
     )
 
     return renderingDesign.renderArtboardLayersToFile(
@@ -799,6 +854,7 @@ export class DesignFacade {
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async renderArtboardLayersToFile(
     artboardId: ArtboardId,
@@ -808,6 +864,7 @@ export class DesignFacade {
       layerAttributes?: Record<string, LayerAttributesConfig>
       scale?: number
       bounds?: Bounds
+      cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
     const artboard = this.getArtboardById(artboardId)
@@ -820,11 +877,18 @@ export class DesignFacade {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: false })
+    const { cancelToken = null, ...layerOptions } = options
+
+    await this._loadRenderingDesignArtboard(artboardId, {
+      loadAssets: false,
+      cancelToken,
+    })
 
     const resolvedLayerSubtrees = await Promise.all(
       layerIds.map((layerId) => {
-        return this._resolveVisibleArtboardLayerSubtree(artboardId, layerId)
+        return this._resolveVisibleArtboardLayerSubtree(artboardId, layerId, {
+          cancelToken,
+        })
       })
     )
     const resolvedLayerIds = resolvedLayerSubtrees.flat(1)
@@ -832,7 +896,7 @@ export class DesignFacade {
     const bitmapAssetDescs = (
       await Promise.all(
         layerIds.map(async (layerId) => {
-          const layer = await artboard.getLayerById(layerId)
+          const layer = await artboard.getLayerById(layerId, { cancelToken })
           return layer ? layer.getBitmapAssets() : []
         })
       )
@@ -841,24 +905,25 @@ export class DesignFacade {
     const fonts = (
       await Promise.all(
         layerIds.map(async (layerId) => {
-          const layer = await artboard.getLayerById(layerId)
+          const layer = await artboard.getLayerById(layerId, { cancelToken })
           return layer ? layer.getFonts() : []
         })
       )
     ).flat(1)
 
     await Promise.all([
-      this.downloadBitmapAssets(bitmapAssetDescs),
-      this._loadFontsToRendering(fonts),
+      this.downloadBitmapAssets(bitmapAssetDescs, { cancelToken }),
+      this._loadFontsToRendering(fonts, { cancelToken }),
     ])
 
     await renderingDesign.markArtboardAsReady(artboardId)
+    cancelToken?.throwIfCancelled()
 
     return renderingDesign.renderArtboardLayersToFile(
       artboardId,
       resolvedLayerIds,
       filePath,
-      options
+      layerOptions
     )
   }
 
@@ -870,10 +935,14 @@ export class DesignFacade {
    * @category Data
    * @param artboardId The ID of the artboard from which to inspect the layer.
    * @param layerId The ID of the layer to inspect.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async getArtboardLayerBounds(
     artboardId: ArtboardId,
-    layerId: LayerId
+    layerId: LayerId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<LayerBounds> {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {
@@ -885,15 +954,18 @@ export class DesignFacade {
       throw new Error('The rendering engine is not configured')
     }
 
-    const layer = await artboard.getLayerById(layerId)
+    const layer = await artboard.getLayerById(layerId, options)
     if (!layer) {
       throw new Error('No such layer')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: false })
+    await this._loadRenderingDesignArtboard(artboardId, {
+      loadAssets: false,
+      ...options,
+    })
 
     const fonts = layer.getFonts()
-    await this._loadFontsToRendering(fonts)
+    await this._loadFontsToRendering(fonts, options)
 
     return renderingDesign.getArtboardLayerBounds(artboardId, layerId)
   }
@@ -907,18 +979,25 @@ export class DesignFacade {
    * @param artboardId The ID of the artboard from which to render the layer.
    * @param x The X coordinate in the coordinate system of the artboard where to look for a layer.
    * @param y The Y coordinate in the coordinate system of the artboard where to look for a layer.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async getArtboardLayerAtPosition(
     artboardId: ArtboardId,
     x: number,
-    y: number
+    y: number,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<LayerFacade | null> {
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: true })
+    await this._loadRenderingDesignArtboard(artboardId, {
+      loadAssets: true,
+      ...options,
+    })
 
     const layerId = await renderingDesign.getArtboardLayerAtPosition(
       artboardId,
@@ -937,23 +1016,32 @@ export class DesignFacade {
    * @param artboardId The ID of the artboard from which to render the layer.
    * @param bounds The area in the corrdinate system of the artboard where to look for layers.
    * @param options.partialOverlap Whether to also return layers which are only partially contained within the specified area.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async getArtboardLayersInArea(
     artboardId: ArtboardId,
     bounds: Bounds,
-    options: { partialOverlap?: boolean } = {}
+    options: {
+      partialOverlap?: boolean
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<Array<LayerFacade>> {
     const renderingDesign = this._renderingDesign
     if (!renderingDesign) {
       throw new Error('The rendering engine is not configured')
     }
 
-    await this._loadRenderingDesignArtboard(artboardId, { loadAssets: true })
+    const { cancelToken = null, ...layerOptions } = options
+
+    await this._loadRenderingDesignArtboard(artboardId, {
+      loadAssets: true,
+      cancelToken: options.cancelToken || null,
+    })
 
     const layerIds = await renderingDesign.getArtboardLayersInArea(
       artboardId,
       bounds,
-      options
+      layerOptions
     )
 
     return layerIds.flatMap((layerId) => {
@@ -972,17 +1060,22 @@ export class DesignFacade {
   }
 
   /** @internal */
-  async load() {
+  async load(options: { cancelToken?: CancelToken | null }) {
     const artboards = this.getArtboards()
     return Promise.all(
       artboards.map((artboard) => {
-        return artboard.load()
+        return artboard.load(options)
       })
     )
   }
 
   /** @internal */
-  async loadArtboard(artboardId: ArtboardId): Promise<ArtboardFacade> {
+  async loadArtboard(
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    }
+  ): Promise<ArtboardFacade> {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {
       throw new Error('No such artboard')
@@ -991,7 +1084,7 @@ export class DesignFacade {
     if (!artboard.isLoaded()) {
       // NOTE: Maybe use the Octopus Reader file entity instead for clearer source of truth.
       const artboardEntity = artboard.getArtboardEntity()
-      const content = await this._loadArtboardContent(artboardId)
+      const content = await this._loadArtboardContent(artboardId, options)
       artboardEntity.setOctopus(content)
     }
 
@@ -1068,7 +1161,10 @@ export class DesignFacade {
   }
 
   private async _loadArtboardContent(
-    artboardId: ArtboardId
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<ArtboardOctopusData> {
     const localDesign = this._localDesign
     const apiDesign = this._apiDesign
@@ -1082,22 +1178,24 @@ export class DesignFacade {
         }
 
         const contentStream = await apiDesign.getArtboardContentJsonStream(
-          artboardId
+          artboardId,
+          options
         )
         await localDesign.saveArtboardContentJsonStream(
           artboardId,
-          contentStream
+          contentStream,
+          options
         )
       }
 
-      return localDesign.getArtboardContent(artboardId)
+      return localDesign.getArtboardContent(artboardId, options)
     }
 
     if (!apiDesign) {
       throw new Error('The artboard cannot be loaded')
     }
 
-    return apiDesign.getArtboardContent(artboardId)
+    return apiDesign.getArtboardContent(artboardId, options)
   }
 
   /**
@@ -1109,10 +1207,13 @@ export class DesignFacade {
    * @param bitmapAssetDescs A list of bitmap assets to download.
    */
   async downloadBitmapAssets(
-    bitmapAssetDescs: Array<BitmapAssetDescriptor>
+    bitmapAssetDescs: Array<BitmapAssetDescriptor>,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
     await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
-      return this.downloadBitmapAsset(bitmapAssetDesc)
+      return this.downloadBitmapAsset(bitmapAssetDesc, options)
     })
   }
 
@@ -1125,7 +1226,10 @@ export class DesignFacade {
    * @param bitmapAssetDescs A list of bitmap assets to download.
    */
   async downloadBitmapAsset(
-    bitmapAssetDesc: BitmapAssetDescriptor
+    bitmapAssetDesc: BitmapAssetDescriptor,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<void> {
     const apiDesign = this._apiDesign
     if (!apiDesign) {
@@ -1139,14 +1243,19 @@ export class DesignFacade {
       throw new Error('The design is not configured to be a local file')
     }
 
-    if (await localDesign.hasBitmapAsset(bitmapAssetDesc)) {
+    if (await localDesign.hasBitmapAsset(bitmapAssetDesc, options)) {
       return
     }
 
     const bitmapAssetStream = await apiDesign.getBitmapAssetStream(
-      bitmapAssetDesc.name
+      bitmapAssetDesc.name,
+      options
     )
-    return localDesign.saveBitmapAssetStream(bitmapAssetDesc, bitmapAssetStream)
+    return localDesign.saveBitmapAssetStream(
+      bitmapAssetDesc,
+      bitmapAssetStream,
+      options
+    )
   }
 
   /**
@@ -1162,35 +1271,47 @@ export class DesignFacade {
    * @category Serialization
    * @param filePath An absolute path of the target `.octopus` file or a path relative to the current working directory. When omitted, the open `.octopus` file location is used instead. The API has to be configured in case there are uncached items.
    */
-  async saveOctopusFile(filePath: string | null = null): Promise<void> {
-    const localDesign = await this._getLocalDesign(filePath)
+  async saveOctopusFile(
+    options: { filePath?: string | null; cancelToken?: CancelToken | null } = {}
+  ): Promise<void> {
+    const cancelToken = options.cancelToken || null
+
+    const localDesign = await this._getLocalDesign({
+      filePath: options.filePath || null,
+      cancelToken,
+    })
     const apiDesign = this._apiDesign
 
     const manifest = this.getManifest()
-    await localDesign.saveManifest(manifest)
+    await localDesign.saveManifest(manifest, { cancelToken })
 
     if (apiDesign) {
-      await localDesign.saveApiDesignInfo({
-        apiRoot: apiDesign.getApiRoot(),
-        designId: apiDesign.id,
-      })
+      await localDesign.saveApiDesignInfo(
+        {
+          apiRoot: apiDesign.getApiRoot(),
+          designId: apiDesign.id,
+        },
+        { cancelToken }
+      )
     }
 
     await Promise.all(
       this.getArtboards().map(async (artboard) => {
-        const artboardOctopus = await artboard.getContent()
+        const artboardOctopus = await artboard.getContent({ cancelToken })
         if (!artboardOctopus) {
           throw new Error('Artboard octopus not available')
         }
 
-        await localDesign.saveArtboardContent(artboard.id, artboardOctopus)
+        await localDesign.saveArtboardContent(artboard.id, artboardOctopus, {
+          cancelToken,
+        })
       })
     )
 
-    await this.setLocalDesign(localDesign)
+    await this.setLocalDesign(localDesign, { cancelToken })
 
-    const bitmapAssetDescs = await this.getBitmapAssets()
-    await this.downloadBitmapAssets(bitmapAssetDescs)
+    const bitmapAssetDescs = await this.getBitmapAssets({ cancelToken })
+    await this.downloadBitmapAssets(bitmapAssetDescs, { cancelToken })
   }
 
   /**
@@ -1201,7 +1322,12 @@ export class DesignFacade {
    * @category Serialization
    * @param filePath An absolute path to which to save the design file or a path relative to the current working directory.
    */
-  async exportDesignFile(filePath: string): Promise<void> {
+  async exportDesignFile(
+    filePath: string,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<void> {
     const format = getDesignFormatByFileName(filePath)
     if (!format) {
       throw new Error('Unknown target design file format')
@@ -1210,17 +1336,22 @@ export class DesignFacade {
       throw new Error('Unsupported target design file format')
     }
 
-    const designExport = await this.getExportToFormat(format)
+    const designExport = await this.getExportToFormat(format, options)
     return this._sdk.saveDesignFileStream(
       filePath,
-      await designExport.getResultStream()
+      await designExport.getResultStream(options),
+      options
     )
   }
 
-  private async _getLocalDesign(filePath: string | null): Promise<LocalDesign> {
+  private async _getLocalDesign(params: {
+    filePath: string | null
+    cancelToken?: CancelToken | null
+  }): Promise<LocalDesign> {
+    const cancelToken = params.cancelToken || null
     const localDesign = this._localDesign
 
-    if (!filePath) {
+    if (!params.filePath) {
       if (!localDesign) {
         throw new Error('The design is not configured to be a local file')
       }
@@ -1229,11 +1360,14 @@ export class DesignFacade {
     }
 
     if (localDesign) {
-      await localDesign.saveAs(filePath)
+      await localDesign.saveAs(params.filePath, { cancelToken })
       return localDesign
     }
 
-    const targetDesignFacade = await this._sdk.openOctopusFile(filePath)
+    const targetDesignFacade = await this._sdk.openOctopusFile(
+      params.filePath,
+      { cancelToken }
+    )
     const targetLocalDesign = targetDesignFacade.getLocalDesign()
     if (!targetLocalDesign) {
       throw new Error('Target location is not available')
@@ -1257,7 +1391,10 @@ export class DesignFacade {
    * @param format The format to which the design should be exported.
    */
   async getExportToFormat(
-    format: DesignExportTargetFormatEnum
+    format: DesignExportTargetFormatEnum,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
   ): Promise<DesignExportFacade> {
     const prevExport = this._designExports.get(format)
     if (prevExport) {
@@ -1269,7 +1406,10 @@ export class DesignFacade {
       throw new Error('The API is not configured, cannot export the design')
     }
 
-    const designExport = await apiDesign.exportDesign({ format })
+    const designExport = await apiDesign.exportDesign({
+      format,
+      cancelToken: options.cancelToken || null,
+    })
     const designExportFacade = new DesignExportFacade(designExport, {
       sdk: this._sdk,
     })
@@ -1282,6 +1422,7 @@ export class DesignFacade {
     pageId: string,
     params: {
       loadAssets: boolean
+      cancelToken?: CancelToken | null
     }
   ) {
     const pageArtboards = this.getPageArtboards(pageId)
@@ -1295,6 +1436,7 @@ export class DesignFacade {
     artboardId: string,
     params: {
       loadAssets: boolean
+      cancelToken?: CancelToken | null
     }
   ) {
     const renderingDesign = this._renderingDesign
@@ -1316,10 +1458,13 @@ export class DesignFacade {
       throw new Error('No such artboard')
     }
 
-    await artboard.load()
+    const cancelToken = params.cancelToken || null
+
+    await artboard.load({ cancelToken })
 
     const octopusFilename = await localDesign.getArtboardContentFilename(
-      artboardId
+      artboardId,
+      { cancelToken }
     )
     if (!octopusFilename) {
       throw new Error('The artboard octopus location is not available')
@@ -1330,6 +1475,7 @@ export class DesignFacade {
       symbolId: artboard.componentId,
       pageId: artboard.pageId,
     })
+    cancelToken?.throwIfCancelled()
 
     // NOTE: This logic is more a future-proofing of the logic rather than a required step
     //   as the SDK works with "expanded" octopus documents only and there should thus not be
@@ -1345,15 +1491,19 @@ export class DesignFacade {
 
     if (params.loadAssets) {
       const bitmapAssetDescs = await artboard.getBitmapAssets()
+      cancelToken?.throwIfCancelled()
+
       const fonts = await artboard.getFonts()
+      cancelToken?.throwIfCancelled()
 
       await Promise.all([
-        this.downloadBitmapAssets(bitmapAssetDescs),
-        this._loadFontsToRendering(fonts),
+        this.downloadBitmapAssets(bitmapAssetDescs, { cancelToken }),
+        this._loadFontsToRendering(fonts, { cancelToken }),
       ])
     }
 
     await renderingDesign.markArtboardAsReady(artboardId)
+    cancelToken?.throwIfCancelled()
 
     if (!renderingDesign.isArtboardReady(artboardId)) {
       throw new Error('The artboard failed to be loaded to a ready state')
@@ -1361,7 +1511,10 @@ export class DesignFacade {
   }
 
   private async _loadFontsToRendering(
-    fonts: Array<{ fontPostScriptName: string }>
+    fonts: Array<{ fontPostScriptName: string }>,
+    options: {
+      cancelToken?: CancelToken | null
+    }
   ) {
     const fontSource = this._fontSource
     if (!fontSource) {
@@ -1374,13 +1527,17 @@ export class DesignFacade {
     }
 
     await sequence(fonts, async ({ fontPostScriptName }) => {
-      const fontMatch = await fontSource.resolveFontPath(fontPostScriptName)
+      const fontMatch = await fontSource.resolveFontPath(
+        fontPostScriptName,
+        options
+      )
       if (fontMatch) {
         await renderingDesign.loadFont(
           fontPostScriptName,
           fontMatch.fontFilename,
           { facePostscriptName: fontMatch.fontPostscriptName }
         )
+        options.cancelToken?.throwIfCancelled()
       } else {
         this._console.warn(`Font not available: ${fontPostScriptName}`)
       }
@@ -1389,13 +1546,16 @@ export class DesignFacade {
 
   private _resolveVisibleArtboardLayerSubtree(
     artboardId: ArtboardId,
-    layerId: LayerId
+    layerId: LayerId,
+    options: {
+      cancelToken?: CancelToken | null
+    }
   ): Promise<Array<LayerId>> {
     const artboard = this.getArtboardById(artboardId)
     if (!artboard) {
       throw new Error('No such artboard')
     }
 
-    return artboard.resolveVisibleLayerSubtree(layerId)
+    return artboard.resolveVisibleLayerSubtree(layerId, options)
   }
 }

@@ -4,51 +4,90 @@ import mkdirp from 'mkdirp'
 import * as fs from 'fs'
 import * as fsExtra from 'fs-extra'
 
-export async function checkFile(filename: string): Promise<boolean> {
+import type { CancelToken } from '@avocode/cancel-token'
+
+export async function checkFile(
+  filename: string,
+  options: {
+    cancelToken?: CancelToken | null
+  } = {}
+): Promise<boolean> {
   const stat = promisify(fs.stat)
   try {
     const stats = await stat(filename)
+    options.cancelToken?.throwIfCancelled()
+
     return stats.isFile() && stats.size > 0
   } catch (err) {
+    options.cancelToken?.throwIfCancelled()
     return false
   }
 }
 
-export async function readJsonFile(filename: string): Promise<unknown> {
+export async function readJsonFile(
+  filename: string,
+  options: {
+    cancelToken?: CancelToken | null
+  } = {}
+): Promise<unknown> {
   const readFile = promisify(fs.readFile)
   const json = await readFile(filename, 'utf8')
+  options.cancelToken?.throwIfCancelled()
+
   return JSON.parse(json)
 }
 
 export async function writeJsonFile(
   filename: string,
-  data: object
+  data: object,
+  options: {
+    cancelToken?: CancelToken | null
+  } = {}
 ): Promise<void> {
   await mkdirp(dirname(filename))
+  options.cancelToken?.throwIfCancelled()
 
   const writeFile = promisify(fs.writeFile)
   const json = JSON.stringify(data)
   await writeFile(filename, json)
+  options.cancelToken?.throwIfCancelled()
 }
 
 export function readFileStream(filename: string): fs.ReadStream {
   return fs.createReadStream(filename)
 }
 
-export function readFileBlob(filename: string): Promise<Buffer> {
+export async function readFileBlob(
+  filename: string,
+  options: {
+    cancelToken?: CancelToken | null
+  } = {}
+): Promise<Buffer> {
   const readFile = promisify(fs.readFile)
-  return readFile(filename)
+  const result = await readFile(filename)
+  options.cancelToken?.throwIfCancelled()
+
+  return result
 }
 
 export async function writeJsonFileStream(
   filename: string,
-  dataStream: NodeJS.ReadableStream
+  dataStream: NodeJS.ReadableStream,
+  options: {
+    cancelToken?: CancelToken | null
+  } = {}
 ): Promise<void> {
   await mkdirp(dirname(filename))
+  options.cancelToken?.throwIfCancelled()
 
   const writeStream = fs.createWriteStream(filename)
 
   return new Promise((resolve, reject) => {
+    options.cancelToken?.onCancelled((reason: any) => {
+      reject(reason)
+      writeStream.close()
+    })
+
     writeStream.once('close', resolve)
     writeStream.once('error', reject)
     dataStream.once('error', reject)
@@ -57,28 +96,49 @@ export async function writeJsonFileStream(
   })
 }
 
-export function writeFileBlob(filename: string, blob: Buffer): Promise<void> {
+export async function writeFileBlob(
+  filename: string,
+  blob: Buffer,
+  options: {
+    cancelToken?: CancelToken | null
+  } = {}
+): Promise<void> {
   const writeFile = promisify(fs.writeFile)
-  return writeFile(filename, blob)
+  await writeFile(filename, blob)
+  options.cancelToken?.throwIfCancelled()
 }
 
-export function deleteFile(filename: string): Promise<void> {
+export async function deleteFile(
+  filename: string,
+  options: {
+    cancelToken?: CancelToken | null
+  } = {}
+): Promise<void> {
   const unlink = promisify(fs.unlink)
-  return unlink(filename)
+  await unlink(filename)
+  options.cancelToken?.throwIfCancelled()
 }
 
-export function copyDirectory(
+export async function copyDirectory(
   prevDirname: string,
-  nextDirname: string
+  nextDirname: string,
+  options: {
+    cancelToken?: CancelToken | null
+  } = {}
 ): Promise<void> {
   const copy = promisify(fsExtra.copy)
-  return copy(prevDirname, nextDirname)
+  await copy(prevDirname, nextDirname)
+  options.cancelToken?.throwIfCancelled()
 }
 
-export function moveDirectory(
+export async function moveDirectory(
   prevDirname: string,
-  nextDirname: string
+  nextDirname: string,
+  options: {
+    cancelToken?: CancelToken | null
+  } = {}
 ): Promise<void> {
   const rename = promisify(fs.rename)
-  return rename(prevDirname, nextDirname)
+  await rename(prevDirname, nextDirname)
+  options.cancelToken?.throwIfCancelled()
 }

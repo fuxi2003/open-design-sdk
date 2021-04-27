@@ -1,6 +1,7 @@
 import { DesignExportFacade } from '../design-export-facade'
 import { DesignFacade } from '../design-facade'
 
+import type { CancelToken } from '@avocode/cancel-token'
 import type { IApiDesign, IApiDesignExport } from '@opendesign/api'
 import type { LocalDesign } from '../local/local-design'
 import type { Sdk } from '../sdk'
@@ -11,11 +12,14 @@ export async function createDesignFromLocalDesign(
     sdk: Sdk
     console?: Console | null
     sourceFilename?: string | null
+    cancelToken?: CancelToken | null
   }
 ): Promise<DesignFacade> {
   const design = new DesignFacade(params)
 
-  await design.setLocalDesign(localDesign)
+  await design.setLocalDesign(localDesign, {
+    cancelToken: params.cancelToken || null,
+  })
 
   return design
 }
@@ -27,6 +31,7 @@ export async function createDesignFromOpenDesignApiDesign(
     console?: Console | null
     sourceFilename?: string | null
     exports?: Array<IApiDesignExport> | null
+    cancelToken?: CancelToken | null
   }
 ): Promise<DesignFacade> {
   const design = new DesignFacade({
@@ -34,7 +39,9 @@ export async function createDesignFromOpenDesignApiDesign(
     console: params.console,
   })
 
-  await design.setApiDesign(apiDesign)
+  await design.setApiDesign(apiDesign, {
+    cancelToken: params.cancelToken || null,
+  })
 
   if (params.exports) {
     params.exports.forEach((designExport) => {
