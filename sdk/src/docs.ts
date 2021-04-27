@@ -1,3 +1,4 @@
+import { CancelToken } from '@avocode/cancel-token'
 import type {
   ArtboardId,
   ArtboardOctopusData,
@@ -24,9 +25,11 @@ import type { BitmapAssetDescriptor } from './local/local-design'
 import type { PageFacade } from './page-facade'
 import type { Sdk } from './sdk'
 
-import type { createSdk } from './index'
+import type { createSdk, createCancelToken } from './index'
 
-export type { createSdk }
+export type { createSdk, createCancelToken }
+
+export type { CancelToken }
 
 export type {
   ArtboardId,

@@ -1,3 +1,4 @@
+import createCancelToken, { CancelToken } from '@avocode/cancel-token'
 import { OpenDesignApi } from '@opendesign/api'
 import { Sdk } from './sdk'
 import { ConsoleConfig, getConsole } from './utils/console'
@@ -53,3 +54,4 @@ function createOpenDesignApi(params: {
 }
 
 export { OpenDesignApi, Sdk }
+export { createCancelToken, CancelToken }

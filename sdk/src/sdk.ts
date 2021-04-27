@@ -174,7 +174,7 @@ export class Sdk {
     filePath: string,
     options: {
       cancelToken?: CancelToken | null
-    }
+    } = {}
   ): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
@@ -223,7 +223,7 @@ export class Sdk {
     filePath: string,
     options: {
       cancelToken?: CancelToken | null
-    }
+    } = {}
   ): Promise<DesignFacade> {
     if (this.isDestroyed()) {
       throw new Error('The SDK has been destroyed.')
