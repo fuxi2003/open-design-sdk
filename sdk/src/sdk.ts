@@ -147,7 +147,7 @@ export class Sdk {
    * @category Configuration
    * @param fallbackFonts An ordered list of font postscript names or font file paths.
    */
-  setFallbackFonts(fallbackFonts: Array<string>) {
+  setGlobalFallbackFonts(fallbackFonts: Array<string>) {
     const systemFontManager = this._systemFontManager
     if (!systemFontManager) {
       throw new Error('Font management is not configured.')
