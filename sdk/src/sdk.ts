@@ -12,7 +12,10 @@ import type {
   IApiDesignExport,
   IOpenDesignApi,
 } from '@opendesign/api'
-import type { IRenderingEngine } from '@opendesign/rendering'
+import type {
+  createRenderingEngine,
+  IRenderingEngine,
+} from '@opendesign/rendering'
 import type { components } from 'open-design-api-types'
 import type { DesignFacade } from './design-facade'
 import type { DesignFileManager } from './local/design-file-manager'
@@ -28,12 +31,13 @@ export class Sdk {
   private _designFileManager: DesignFileManager | null = null
   private _localDesignCache: LocalDesignCache | null = null
   private _localDesignManager: LocalDesignManager | null = null
-  private _renderingEngine: Promise<IRenderingEngine | null> | null = null
+  private _renderingEngineFactory: typeof createRenderingEngine | null = null
   private _systemFontManager: SystemFontManager | null = null
 
   private _destroyed: boolean = false
 
   private _console: Console
+  private _renderingEngine: Promise<IRenderingEngine | null> | null = null
 
   /** @internal */
   constructor(params: { console?: Console | null } = {}) {
@@ -76,6 +80,10 @@ export class Sdk {
    * @category Status
    */
   async destroy() {
+    if (this._destroyed) {
+      return
+    }
+
     this._destroyed = true
 
     const openDesignApi = this._openDesignApi
@@ -223,7 +231,7 @@ export class Sdk {
       await designFacade.setApiDesign(apiDesign, options)
     }
 
-    const renderingEngine = await this._renderingEngine
+    const renderingEngine = await this._getRenderingEngine()
     if (renderingEngine) {
       const renderingDesign = await renderingEngine.createDesign(uuid(), {
         bitmapAssetDirectoryPath: localDesign.getBitmapAssetDirectory(),
@@ -272,7 +280,7 @@ export class Sdk {
       console: this._console,
     })
 
-    const renderingEngine = await this._renderingEngine
+    const renderingEngine = await this._getRenderingEngine()
     if (renderingEngine) {
       const renderingDesign = await renderingEngine.createDesign(uuid(), {
         bitmapAssetDirectoryPath: localDesign.getBitmapAssetDirectory(),
@@ -550,7 +558,7 @@ export class Sdk {
         designFacade.setFontSource(fontSource)
       }
 
-      const renderingEngine = await this._renderingEngine
+      const renderingEngine = await this._getRenderingEngine()
       params.cancelToken?.throwIfCancelled()
 
       if (renderingEngine) {
@@ -612,14 +620,33 @@ export class Sdk {
   }
 
   /** @internal */
-  useRenderingEngine(
-    renderingEngine: IRenderingEngine | Promise<IRenderingEngine>
+  useRenderingEngineFactory(
+    renderingEngineFactory: typeof createRenderingEngine
   ): void {
-    this._renderingEngine = Promise.resolve(renderingEngine).catch((err) => {
+    this._renderingEngineFactory = renderingEngineFactory
+  }
+
+  private _getRenderingEngine() {
+    if (this._renderingEngine) {
+      return this._renderingEngine
+    }
+
+    const renderingEngineFactory = this._renderingEngineFactory
+    if (!renderingEngineFactory) {
+      return Promise.resolve(null)
+    }
+    console.trace('create rendering')
+    this._renderingEngine = Promise.resolve(
+      renderingEngineFactory({
+        console: this._console,
+      })
+    ).catch((err) => {
       this._console.error('Rendering engine cound not be initialized', err)
       this.destroy()
       return null
     })
+
+    return this._renderingEngine
   }
 
   private _getCommonApiDesignInfo() {
