@@ -63,11 +63,7 @@ export function createSdk(params: {
   }
 
   if (params.rendering !== false) {
-    sdk.useRenderingEngine(
-      createRenderingEngine({
-        console: sdkConsole,
-      })
-    )
+    sdk.useRenderingEngineFactory(createRenderingEngine)
   }
 
   sdk.setWorkingDirectory(params.workingDirectory || null)
