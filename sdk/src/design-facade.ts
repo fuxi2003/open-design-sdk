@@ -641,6 +641,8 @@ export class DesignFacade {
    * Sets the directory where fonts should be looked up when rendering the design.
    *
    * Fonts are matched based on their postscript names, not the file basenames.
+   *
+   * This configuration overrides the global font directory configuration (set up via {@link Sdk.setGlobalFontDirectory}) – i.e. fonts from the globally configured directory are not used for the design.
    */
   setFontDirectory(fontDirectoryPath: string) {
     const renderingDesign = this._renderingDesign
