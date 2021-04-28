@@ -1,3 +1,4 @@
+import createCancelToken, { CancelToken } from '@avocode/cancel-token'
 import { stat } from 'fs'
 import { extname, join as joinPaths, resolve as resolvePath } from 'path'
 import { promisify } from 'util'
@@ -9,7 +10,6 @@ import { ApiDesignInfo, LocalDesign } from './local-design'
 
 import { MANIFEST_BASENAME } from './consts'
 
-import type { CancelToken } from '@avocode/cancel-token'
 import type { ManifestData } from '@opendesign/octopus-reader'
 
 const statPromised = promisify(stat)
@@ -17,9 +17,14 @@ const statPromised = promisify(stat)
 export class LocalDesignManager {
   private _console: Console
   private _workingDirectory: string | null = null
+  private _destroyTokenController = createCancelToken()
 
   constructor(params: { console?: Console | null } = {}) {
     this._console = params.console || console
+  }
+
+  destroy() {
+    this._destroyTokenController.cancel()
   }
 
   getWorkingDirectory() {
@@ -43,6 +48,11 @@ export class LocalDesignManager {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<LocalDesign> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const filename = this.resolvePath(filePath)
     this._checkOctopusFileName(filename)
 
@@ -61,7 +71,7 @@ export class LocalDesignManager {
     if (
       options.apiDesignInfo &&
       !(await this._checkApiDesignInfo(localDesign, options.apiDesignInfo, {
-        cancelToken: options.cancelToken || null,
+        cancelToken,
       }))
     ) {
       throw new Error('Incompatible API design entity info')
@@ -76,18 +86,22 @@ export class LocalDesignManager {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<LocalDesign> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const filename = this.resolvePath(filePath)
     this._checkOctopusFileName(filename)
 
     await this._createDirectory(filename)
-    options.cancelToken?.throwIfCancelled()
+    cancelToken.throwIfCancelled()
 
     const emptyManifest = { 'artboards': [], 'pages': {} }
-    await writeJsonFile(
-      `${filename}/${MANIFEST_BASENAME}`,
-      emptyManifest,
-      options
-    )
+    await writeJsonFile(`${filename}/${MANIFEST_BASENAME}`, emptyManifest, {
+      ...options,
+      cancelToken,
+    })
 
     return new LocalDesign({ filename, localDesignManager: this })
   }
@@ -100,17 +114,30 @@ export class LocalDesignManager {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<LocalDesign> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const filename = await this._createTempLocation(options.name || null)
     options.cancelToken?.throwIfCancelled()
 
-    const localDesign = await this.createOctopusFile(filename, options)
+    const localDesign = await this.createOctopusFile(filename, {
+      ...options,
+      cancelToken,
+    })
     this._console.debug('Cache:', filename)
-    options.cancelToken?.throwIfCancelled()
 
-    await localDesign.saveManifest(manifest, options)
+    await localDesign.saveManifest(manifest, {
+      ...options,
+      cancelToken,
+    })
 
     if (options.apiDesignInfo) {
-      await localDesign.saveApiDesignInfo(options.apiDesignInfo, options)
+      await localDesign.saveApiDesignInfo(options.apiDesignInfo, {
+        ...options,
+        cancelToken,
+      })
     }
 
     return localDesign
@@ -158,11 +185,11 @@ export class LocalDesignManager {
   async _checkApiDesignInfo(
     localDesign: LocalDesign,
     nextApiDesignInfo: ApiDesignInfo,
-    options: {
-      cancelToken?: CancelToken | null
+    params: {
+      cancelToken: CancelToken
     }
   ): Promise<boolean> {
-    const prevApiDesignInfo = await localDesign.getApiDesignInfo(options)
+    const prevApiDesignInfo = await localDesign.getApiDesignInfo(params)
     if (!prevApiDesignInfo) {
       return true
     }

@@ -1,3 +1,4 @@
+import createCancelToken, { CancelToken } from '@avocode/cancel-token'
 import { create as createFontkit, Fontkit } from '@avocode/fontkit'
 import SystemFontFamilies, { getFontInfo } from '@avocode/system-font-families'
 import { extname, resolve as resolvePath } from 'path'
@@ -5,7 +6,6 @@ import { readFile } from 'fs'
 import { promisify } from 'util'
 import { FontSource } from './font-source'
 import { mapFind } from '../utils/async'
-import { CancelToken } from '@avocode/cancel-token'
 
 const readFilePromised = promisify(readFile)
 
@@ -18,7 +18,9 @@ export type FontMatchDescriptor = {
 export class SystemFontManager {
   // NOTE: Record<postscriptName, filename>
   _systemFonts: Record<string, string> | null = null
+
   private _workingDirectory: string | null = null
+  private _destroyTokenController = createCancelToken()
 
   _console: Console
   _systemFontFamilies: SystemFontFamilies
@@ -36,6 +38,10 @@ export class SystemFontManager {
 
     this._systemFontFamilies = new SystemFontFamilies()
     this._fontkit = createFontkit()
+  }
+
+  destroy() {
+    this._destroyTokenController.cancel()
   }
 
   getWorkingDirectory() {
@@ -80,13 +86,24 @@ export class SystemFontManager {
     fontPostscriptName: string
     fallback: boolean
   } | null> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const fontFamilies = options.fontFamilies || null
-    const fontMatch = await this._getMatchingFont(font, fontFamilies, options)
+    const fontMatch = await this._getMatchingFont(font, fontFamilies, {
+      ...options,
+      cancelToken,
+    })
     if (fontMatch) {
       return { ...fontMatch, fallback: false }
     }
 
-    const fallbackFontMatch = await this._getMatchingFallbackFont(options)
+    const fallbackFontMatch = await this._getMatchingFallbackFont({
+      ...options,
+      cancelToken,
+    })
     if (fallbackFontMatch) {
       return { ...fallbackFontMatch, fallback: true }
     }
@@ -97,8 +114,8 @@ export class SystemFontManager {
   async _getMatchingFont(
     font: string,
     fontFamilies: SystemFontFamilies | null,
-    options: {
-      cancelToken?: CancelToken | null
+    params: {
+      cancelToken: CancelToken
     }
   ): Promise<{ fontFilename: string; fontPostscriptName: string } | null> {
     const ext = extname(font)
@@ -106,7 +123,7 @@ export class SystemFontManager {
       try {
         const fontFilename = this._resolvePath(font)
         const fontInfo = await getFontInfo(fontFilename)
-        options.cancelToken?.throwIfCancelled()
+        params.cancelToken.throwIfCancelled()
 
         if (fontInfo) {
           return { fontFilename, fontPostscriptName: fontInfo.postscript }
@@ -129,7 +146,7 @@ export class SystemFontManager {
     const fontFilename = await this._getFontPathByPostscriptName(
       font,
       fontFamilies,
-      options
+      params
     )
     return fontFilename ? { fontFilename, fontPostscriptName: font } : null
   }
@@ -137,7 +154,7 @@ export class SystemFontManager {
   _getMatchingFallbackFont(options: {
     fontFamilies?: SystemFontFamilies | null
     fallbackFonts?: Array<string>
-    cancelToken?: CancelToken | null
+    cancelToken: CancelToken
   }) {
     const fallbackFonts = [
       ...(options.fallbackFonts || []),
@@ -146,7 +163,7 @@ export class SystemFontManager {
 
     return mapFind(fallbackFonts, (fallbackFont) => {
       return this._getMatchingFont(fallbackFont, options.fontFamilies || null, {
-        cancelToken: options.cancelToken || null,
+        cancelToken: options.cancelToken,
       })
     })
   }
@@ -154,14 +171,14 @@ export class SystemFontManager {
   async _getFontPathByPostscriptName(
     postscriptName: string,
     fontFamilies: SystemFontFamilies | null,
-    options: {
-      cancelToken?: CancelToken | null
+    params: {
+      cancelToken: CancelToken
     }
   ): Promise<string | null> {
     if (fontFamilies) {
       const customFontFilenames = await this._getFontLocations(
         fontFamilies,
-        options
+        params
       )
       const customFontFilename = customFontFilenames[postscriptName]
       if (customFontFilename) {
@@ -169,20 +186,18 @@ export class SystemFontManager {
       }
     }
 
-    const systemFontFilenames = await this._loadSystemFontLocations(options)
+    const systemFontFilenames = await this._loadSystemFontLocations(params)
     return systemFontFilenames[postscriptName] || null
   }
 
-  async _loadSystemFontLocations(options: {
-    cancelToken?: CancelToken | null
-  }) {
+  async _loadSystemFontLocations(params: { cancelToken: CancelToken }) {
     if (this._systemFonts) {
       return this._systemFonts
     }
 
     const systemFonts = await this._getFontLocations(
       this._systemFontFamilies,
-      options
+      params
     )
     this._systemFonts = systemFonts
 
@@ -191,24 +206,24 @@ export class SystemFontManager {
 
   async _getFontLocations(
     fontFamilies: SystemFontFamilies,
-    options: {
-      cancelToken?: CancelToken | null
+    params: {
+      cancelToken: CancelToken
     }
   ) {
     return {
-      ...(await this._parseRegularFonts(fontFamilies, options)),
-      ...(await this._parseFontCollections(fontFamilies, options)),
+      ...(await this._parseRegularFonts(fontFamilies, params)),
+      ...(await this._parseFontCollections(fontFamilies, params)),
     }
   }
 
   async _parseRegularFonts(
     fontFamilies: SystemFontFamilies,
-    options: {
-      cancelToken?: CancelToken | null
+    params: {
+      cancelToken: CancelToken
     }
   ) {
     const fontDescs = await fontFamilies.getFontsExtended()
-    options.cancelToken?.throwIfCancelled()
+    params.cancelToken.throwIfCancelled()
 
     const supportedFormats = ['.otf', '.ttf']
     const filenames: Record<string, string> = {}
@@ -230,8 +245,8 @@ export class SystemFontManager {
 
   async _parseFontCollections(
     fontFamilies: SystemFontFamilies,
-    options: {
-      cancelToken?: CancelToken | null
+    params: {
+      cancelToken: CancelToken
     }
   ) {
     try {
@@ -241,7 +256,7 @@ export class SystemFontManager {
         return ext === '.ttc'
       })
 
-      return this._parseCollectionFontFiles(fontCollectionFilenames, options)
+      return this._parseCollectionFontFiles(fontCollectionFilenames, params)
     } catch (err) {
       return {}
     }
@@ -249,8 +264,8 @@ export class SystemFontManager {
 
   async _parseCollectionFontFiles(
     fontCollectionFilenames: Array<string>,
-    options: {
-      cancelToken?: CancelToken | null
+    params: {
+      cancelToken: CancelToken
     }
   ) {
     const filenames: Record<string, string> = {}
@@ -258,10 +273,10 @@ export class SystemFontManager {
     await Promise.all(
       fontCollectionFilenames.map(async (fontCollectionFilename) => {
         const fontData = await readFilePromised(fontCollectionFilename)
-        options.cancelToken?.throwIfCancelled()
+        params.cancelToken.throwIfCancelled()
 
         const fontCollection = await this._fontkit.create(fontData)
-        options.cancelToken?.throwIfCancelled()
+        params.cancelToken.throwIfCancelled()
 
         fontCollection.fonts.forEach((fontInfo) => {
           const postscriptName = fontInfo.postscriptName

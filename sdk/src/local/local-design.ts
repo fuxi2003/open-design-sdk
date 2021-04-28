@@ -1,3 +1,4 @@
+import createCancelToken, { CancelToken } from '@avocode/cancel-token'
 import { basename, join as joinPaths } from 'path'
 import {
   checkFile,
@@ -23,7 +24,6 @@ import {
   PAGE_DIRECTORY_BASENAME,
 } from './consts'
 
-import type { CancelToken } from '@avocode/cancel-token'
 import type {
   ArtboardId,
   ArtboardOctopusData,
@@ -47,12 +47,14 @@ export class LocalDesign {
   _filename: string
 
   _apiDesignInfo: ApiDesignInfo | null
+  _destroyToken: CancelToken | null
   _bitmapMapping: BitmapMapping | null = null
 
   constructor(init: {
     filename: string
     localDesignManager: LocalDesignManager
     apiDesignInfo?: ApiDesignInfo | null
+    destroyToken?: CancelToken | null
   }) {
     const filename = init.filename
     if (!filename) {
@@ -62,6 +64,7 @@ export class LocalDesign {
     this._filename = init.filename
     this._localDesignManager = init.localDesignManager
     this._apiDesignInfo = init.apiDesignInfo || null
+    this._destroyToken = init.destroyToken || null
   }
 
   get filename(): string {
@@ -74,10 +77,15 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ) {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const nextFilename = this._localDesignManager.resolvePath(nextFilePath)
     const prevFilename = this._filename
     await copyDirectory(prevFilename, nextFilename)
-    options.cancelToken?.throwIfCancelled()
+    cancelToken.throwIfCancelled()
 
     this._filename = nextFilename
   }
@@ -88,10 +96,15 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ) {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const nextFilename = this._localDesignManager.resolvePath(nextFilePath)
     const prevFilename = this._filename
     await moveDirectory(prevFilename, nextFilename)
-    options.cancelToken?.throwIfCancelled()
+    cancelToken.throwIfCancelled()
 
     this._filename = nextFilename
   }
@@ -101,11 +114,15 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<ManifestData> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const manifestFilename = this._getManifestFilename()
-    const manifest = (await readJsonFile(
-      manifestFilename,
-      options
-    )) as ManifestData
+    const manifest = (await readJsonFile(manifestFilename, {
+      cancelToken,
+    })) as ManifestData
     return manifest
   }
 
@@ -115,8 +132,13 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const manifestFilename = this._getManifestFilename()
-    await writeJsonFile(manifestFilename, manifest, options)
+    await writeJsonFile(manifestFilename, manifest, { cancelToken })
   }
 
   async hasArtboardContent(
@@ -125,8 +147,13 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<boolean> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const contentFilename = this._getArtboardContentFilename(artboardId)
-    return checkFile(contentFilename, options)
+    return checkFile(contentFilename, { cancelToken })
   }
 
   async getArtboardContentFilename(
@@ -135,7 +162,12 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<string | null> {
-    if (!this.hasArtboardContent(artboardId, options)) {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
+    if (!this.hasArtboardContent(artboardId, { cancelToken })) {
       return null
     }
 
@@ -148,11 +180,15 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<ArtboardOctopusData> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const contentFilename = this._getArtboardContentFilename(artboardId)
-    const content = (await readJsonFile(
-      contentFilename,
-      options
-    )) as ArtboardOctopusData
+    const content = (await readJsonFile(contentFilename, {
+      cancelToken,
+    })) as ArtboardOctopusData
     return content
   }
 
@@ -170,8 +206,13 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const contentFilename = this._getArtboardContentFilename(artboardId)
-    await writeJsonFile(contentFilename, content, options)
+    await writeJsonFile(contentFilename, content, { cancelToken })
   }
 
   async saveArtboardContentJsonStream(
@@ -181,8 +222,13 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const contentFilename = this._getArtboardContentFilename(artboardId)
-    await writeJsonFileStream(contentFilename, contentStream, options)
+    await writeJsonFileStream(contentFilename, contentStream, { cancelToken })
   }
 
   async hasPageContent(
@@ -201,11 +247,15 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<ArtboardOctopusData> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const contentFilename = this._getPageContentFilename(pageId)
-    const content = (await readJsonFile(
-      contentFilename,
-      options
-    )) as ArtboardOctopusData
+    const content = (await readJsonFile(contentFilename, {
+      cancelToken,
+    })) as ArtboardOctopusData
     return content
   }
 
@@ -223,8 +273,13 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const contentFilename = this._getPageContentFilename(pageId)
-    await writeJsonFile(contentFilename, content, options)
+    await writeJsonFile(contentFilename, content, { cancelToken })
   }
 
   async savePageContentJsonStream(
@@ -234,8 +289,13 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const contentFilename = this._getPageContentFilename(pageId)
-    await writeJsonFileStream(contentFilename, contentStream, options)
+    await writeJsonFileStream(contentFilename, contentStream, { cancelToken })
   }
 
   async hasBitmapAsset(
@@ -244,10 +304,14 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<boolean> {
-    const { available } = await this.resolveBitmapAsset(
-      bitmapAssetDesc,
-      options
-    )
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
+    const { available } = await this.resolveBitmapAsset(bitmapAssetDesc, {
+      cancelToken,
+    })
     return available
   }
 
@@ -261,10 +325,15 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<NodeJS.ReadableStream> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const {
       filename: bitmapAssetFilename,
       available,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, { cancelToken })
     if (!available) {
       throw new Error('No such asset')
     }
@@ -278,10 +347,15 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<Buffer> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const {
       filename: bitmapAssetFilename,
       available,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, { cancelToken })
     if (!available) {
       throw new Error('No such asset')
     }
@@ -296,13 +370,18 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
-    await this._loadBitmapMapping(options)
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
+    await this._loadBitmapMapping({ cancelToken })
 
     const {
       filename: bitmapAssetFilename,
       basename,
       mapped,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, { cancelToken })
     await writeJsonFile(bitmapAssetFilename, content)
 
     if (mapped) {
@@ -311,7 +390,7 @@ export class LocalDesign {
           ...(this._bitmapMapping || {}),
           [bitmapAssetDesc.name]: basename,
         },
-        options
+        { cancelToken }
       )
     }
   }
@@ -323,14 +402,21 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
-    await this._loadBitmapMapping(options)
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
+    await this._loadBitmapMapping({ cancelToken })
 
     const {
       filename: bitmapAssetFilename,
       basename,
       mapped,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
-    await writeJsonFileStream(bitmapAssetFilename, contentStream, options)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, { cancelToken })
+    await writeJsonFileStream(bitmapAssetFilename, contentStream, {
+      cancelToken,
+    })
 
     if (mapped) {
       await this.saveBitmapMapping(
@@ -338,7 +424,7 @@ export class LocalDesign {
           ...(this._bitmapMapping || {}),
           [bitmapAssetDesc.name]: basename,
         },
-        options
+        { cancelToken }
       )
     }
   }
@@ -350,14 +436,19 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
-    await this._loadBitmapMapping(options)
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
+    await this._loadBitmapMapping({ cancelToken })
 
     const {
       filename: bitmapAssetFilename,
       basename,
       mapped,
-    } = await this.resolveBitmapAsset(bitmapAssetDesc, options)
-    await writeFileBlob(bitmapAssetFilename, bitmapAssetBlob, options)
+    } = await this.resolveBitmapAsset(bitmapAssetDesc, { cancelToken })
+    await writeFileBlob(bitmapAssetFilename, bitmapAssetBlob, { cancelToken })
 
     if (mapped) {
       await this.saveBitmapMapping(
@@ -365,7 +456,7 @@ export class LocalDesign {
           ...(this._bitmapMapping || {}),
           [bitmapAssetDesc.name]: basename,
         },
-        options
+        { cancelToken }
       )
     }
   }
@@ -375,7 +466,12 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<BitmapMapping> {
-    await this._loadBitmapMapping(options)
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
+    await this._loadBitmapMapping({ cancelToken })
 
     if (!this._bitmapMapping) {
       throw new Error('Bitmap mapping is not available')
@@ -389,18 +485,25 @@ export class LocalDesign {
       return
     }
 
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const bitmapMappingFilename = this._getBitmapMappingFilename()
 
     const bitmapMappingExists = await checkFile(bitmapMappingFilename)
-    options.cancelToken?.throwIfCancelled()
+    cancelToken.throwIfCancelled()
 
     if (!bitmapMappingExists) {
       this._bitmapMapping = {}
       return
     }
 
-    this._bitmapMapping = (await readJsonFile(bitmapMappingFilename),
-    options) as BitmapMapping
+    this._bitmapMapping = (await readJsonFile(
+      bitmapMappingFilename,
+      options
+    )) as BitmapMapping
   }
 
   unload() {
@@ -417,19 +520,24 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     const prevBitmapMapping = this._bitmapMapping
     this._bitmapMapping = bitmapMapping
 
-    const unregisterCanceller = options.cancelToken?.onCancelled(() => {
+    const unregisterCanceller = cancelToken.onCancelled(() => {
       if (this._bitmapMapping === bitmapMapping) {
         this._bitmapMapping = prevBitmapMapping
       }
     })
 
     const bitmapMappingFilename = this._getBitmapMappingFilename()
-    await writeJsonFile(bitmapMappingFilename, bitmapMapping, options)
+    await writeJsonFile(bitmapMappingFilename, bitmapMapping, { cancelToken })
 
-    unregisterCanceller?.()
+    unregisterCanceller()
   }
 
   async getApiDesignInfo(
@@ -437,7 +545,12 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<ApiDesignInfo | null> {
-    await this._loadApiDesignInfo(options)
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
+    await this._loadApiDesignInfo({ cancelToken })
 
     return this._apiDesignInfo
   }
@@ -468,11 +581,16 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
     this._apiDesignInfo = apiDesignInfo
 
     const apiDesignInfoFilename = this._getApiDesignInfoFilename()
     if (apiDesignInfo) {
-      await writeJsonFile(apiDesignInfoFilename, apiDesignInfo, options)
+      await writeJsonFile(apiDesignInfoFilename, apiDesignInfo, { cancelToken })
     } else {
       await deleteFile(apiDesignInfoFilename)
     }
@@ -519,10 +637,15 @@ export class LocalDesign {
     filename: string
     available: boolean
   }> {
-    const { basename, mapped } = await this._getBitmapAssetBasename(
-      bitmapAssetDesc,
-      options
-    )
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
+    const {
+      basename,
+      mapped,
+    } = await this._getBitmapAssetBasename(bitmapAssetDesc, { cancelToken })
     const filename = joinPaths(
       this._filename,
       BITMAP_ASSET_DIRECTORY_BASENAME,
@@ -533,7 +656,7 @@ export class LocalDesign {
       basename,
       mapped,
       filename,
-      available: await checkFile(filename, options),
+      available: await checkFile(filename, { cancelToken }),
     }
   }
 
@@ -543,7 +666,12 @@ export class LocalDesign {
       cancelToken?: CancelToken | null
     }
   ): Promise<{ basename: string; mapped: boolean }> {
-    await this._loadBitmapMapping(options)
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyToken,
+    ])
+
+    await this._loadBitmapMapping({ cancelToken })
 
     const bitmapMapping = this._bitmapMapping || {}
     const mappedBasename = bitmapMapping[bitmapAssetDesc.name]

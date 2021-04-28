@@ -1,13 +1,12 @@
-import { get, getStream, post, postMultipart } from './utils/fetch'
+import createCancelToken, { CancelToken } from '@avocode/cancel-token'
+import { fetch, get, getStream, post, postMultipart } from './utils/fetch'
 import { sleep } from './utils/sleep'
 import cplus from 'cplus'
-import fetch from 'node-fetch'
 
 import { ApiDesign } from './api-design'
 import { ApiDesignExport } from './api-design-export'
 import { OpenDesignApiError } from './open-design-api-error'
 
-import type { CancelToken } from '@avocode/cancel-token'
 import type { ReadStream } from 'fs'
 import type { ArtboardId } from '@opendesign/octopus-reader'
 import type { components } from 'open-design-api-types'
@@ -26,6 +25,7 @@ export class OpenDesignApi implements IOpenDesignApi {
   private _token: string
 
   private _console: Console
+  private _destroyTokenController = createCancelToken()
 
   constructor(params: {
     apiRoot: string
@@ -46,12 +46,21 @@ export class OpenDesignApi implements IOpenDesignApi {
     return { token: this._token }
   }
 
+  destroy() {
+    this._destroyTokenController.cancel('The API has been destroyed.')
+  }
+
   async getDesignById(
     designId: DesignId,
     options: {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<ApiDesign> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}',
@@ -62,6 +71,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         console: this._console,
         ...options,
+        cancelToken,
       }
     )
 
@@ -80,7 +90,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode === 202) {
       await sleep(1000)
-      options.cancelToken?.throwIfCancelled()
+      cancelToken.throwIfCancelled()
 
       return this.getDesignById(designId)
     }
@@ -98,6 +108,11 @@ export class OpenDesignApi implements IOpenDesignApi {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<DesignSummary> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}/summary',
@@ -108,6 +123,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         console: this._console,
         ...options,
+        cancelToken,
       }
     )
 
@@ -118,7 +134,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode === 202) {
       await sleep(1000)
-      options.cancelToken?.throwIfCancelled()
+      cancelToken.throwIfCancelled()
 
       return this.getDesignSummary(designId)
     }
@@ -133,6 +149,11 @@ export class OpenDesignApi implements IOpenDesignApi {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<ApiDesign> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await postMultipart(
       this._apiRoot,
       '/designs/upload',
@@ -144,7 +165,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._getAuthInfo(),
       {
         console: this._console,
-        cancelToken: options.cancelToken || null,
+        cancelToken,
       }
     )
 
@@ -164,6 +185,11 @@ export class OpenDesignApi implements IOpenDesignApi {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<ApiDesign> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await post(
       this._apiRoot,
       '/designs/link',
@@ -175,7 +201,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._getAuthInfo(),
       {
         console: this._console,
-        cancelToken: options.cancelToken || null,
+        cancelToken,
       }
     )
 
@@ -195,6 +221,11 @@ export class OpenDesignApi implements IOpenDesignApi {
     name?: string | null
     cancelToken?: CancelToken | null
   }): Promise<ApiDesign> {
+    const cancelToken = createCancelToken.race([
+      params.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await post(
       this._apiRoot,
       '/designs/figma-link',
@@ -208,7 +239,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._getAuthInfo(),
       {
         console: this._console,
-        cancelToken: params.cancelToken || null,
+        cancelToken,
       }
     )
 
@@ -229,6 +260,11 @@ export class OpenDesignApi implements IOpenDesignApi {
     exports: Array<{ format: DesignExportTargetFormatEnum }>
     cancelToken?: CancelToken | null
   }): Promise<{ designId: DesignId; exports: Array<ApiDesignExport> }> {
+    const cancelToken = createCancelToken.race([
+      params.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await post(
       this._apiRoot,
       '/designs/figma-link',
@@ -243,7 +279,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._getAuthInfo(),
       {
         console: this._console,
-        cancelToken: params.cancelToken || null,
+        cancelToken,
       }
     )
 
@@ -272,6 +308,11 @@ export class OpenDesignApi implements IOpenDesignApi {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<OctopusDocument> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}/artboards/{artboard_id}/content',
@@ -280,6 +321,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         console: this._console,
         ...options,
+        cancelToken,
       }
     )
 
@@ -290,7 +332,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode === 202) {
       await sleep(1000)
-      options.cancelToken?.throwIfCancelled()
+      cancelToken.throwIfCancelled()
 
       return this.getDesignArtboardContent(designId, artboardId)
     }
@@ -305,6 +347,11 @@ export class OpenDesignApi implements IOpenDesignApi {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<NodeJS.ReadableStream> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await getStream(
       this._apiRoot,
       '/designs/{design_id}/artboards/{artboard_id}/content',
@@ -313,6 +360,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         console: this._console,
         ...options,
+        cancelToken,
       }
     )
 
@@ -327,7 +375,7 @@ export class OpenDesignApi implements IOpenDesignApi {
 
     if (res.statusCode === 202) {
       await sleep(1000)
-      options.cancelToken?.throwIfCancelled()
+      cancelToken?.throwIfCancelled()
 
       return this.getDesignArtboardContentJsonStream(designId, artboardId)
     }
@@ -342,6 +390,11 @@ export class OpenDesignApi implements IOpenDesignApi {
       cancelToken?: CancelToken | null
     }
   ): Promise<ApiDesignExport> {
+    const cancelToken = createCancelToken.race([
+      params.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await post(
       this._apiRoot,
       '/designs/{design_id}/exports',
@@ -350,7 +403,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._getAuthInfo(),
       {
         console: this._console,
-        cancelToken: params.cancelToken || null,
+        cancelToken,
       }
     )
 
@@ -379,6 +432,11 @@ export class OpenDesignApi implements IOpenDesignApi {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<ApiDesignExport> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const res = await get(
       this._apiRoot,
       '/designs/{design_id}/exports/{export_id}',
@@ -387,6 +445,7 @@ export class OpenDesignApi implements IOpenDesignApi {
       {
         console: this._console,
         ...options,
+        cancelToken,
       }
     )
 
@@ -435,7 +494,14 @@ export class OpenDesignApi implements IOpenDesignApi {
       throw new Error('Relative asset paths are not supported')
     }
 
-    const res = await fetch(bitmapKey, options)
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
+    const res = await fetch(bitmapKey, {
+      cancelToken,
+    })
     if (res.status !== 200 || !res.body) {
       this._console.debug('ApiDesign#getBitmapAssetStream()', {
         bitmapKey,

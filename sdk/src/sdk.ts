@@ -78,6 +78,26 @@ export class Sdk {
   async destroy() {
     this._destroyed = true
 
+    const openDesignApi = this._openDesignApi
+    if (openDesignApi) {
+      openDesignApi.destroy()
+    }
+
+    const systemFontManager = this._systemFontManager
+    if (systemFontManager) {
+      systemFontManager.destroy()
+    }
+
+    const designFileManager = this._designFileManager
+    if (designFileManager) {
+      designFileManager.destroy()
+    }
+
+    const localDesignManager = this._localDesignManager
+    if (localDesignManager) {
+      localDesignManager.destroy()
+    }
+
     const renderingEngine = await this._renderingEngine
     if (renderingEngine && !renderingEngine.isDestroyed()) {
       this._renderingEngine = null

@@ -1,10 +1,16 @@
+import createCancelToken, { CancelToken } from '@avocode/cancel-token'
 import { createReadStream, createWriteStream, ReadStream } from 'fs'
 import { resolve as resolvePath } from 'path'
 
-import type { CancelToken } from '@avocode/cancel-token'
-
 export class DesignFileManager {
   private _workingDirectory: string | null = null
+  private _destroyTokenController = createCancelToken()
+
+  destroy() {
+    this._destroyTokenController.cancel(
+      'The design file manager has been destroyed.'
+    )
+  }
 
   getWorkingDirectory() {
     return this._workingDirectory || resolvePath('.')
@@ -22,16 +28,19 @@ export class DesignFileManager {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<ReadStream> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const filename = this._resolvePath(filePath)
     const stream = createReadStream(filename)
 
     return new Promise((resolve, reject) => {
-      const unregisterCanceller = options.cancelToken?.onCancelled(
-        (reason: unknown) => {
-          stream.close()
-          reject(reason)
-        }
-      )
+      const unregisterCanceller = cancelToken.onCancelled((reason: unknown) => {
+        stream.close()
+        reject(reason)
+      })
       const handleError = (err: Error) => {
         unregisterCanceller?.()
         reject(err)
@@ -53,11 +62,16 @@ export class DesignFileManager {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<void> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
     const filename = this._resolvePath(filePath)
     const writeStream = createWriteStream(filename)
 
     return new Promise((resolve, reject) => {
-      const unregisterCanceller = options.cancelToken?.onCancelled(
+      const unregisterCanceller = cancelToken?.onCancelled(
         (reason: unknown) => {
           writeStream.close()
           reject(reason)

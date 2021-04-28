@@ -22,6 +22,8 @@ export interface IOpenDesignApiModule {
 export interface IOpenDesignApi {
   getApiRoot(): string
 
+  destroy(): void
+
   // Import
 
   importDesignFile(
