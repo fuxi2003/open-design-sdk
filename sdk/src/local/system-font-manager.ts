@@ -26,6 +26,9 @@ export class SystemFontManager {
   _systemFontFamilies: SystemFontFamilies
   _fontkit: Fontkit
 
+  private _globalFontDirname: string | null = null
+  private _globalFontFamilies: SystemFontFamilies | null = null
+
   private _globalFallbackFonts: Array<string> = [
     'Roboto',
     'Helvetica',
@@ -51,6 +54,14 @@ export class SystemFontManager {
   setWorkingDirectory(workingDirectory: string | null) {
     this._workingDirectory = workingDirectory
       ? resolvePath(workingDirectory)
+      : null
+  }
+
+  setGlobalFontDirectory(fontDirname: string | null) {
+    this._globalFontDirname = fontDirname
+
+    this._globalFontFamilies = fontDirname
+      ? this.getFontFamilies(fontDirname)
       : null
   }
 
@@ -91,7 +102,7 @@ export class SystemFontManager {
       this._destroyTokenController.token,
     ])
 
-    const fontFamilies = options.fontFamilies || null
+    const fontFamilies = options.fontFamilies || this._globalFontFamilies
     const fontMatch = await this._getMatchingFont(font, fontFamilies, {
       ...options,
       cancelToken,

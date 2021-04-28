@@ -167,6 +167,23 @@ export class Sdk {
   }
 
   /**
+   * Sets the directory where fonts should be looked up when rendering the design.
+   *
+   * This configuration can be overriden/extended for each individual design via {@link DesignFacade.setFontDirectory}.
+   *
+   * @category Configuration
+   * @param fallbackFonts An ordered list of font postscript names or font file paths.
+   */
+  setGlobalFontDirectory(fontDirname: string | null) {
+    const systemFontManager = this._systemFontManager
+    if (!systemFontManager) {
+      throw new Error('Font management is not configured.')
+    }
+
+    systemFontManager.setGlobalFontDirectory(fontDirname)
+  }
+
+  /**
    * Sets the fonts which should be used as a fallback in case the actual fonts needed for rendering text layers are not available.
    *
    * The first font from this list which is available in the system is used for all text layers with missing actual fonts. If none of the fonts are available, the text layers are not rendered.
