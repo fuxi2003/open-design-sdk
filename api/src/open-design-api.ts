@@ -359,7 +359,7 @@ export class OpenDesignApi implements IOpenDesignApi {
     }
 
     const res = await fetch(bitmapKey)
-    if (res.status !== 200) {
+    if (res.status !== 200 || !res.body) {
       this._console.debug('ApiDesign#getBitmapAssetStream()', {
         bitmapKey,
         statusCode: res.status,

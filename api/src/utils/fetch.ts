@@ -223,6 +223,10 @@ async function requestStream<
     throw new Error('Server Error')
   }
 
+  if (!res.body) {
+    throw new Error('Response body stream not available')
+  }
+
   return {
     statusCode: res.status as Exclude<OperationStatusCodes<Operation>, 500>,
     headers: res.headers,

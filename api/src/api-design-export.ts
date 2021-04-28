@@ -64,7 +64,7 @@ export class ApiDesignExport implements IApiDesignExport {
     }
 
     const res = await fetch(resultUrl)
-    if (res.status !== 200) {
+    if (res.status !== 200 || !res.body) {
       throw new Error('The design export result is not available')
     }
 
