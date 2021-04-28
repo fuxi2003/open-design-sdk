@@ -223,6 +223,15 @@ export class Sdk {
       await designFacade.setApiDesign(apiDesign, options)
     }
 
+    const renderingEngine = await this._renderingEngine
+    if (renderingEngine) {
+      const renderingDesign = await renderingEngine.createDesign(uuid(), {
+        bitmapAssetDirectoryPath: localDesign.getBitmapAssetDirectory(),
+        // fontDirectoryPath: localDesign.getFontDirectory(),
+      })
+      designFacade.setRenderingDesign(renderingDesign)
+    }
+
     return designFacade
   }
 
