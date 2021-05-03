@@ -17,6 +17,7 @@ import type {
 import type { BlendingMode } from '@opendesign/rendering'
 
 import type { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
+import type { ConsoleConfig } from './utils/console'
 import type { DesignExportFacade } from './design-export-facade'
 import type { DesignFacade } from './design-facade'
 import type { DesignLayerCollectionFacade } from './design-layer-collection-facade'
@@ -52,6 +53,7 @@ export type {
 
 export type {
   ArtboardFacade,
+  ConsoleConfig,
   DesignExportFacade,
   DesignFacade,
   DesignLayerCollectionFacade,

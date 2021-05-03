@@ -25,6 +25,7 @@ import { Sdk } from './sdk'
  * @param params.cached Whether to use a local (file system) cache in the form for `.octopus` files. This is enabled by default.
  * @param params.rendering Whether to use a local rendering engine for rendering designs. This is enabled by default.
  * @param params.systemFonts Whether to use local system fonts for rendering designs via the rendering engine. This is enabled by default.
+ * @param params.console Configuration of the console/logger. This can either be a log level configuration for the bundled logger or a custom console object. The bundled logger can be replaced with the default node.js console via `{ console: console }`.
  */
 export function createSdk(params: {
   token: string
