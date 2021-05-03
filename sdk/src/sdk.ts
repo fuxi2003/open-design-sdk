@@ -1,3 +1,4 @@
+import { createCancelToken } from './utils/cancel-token'
 import {
   createDesignFromLocalDesign,
   createDesignFromOpenDesignApiDesign,
@@ -737,6 +738,37 @@ export class Sdk {
     renderingEngineFactory: typeof createRenderingEngine
   ): void {
     this._renderingEngineFactory = renderingEngineFactory
+  }
+
+  /**
+   * This method is just an alias of {@link @opendesign/sdk.createCancelToken}.
+   *
+   * Creates a cancellation token which can be used for aborting asynchronous operations of the SDK.
+   *
+   * Most asynchronous methods accept a cancellation token (the returned `token`). The same cancellation token can be used for multiple sequential as well as parallel operations. Finished operations no longer react to cancellations.
+   *
+   * This mechanism is analogous to the standard `AbortSignal`/`AbortController` API with the difference that a cancellation reason can be specified. The created tokens are also somehow compatible with the standard API by exposing the standard `AbortSignal` as `token.signal`, just as it is possible to create a `CancelToken` from an `AbortSignal` via `createCancelToken.fromSignal()`.
+   *
+   * @example
+   * ```typescript
+   * const controller = sdk.createCancelToken()
+   *
+   * sdk.fetchDesignById('<ID>', { cancelToken: controller.token })
+   *   .then((design) => {
+   *     doStuffWithDesign(design)
+   *     controller.dispose()
+   *   })
+   *   .catch((err) => {
+   *     if (err.code !== 'OperationCancelled') { throw err }
+   *   })
+   *
+   * setTimeout(() => {
+   *   controller.cancel('Timed out.')
+   * }, 2000)
+   * ```
+   */
+  createCancelToken() {
+    return createCancelToken()
   }
 
   private _getRenderingEngine() {
