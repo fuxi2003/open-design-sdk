@@ -120,11 +120,13 @@ export class LayerFacade {
   }
 
   /**
-   * Returns the nesting level at which the layer is contained within the layer tree of the artboard.
+   * The nesting level at which the layer is contained within the layer tree of the artboard.
+   *
+   * Root (first-level) layers have depth of 1.
    *
    * @category Layer Context
    */
-  getDepth(): number {
+  get depth(): number {
     return this._layerEntity.getDepth()
   }
 
