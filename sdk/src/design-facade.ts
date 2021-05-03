@@ -3,6 +3,7 @@ import { DesignExportFacade } from './design-export-facade'
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { PageFacade } from './page-facade'
 
+import { basename } from 'path'
 import { inspect } from 'util'
 import {
   createEmptyFile,
@@ -91,6 +92,20 @@ export class DesignFacade {
   get id() {
     const apiDesign = this._apiDesign
     return apiDesign?.id || null
+  }
+
+  get name() {
+    const apiDesign = this._apiDesign
+    if (apiDesign) {
+      return apiDesign.name
+    }
+
+    const localDesign = this._localDesign
+    if (localDesign) {
+      return basename(localDesign?.filename)
+    }
+
+    return null
   }
 
   /**
