@@ -11,6 +11,7 @@ import { ConsoleConfig, getConsole } from './utils/console'
  * @category Experimental Entry Point
  * @param params.token An Open Design API access token. Test tokens can be generated within the [Open Design API documentation](https://opendesign.avocode.com/docs/authentication).
  * @param params.apiRoot The URL base for Open Design API calls. By default, production Avocode Open Design API servers are used.
+ * @param params.console Configuration of the console/logger. This can either be a log level configuration for the bundled logger or a custom console object. The bundled logger can be replaced with the default browser console via `{ console: console }`.
  */
 export function createSdk(params: {
   token: string
