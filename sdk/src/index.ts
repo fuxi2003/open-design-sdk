@@ -8,6 +8,30 @@ import { LocalDesignManager } from './local/local-design-manager'
 import { SystemFontManager } from './local/system-font-manager'
 import { Sdk } from './sdk'
 
+export type {
+  ArtboardId,
+  ArtboardOctopusData,
+  ArtboardSelector,
+  ComponentId,
+  FileLayerSelector,
+  IBitmap,
+  IBitmapMask,
+  LayerId,
+  LayerOctopusData,
+  LayerSelector,
+  PageId,
+  PageSelector,
+} from '@opendesign/octopus-reader'
+export type { BlendingMode } from '@opendesign/rendering'
+
+export type { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
+export type { DesignExportFacade } from './design-export-facade'
+export type { DesignFacade } from './design-facade'
+export type { DesignLayerCollectionFacade } from './design-layer-collection-facade'
+export type { FontDescriptor, LayerFacade } from './layer-facade'
+export type { BitmapAssetDescriptor } from './local/local-design'
+export type { PageFacade } from './page-facade'
+
 /**
  * Creates an SDK instance
  *
