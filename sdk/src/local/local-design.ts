@@ -373,7 +373,7 @@ export class LocalDesign {
     options: {
       cancelToken?: CancelToken | null
     } = {}
-  ): Promise<void> {
+  ): Promise<string> {
     const cancelToken = createCancelToken.race([
       options.cancelToken,
       this._destroyToken,
@@ -397,6 +397,8 @@ export class LocalDesign {
         { cancelToken }
       )
     }
+
+    return bitmapAssetFilename
   }
 
   async saveBitmapAssetStream(
@@ -405,7 +407,7 @@ export class LocalDesign {
     options: {
       cancelToken?: CancelToken | null
     } = {}
-  ): Promise<void> {
+  ): Promise<string> {
     const cancelToken = createCancelToken.race([
       options.cancelToken,
       this._destroyToken,
@@ -431,6 +433,8 @@ export class LocalDesign {
         { cancelToken }
       )
     }
+
+    return bitmapAssetFilename
   }
 
   async saveBitmapAssetBlob(
@@ -439,7 +443,7 @@ export class LocalDesign {
     options: {
       cancelToken?: CancelToken | null
     } = {}
-  ): Promise<void> {
+  ): Promise<string> {
     const cancelToken = createCancelToken.race([
       options.cancelToken,
       this._destroyToken,
@@ -463,6 +467,8 @@ export class LocalDesign {
         { cancelToken }
       )
     }
+
+    return bitmapAssetFilename
   }
 
   async getBitmapMapping(

@@ -1218,20 +1218,36 @@ export class DesignFacade {
   /**
    * Downloads the specified bitmap assets to the local cache.
    *
+   * Assets which have already been downloaded are skipped.
+   *
    * The API and the local cache have to be configured when using this method.
    *
    * @category Asset
    * @param bitmapAssetDescs A list of bitmap assets to download.
+   * @returns The locations of the bitmap assets within the file system.
    */
   async downloadBitmapAssets(
     bitmapAssetDescs: Array<BitmapAssetDescriptor>,
     options: {
       cancelToken?: CancelToken | null
     } = {}
-  ): Promise<void> {
-    await sequence(bitmapAssetDescs, async (bitmapAssetDesc) => {
-      return this.downloadBitmapAsset(bitmapAssetDesc, options)
+  ): Promise<{ [assetName in BitmapAssetDescriptor['name']]: string }> {
+    const filenames = await sequence(
+      bitmapAssetDescs,
+      async (bitmapAssetDesc) => {
+        return this.downloadBitmapAsset(bitmapAssetDesc, options)
+      }
+    )
+
+    const bitmapAssetFilenames = {} as {
+      [K in BitmapAssetDescriptor['name']]: string
+    }
+    bitmapAssetDescs.forEach((bitmapAssetDesc, index) => {
+      const filename = filenames[index] as string
+      bitmapAssetFilenames[bitmapAssetDesc['name']] = filename
     })
+
+    return bitmapAssetFilenames
   }
 
   /**
@@ -1241,13 +1257,14 @@ export class DesignFacade {
    *
    * @category Asset
    * @param bitmapAssetDescs A list of bitmap assets to download.
+   * @returns The location of the bitmap asset within the file system.
    */
   async downloadBitmapAsset(
     bitmapAssetDesc: BitmapAssetDescriptor,
     options: {
       cancelToken?: CancelToken | null
     } = {}
-  ): Promise<void> {
+  ): Promise<string> {
     const apiDesign = this._apiDesign
     if (!apiDesign) {
       throw new Error(
@@ -1260,8 +1277,12 @@ export class DesignFacade {
       throw new Error('The design is not configured to be a local file')
     }
 
-    if (await localDesign.hasBitmapAsset(bitmapAssetDesc, options)) {
-      return
+    const { available, filename } = await localDesign.resolveBitmapAsset(
+      bitmapAssetDesc,
+      options
+    )
+    if (available) {
+      return filename
     }
 
     const bitmapAssetStream = await apiDesign.getBitmapAssetStream(
@@ -1273,6 +1294,34 @@ export class DesignFacade {
       bitmapAssetStream,
       options
     )
+  }
+
+  /**
+   * Returns the file system location of the specified bitmap asset if it is downloaded.
+   *
+   * The local cache has to be configured when using this method.
+   *
+   * @category Asset
+   * @param bitmapAssetDescs A list of bitmap assets to download.
+   * @returns The location of the bitmap asset. `null` is returned when the asset is not downloaded.
+   */
+  async getBitmapAssetFilename(
+    bitmapAssetDesc: BitmapAssetDescriptor,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<string | null> {
+    const localDesign = this._localDesign
+    if (!localDesign) {
+      throw new Error('The design is not configured to be a local file')
+    }
+
+    const { available, filename } = await localDesign.resolveBitmapAsset(
+      bitmapAssetDesc,
+      options
+    )
+
+    return available ? filename : null
   }
 
   /**
