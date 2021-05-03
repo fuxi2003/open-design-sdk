@@ -15,7 +15,7 @@
     "Collection Manipulation",
     "Rendering"
   ],
-  "entryPoints": ["./src/docs.ts"],
+  "entryPoints": ["./src/index.ts"],
   "readme": "none",
   "listInvalidSymbolLinks": true,
   "hideGenerator": true,
