@@ -41,6 +41,10 @@ export type BitmapAssetDescriptor = { name: string; prerendered: boolean }
 
 export type BitmapMapping = { [bitmapKey: string]: string }
 
+function sanitizeName(name: string): string {
+  return name.replace(/[^a-z0-9-]/g, '-')
+}
+
 export class LocalDesign {
   _localDesignManager: LocalDesignManager
 
@@ -612,7 +616,7 @@ export class LocalDesign {
     return joinPaths(
       this._filename,
       ARTBOARD_DIRECTORY_BASENAME,
-      artboardId,
+      sanitizeName(artboardId),
       ARTBOARD_CONTENT_BASENAME
     )
   }
