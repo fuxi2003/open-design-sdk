@@ -113,6 +113,7 @@ export class SystemFontManager {
 
     const fallbackFontMatch = await this._getMatchingFallbackFont({
       ...options,
+      fontFamilies,
       cancelToken,
     })
     if (fallbackFontMatch) {
