@@ -209,15 +209,15 @@ export class Sdk {
    * This configuration can be overriden/extended for each individual design via {@link DesignFacade.setFontDirectory}.
    *
    * @category Configuration
-   * @param fallbackFonts An ordered list of font postscript names or font file paths.
+   * @param fontDirectoryPath An absolute path to a directory or a path relative to the process working directory (`process.cwd()` in node.js). When `null` is provided, the global configuration is cleared.
    */
-  setGlobalFontDirectory(fontDirname: string | null) {
+  setGlobalFontDirectory(fontDirectoryPath: string | null) {
     const systemFontManager = this._systemFontManager
     if (!systemFontManager) {
       throw new Error('Font management is not configured.')
     }
 
-    systemFontManager.setGlobalFontDirectory(fontDirname)
+    systemFontManager.setGlobalFontDirectory(fontDirectoryPath)
   }
 
   /**

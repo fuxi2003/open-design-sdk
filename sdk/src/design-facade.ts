@@ -94,6 +94,10 @@ export class DesignFacade {
     return apiDesign?.id || null
   }
 
+  /**
+   * The name of the design. This is the basename of the file by default or a custom name provided during design import.
+   * @category Data
+   */
   get name() {
     const apiDesign = this._apiDesign
     if (apiDesign) {
@@ -648,6 +652,7 @@ export class DesignFacade {
     return entity.getFonts({ depth: options.depth || 0 })
   }
 
+  /** @internal */
   setFontSource(fontSource: FontSource | null) {
     this._fontSource = fontSource
   }
@@ -658,6 +663,9 @@ export class DesignFacade {
    * Fonts are matched based on their postscript names, not the file basenames.
    *
    * This configuration overrides the global font directory configuration (set up via {@link Sdk.setGlobalFontDirectory}) – i.e. fonts from the globally configured directory are not used for the design.
+   *
+   * @category Configuration
+   * @param fontDirectoryPath An absolute path to a directory or a path relative to the process working directory (`process.cwd()` in node.js). When `null` is provided, the configuration is cleared for the design.
    */
   setFontDirectory(fontDirectoryPath: string) {
     const renderingDesign = this._renderingDesign
