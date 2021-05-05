@@ -62,6 +62,7 @@ export class DesignFacade {
 
   private _manifestLoaded: boolean = false
   private _pendingManifestUpdate: ManifestData | null = null
+  private _loadingArtboardPromises: Map<ArtboardId, Promise<void>> = new Map()
 
   private _designExports: Map<
     DesignExportTargetFormatEnum,
@@ -1129,11 +1130,23 @@ export class DesignFacade {
       throw new Error('No such artboard')
     }
 
-    if (!artboard.isLoaded()) {
+    const prevArtboardLoadingPromise = this._loadingArtboardPromises.get(
+      artboardId
+    )
+    if (prevArtboardLoadingPromise) {
+      await prevArtboardLoadingPromise
+    } else if (!artboard.isLoaded()) {
       // NOTE: Maybe use the Octopus Reader file entity instead for clearer source of truth.
       const artboardEntity = artboard.getArtboardEntity()
-      const content = await this._loadArtboardContent(artboardId, options)
-      artboardEntity.setOctopus(content)
+      const artboardLoadingPromise = this._loadArtboardContent(
+        artboardId,
+        options
+      ).then((content) => {
+        artboardEntity.setOctopus(content)
+      })
+
+      this._loadingArtboardPromises.set(artboardId, artboardLoadingPromise)
+      await artboardLoadingPromise
     }
 
     return artboard
