@@ -67,7 +67,7 @@ export class ArtboardFacade {
    *
    * This data includes the list of layers, the artboard position and size as well as styles used in the artboard.
    *
-   * See the [Octopus Format](https://opendesign.avocode.com/docs/octopus-format) documentation page for more info.
+   * See the [Octopus Format](https://opendesign.dev/docs/octopus-format) documentation page for more info.
    *
    * This method internally triggers loading of the artboard content. In case the artboard is uncached, it is downloaded (and cached when the local cache is configured). The API has to be configured when working with an uncached artboard.
    *

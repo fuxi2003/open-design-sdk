@@ -66,7 +66,7 @@ export class LayerFacade {
   /**
    * Octopus data of the layer.
    *
-   * See the [Octopus Format](https://opendesign.avocode.com/docs/octopus-format) documentation page for more info.
+   * See the [Octopus Format](https://opendesign.dev/docs/octopus-format) documentation page for more info.
    *
    * @category Data
    */
