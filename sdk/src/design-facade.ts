@@ -1231,15 +1231,17 @@ export class DesignFacade {
    * The API and the local cache have to be configured when using this method.
    *
    * @category Asset
-   * @param bitmapAssetDescs A list of bitmap assets to download.
+   * @param bitmapAssetDescs A list of bitmap assets to download. When not provided, all bitmap assets of the design are downloaded.
    * @returns The locations of the bitmap assets within the file system.
    */
   async downloadBitmapAssets(
-    bitmapAssetDescs: Array<BitmapAssetDescriptor>,
+    bitmapAssetDescs?: Array<BitmapAssetDescriptor>,
     options: {
       cancelToken?: CancelToken | null
     } = {}
   ): Promise<{ [assetName in BitmapAssetDescriptor['name']]: string }> {
+    bitmapAssetDescs = bitmapAssetDescs || (await this.getBitmapAssets())
+
     const filenames = await sequence(
       bitmapAssetDescs,
       async (bitmapAssetDesc) => {
