@@ -1302,7 +1302,7 @@ export class DesignFacade {
    * The API and the local cache have to be configured when using this method.
    *
    * @category Asset
-   * @param bitmapAssetDescs A list of bitmap assets to download.
+   * @param bitmapAssetDesc The bitmap asset to download.
    * @returns The location of the bitmap asset within the file system.
    */
   async downloadBitmapAsset(
