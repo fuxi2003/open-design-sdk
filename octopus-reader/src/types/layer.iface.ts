@@ -7,7 +7,7 @@ import type { AggregatedFontDescriptor } from './fonts.type'
 import type { ArtboardId, LayerId } from './ids.type'
 import type { ILayerCollection } from './layer-collection.iface'
 import type { LayerOctopusData } from './octopus.type'
-import type { LayerSelector } from './selectors.type'
+import type { FileLayerSelector, LayerSelector } from './selectors.type'
 import type { IShape } from './shape.iface'
 import type { IText } from './text.iface'
 
@@ -44,6 +44,8 @@ export interface ILayer {
     selector: LayerSelector | ((layer: ILayer) => boolean),
     options?: Partial<{ depth: number }>
   ): ILayerCollection
+
+  matches(selector: FileLayerSelector): boolean
 
   isMasked(): boolean
   getMaskLayer(): ILayer | null

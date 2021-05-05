@@ -5,6 +5,7 @@ import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
 import type { CancelToken } from '@avocode/cancel-token'
 import type {
+  FileLayerSelector,
   IBitmap,
   IBitmapMask,
   IEffects,
@@ -251,6 +252,15 @@ export class LayerFacade {
     return new DesignLayerCollectionFacade(layerEntities, {
       designFacade: this._designFacade,
     })
+  }
+
+  /**
+   * Returns whether the layer matches the provided selector.
+   *
+   * @param selector The selector against which to test the layer.
+   */
+  matches(selector: FileLayerSelector): boolean {
+    return this._layerEntity.matches(selector)
   }
 
   /**

@@ -10,6 +10,7 @@ import {
 } from '../utils/assets'
 import { getLayerBitmapAssets } from '../utils/layer-bitmaps'
 import { createLayers } from '../utils/layer-factories'
+import { matchLayer } from '../utils/layer-lookup'
 import { memoize } from '../utils/memoize'
 
 import type { IArtboard } from '../types/artboard.iface'
@@ -24,7 +25,7 @@ import type { LayerId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
 import type { ILayerCollection } from '../types/layer-collection.iface'
 import type { LayerOctopusData } from '../types/octopus.type'
-import type { LayerSelector } from '../types/selectors.type'
+import type { FileLayerSelector, LayerSelector } from '../types/selectors.type'
 import type { IShape } from '../types/shape.iface'
 import type { IText } from '../types/text.iface'
 import { BitmapMask } from '../layer-info/bitmap-mask'
@@ -191,6 +192,10 @@ export class Layer implements ILayer {
       )
     }
   )
+
+  matches(selector: FileLayerSelector): boolean {
+    return matchLayer(selector, this)
+  }
 
   getBitmapAssets(
     options: Partial<{ depth: number; includePrerendered: boolean }> = {}
