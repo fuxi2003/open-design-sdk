@@ -953,6 +953,29 @@ export class DesignFacade {
   }
 
   /**
+   * Returns the bounds of the specified artboard.
+   *
+   * The API has to be configured when using this method to get bounds of an uncached artboard.
+   *
+   * @category Data
+   * @param artboardId The ID of the artboard to inspect.
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
+   */
+  async getArtboardBounds(
+    artboardId: ArtboardId,
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<Bounds> {
+    const artboard = this.getArtboardById(artboardId)
+    if (!artboard) {
+      throw new Error('No such artboard')
+    }
+
+    return artboard.getBounds(options)
+  }
+
+  /**
    * Returns various bounds of the specified layer.
    *
    * The rendering engine and the local cache have to be configured when using this method.
