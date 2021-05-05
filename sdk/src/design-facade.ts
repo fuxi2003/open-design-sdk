@@ -1124,6 +1124,9 @@ export class DesignFacade {
    * @category Status
    */
   async destroy() {
+    this._designEntity = null
+    this._getDesignEntity.clear()
+
     const localDesign = this._localDesign
     if (localDesign) {
       localDesign.unload()
@@ -1133,9 +1136,6 @@ export class DesignFacade {
     if (renderingDesign) {
       renderingDesign.destroy()
     }
-
-    this._designEntity = null
-    this._getDesignEntity.clear()
   }
 
   /**
@@ -1144,6 +1144,9 @@ export class DesignFacade {
    * @category Status
    */
   async unload() {
+    const designEntity = this._getDesignEntity()
+    designEntity.unloadArtboards()
+
     const localDesign = this._localDesign
     if (localDesign) {
       localDesign.unload()
@@ -1153,9 +1156,6 @@ export class DesignFacade {
     if (renderingDesign) {
       await renderingDesign.unloadArtboards()
     }
-
-    const designEntity = this._getDesignEntity()
-    designEntity.unloadArtboards()
   }
 
   /**
@@ -1176,13 +1176,13 @@ export class DesignFacade {
       return
     }
 
+    const artboardEntity = artboard.getArtboardEntity()
+    artboardEntity.unload()
+
     const renderingDesign = this._renderingDesign
     if (renderingDesign) {
       renderingDesign.unloadArtboard(artboardId)
     }
-
-    const artboardEntity = artboard.getArtboardEntity()
-    artboardEntity.unload()
   }
 
   private async _loadArtboardContent(
