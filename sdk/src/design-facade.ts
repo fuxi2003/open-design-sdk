@@ -1134,7 +1134,7 @@ export class DesignFacade {
 
     const renderingDesign = this._renderingDesign
     if (renderingDesign) {
-      renderingDesign.destroy()
+      await renderingDesign.destroy()
     }
   }
 
@@ -1181,7 +1181,7 @@ export class DesignFacade {
 
     const renderingDesign = this._renderingDesign
     if (renderingDesign) {
-      renderingDesign.unloadArtboard(artboardId)
+      await renderingDesign.unloadArtboard(artboardId)
     }
   }
 
