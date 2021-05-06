@@ -84,7 +84,7 @@ export class Sdk {
    * ```typescript
    * sdk.destroy()
    *
-   * sdk.openDesignFile('design.sketch') // throws
+   * sdk.importDesignFile('./design.sketch') // throws
    * ```
    */
   async destroy() {
@@ -361,7 +361,7 @@ export class Sdk {
    *
    * @example
    * ```typescript
-   * const design = await sdk.openDesignFile('data.sketch')
+   * const design = await sdk.importDesignFile('data.sketch')
    * console.log(design.sourceFilename) // == path.join(process.cwd(), 'data.sketch')
    * console.log(design.id) // == server-generated UUID
    *
@@ -417,7 +417,7 @@ export class Sdk {
    *
    * @example
    * ```typescript
-   * const design = await sdk.openDesignLink('https://example.com/designs/data.sketch')
+   * const design = await sdk.importDesignLink('https://example.com/designs/data.sketch')
    * console.log(design.id) // == server-generated UUID
    *
    * // Continue working with the processed design
@@ -461,7 +461,7 @@ export class Sdk {
    *
    * @example
    * ```typescript
-   * const design = await sdk.openFigmaDesign({
+   * const design = await sdk.importFigmaDesign({
    *   figmaToken: '<FIGMA_TOKEN>',
    *   figmaFileKey: 'abc',
    * })
@@ -511,7 +511,7 @@ export class Sdk {
    *
    * @example
    * ```typescript
-   * const design = await sdk.openFigmaDesign({
+   * const design = await sdk.importFigmaDesign({
    *   figmaToken: '<FIGMA_TOKEN>',
    *   figmaFileKey: 'abc',
    *   conversions: [
@@ -520,7 +520,7 @@ export class Sdk {
    * })
    *
    * // Download the converted design file
-   * await design.saveDesignFile('design.sketch')
+   * await design.exportDesignFile('./design.sketch')
    * ```
    *
    * @category Figma Design Usage
