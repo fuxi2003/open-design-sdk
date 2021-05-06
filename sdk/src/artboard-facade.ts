@@ -29,8 +29,8 @@ export type LayerAttributesConfig = {
   includeEffects?: boolean
   /** Whether to apply clipping by a mask layer if any such mask is set for the layer (see {@link LayerFacade.isMasked}). Clipping is disabled by default. Setting this flag for layers which do not have a mask layer set has no effect on the results. */
   clip?: boolean
-  /** Whether to render the artboard background below the layer. By default, the background is not included. */
-  includeArtboardBackground?: boolean
+  /** Whether to render the component background from the main/master component. By default, the configuration from the main/master component is used. */
+  includeComponentBackground?: boolean
   /** The blending mode to use for rendering the layer instead of its default blending mode. */
   blendingMode?: BlendingMode
   /** The opacity to use for the layer instead of its default opacity. */
@@ -505,9 +505,9 @@ export class ArtboardFacade {
    * @category Rendering
    * @param layerId The ID of the artboard layer to render.
    * @param filePath The target location of the produced PNG image file.
-   * @param options.blendingMode The blending mode to use for rendering the layer instead of its default blending mode. Note that this configuration has no effect when the artboard background is not included via `includeArtboardBackground=true`.
+   * @param options.blendingMode The blending mode to use for rendering the layer instead of its default blending mode.
    * @param options.clip Whether to apply clipping by a mask layer if any such mask is set for the layer (see {@link LayerFacade.isMasked}). Clipping is disabled by default. Setting this flag for layers which do not have a mask layer set has no effect on the results.
-   * @param options.includeArtboardBackground Whether to render the artboard background below the layer. By default, the background is not included.
+   * @param options.includeComponentBackground Whether to render the component background from the main/master component. By default, the configuration from the main/master component is used. Note that this configuration has no effect when the artboard background is not included via explicit `includeComponentBackground=true` nor the main/master component configuration as there is nothing with which to blend the layer.
    * @param options.includeEffects Whether to apply layer effects of the layer. Rendering of effects of nested layers is not affected. By defaults, effects of the layer are applied.
    * @param options.opacity The opacity to use for the layer instead of its default opacity.
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
@@ -520,7 +520,7 @@ export class ArtboardFacade {
     options: {
       includeEffects?: boolean
       clip?: boolean
-      includeArtboardBackground?: boolean
+      includeComponentBackground?: boolean
       blendingMode?: BlendingMode
       opacity?: number
       bounds?: Bounds

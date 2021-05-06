@@ -6,7 +6,7 @@ export function serializeLayerAttributes(
   return {
     'draw-effects': layerAttributes.includeEffects !== false,
     'enable-clipping': layerAttributes.clip !== false,
-    'draw-background': Boolean(layerAttributes.includeArtboardBackground),
+    'draw-background': Boolean(layerAttributes.includeComponentBackground),
     ...(typeof layerAttributes.blendingMode === 'undefined'
       ? {}
       : { 'blend-mode': layerAttributes.blendingMode }),
