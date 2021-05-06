@@ -714,7 +714,7 @@ export class DesignFacade {
    * @param artboardId The ID of the artboard to render.
    * @param filePath The target location of the produced PNG image file.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
-   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default artboard area.
+   * @param options.bounds The area (in the coordinate system of the artboard) to include. This can be used to either crop or expand (add empty space to) the default artboard area.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async renderArtboardToFile(
@@ -757,7 +757,7 @@ export class DesignFacade {
    * @param pageId The ID of the page to render.
    * @param filePath The target location of the produced PNG image file.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
-   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default page area.
+   * @param options.bounds The area (in the coordinate system of the page) to include. This can be used to either crop or expand (add empty space to) the default page area.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async renderPageToFile(
@@ -797,7 +797,7 @@ export class DesignFacade {
    * @param options.includeComponentBackground Whether to render the component background from the main/master component. By default, the configuration from the main/master component is used. Note that this configuration has no effect when the artboard background is not included via explicit `includeComponentBackground=true` nor the main/master component configuration as there is nothing with which to blend the layer.
    * @param options.includeEffects Whether to apply layer effects of the layer. Rendering of effects of nested layers is not affected. By defaults, effects of the layer are applied.
    * @param options.opacity The opacity to use for the layer instead of its default opacity.
-   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
+   * @param options.bounds The area (in the coordinate system of the artboard) to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
@@ -877,7 +877,7 @@ export class DesignFacade {
    * @param artboardId The ID of the artboard from which to render the layer.
    * @param layerIds The IDs of the artboard layers to render.
    * @param filePath The target location of the produced PNG image file.
-   * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
+   * @param options.bounds The area (in the coordinate system of the artboard) to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.

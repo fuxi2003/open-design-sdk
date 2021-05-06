@@ -66,6 +66,8 @@ export class LayerFacade {
   /**
    * Octopus data of the layer.
    *
+   * This data can be used for accessing details about the layer.
+   *
    * See the [Octopus Format](https://opendesign.dev/docs/octopus-format) documentation page for more info.
    *
    * @category Data
@@ -203,6 +205,8 @@ export class LayerFacade {
    * Returns a collection of layer objects nested within the layer (i.e. the layer is either the immediate parent layer of other layers or one of their parent layers), optionally down to a specific layer nesting level.
    *
    * This usually applies to group layers and expanded/inlined component layers. Empty group layers return an empty nested layer collection.
+   *
+   * Note that, in case of `depth` other than 1, the subtree is flattened in *document order*, not level by level, which means that nested layers of a layer are included before sibling layers of the layer.
    *
    * @category Layer Lookup
    * @param options.depth The maximum nesting level within the layer to include in the collection. By default, only the immediate nesting level is included. `Infinity` can be specified to get all nesting levels.

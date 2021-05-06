@@ -324,6 +324,8 @@ export class DesignLayerCollectionFacade {
    *
    * In case of group layers, all visible nested layers are also included.
    *
+   * This can only be done for collections containing layers from a single artboards. When there are layers from multiple artboards, the operation is rejected.
+   *
    * Uncached items (artboard content and bitmap assets of rendered layers) are downloaded and cached.
    *
    * The rendering engine and the local cache have to be configured when using this method.
