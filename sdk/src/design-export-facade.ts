@@ -1,4 +1,5 @@
 import { inspect } from 'util'
+import { enumerablizeWithPrototypeGetters } from './utils/object'
 
 import type { CancelToken } from '@avocode/cancel-token'
 import type { IApiDesignExport } from '@opendesign/api'
@@ -11,6 +12,8 @@ export class DesignExportFacade {
   constructor(designExport: IApiDesignExport, params: { sdk: Sdk }) {
     this._sdk = params.sdk
     this._designExport = designExport
+
+    enumerablizeWithPrototypeGetters(this)
   }
 
   /**
@@ -58,12 +61,7 @@ export class DesignExportFacade {
 
   /** @internal */
   toJSON() {
-    return {
-      id: this.id,
-      designId: this.designId,
-      status: this.status,
-      resultFormat: this.resultFormat,
-    }
+    return { ...this }
   }
 
   /**
