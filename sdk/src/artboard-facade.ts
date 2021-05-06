@@ -73,6 +73,11 @@ export class ArtboardFacade {
    *
    * @category Data
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const artboardContent = await artboards.getContent()
+   * ```
    */
   async getContent(
     options: {
@@ -147,6 +152,11 @@ export class ArtboardFacade {
   /**
    * Returns the design object associated with the artboard object.
    * @category Reference
+   *
+   * @example
+   * ```typescript
+   * const design = artboard.getDesign()
+   * ```
    */
   getDesign(): DesignFacade {
     return this._designFacade
@@ -164,7 +174,18 @@ export class ArtboardFacade {
 
   /**
    * Returns whether the artboard content is loaded in memory from the API or a local cache.
+   *
    * @category Status
+   *
+   * @example
+   * ```typescript
+   * const design = await sdk.fetchDesignById('<DESIGN_ID>')
+   * const artboard = design.getArtboardById('<ARTBOARD_ID>')
+   * console.log(artboard.isLoaded()) // false
+   *
+   * const layerA = await artboard.findLayerById('a')
+   * console.log(artboard.isLoaded()) // true
+   * ```
    */
   isLoaded() {
     return this._artboardEntity.isLoaded()
@@ -189,7 +210,13 @@ export class ArtboardFacade {
 
   /**
    * Returns the page object associated with the artboard object.
+   *
    * @category Reference
+   *
+   * @example
+   * ```typescript
+   * const page = artboard.getPage()
+   * ```
    */
   getPage(): PageFacade | null {
     const pageId = this.pageId
@@ -208,8 +235,14 @@ export class ArtboardFacade {
 
   /**
    * Returns the dimensions of the artboard and its position within the coordinate system of the design/page.
+   *
    * @category Data
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const artboardBounds = await artboard.getBounds()
+   * ```
    */
   async getBounds(
     options: {
@@ -235,6 +268,17 @@ export class ArtboardFacade {
    * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // All bitmap assets from the artboard
+   * const bitmapAssetDescs = await artboard.getBitmapAssets()
+   *
+   * // Bitmap assets excluding pre-renredered bitmaps from the artboard
+   * const bitmapAssetDescs = await artboard.getBitmapAssets({
+   *   includePrerendered: false,
+   * })
+   * ```
    */
   async getBitmapAssets(
     options: {
@@ -264,6 +308,12 @@ export class ArtboardFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // All fonts from the artboard
+   * const fontDescs = await artboard.getFonts()
+   * ```
    */
   async getFonts(
     options: {
@@ -289,6 +339,14 @@ export class ArtboardFacade {
    *
    * @category Data
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const color = await artboard.getBackgroundColor()
+   * if (color) {
+   *   console.log(color) // { r: number, g: number, b: number, a: number }
+   * }
+   * ```
    */
   async getBackgroundColor(
     options: {
@@ -307,6 +365,11 @@ export class ArtboardFacade {
    *
    * @category Layer Lookup
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const rootLayers = await artboard.getRootLayers()
+   * ```
    */
   async getRootLayers(
     options: {
@@ -331,6 +394,15 @@ export class ArtboardFacade {
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within the artboard to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in the artboard should be included.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // All layers (from all nesting levels)
+   * const allLayers = await artboard.getFlattenedLayers()
+   *
+   * // Layers from the first three nesting levels (root layers + 2 levels)
+   * const layers = await artboard.getFlattenedLayers({ depth: 3 })
+   * ```
    */
   async getFlattenedLayers(
     options: {
@@ -360,6 +432,18 @@ export class ArtboardFacade {
    * @category Layer Lookup
    * @param layerId A layer ID.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const layerA = await artboard.getLayerById('a')
+   *
+   * // Multiple layers
+   * const [ layerA, layerB, layerC ] = await Promise.all([
+   *   artboard.getLayerById('a'),
+   *   artboard.getLayerById('b'),
+   *   artboard.getLayerById('c'),
+   * ])
+   * ```
    */
   async getLayerById(
     layerId: LayerId,
@@ -396,6 +480,26 @@ export class ArtboardFacade {
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // Layer by name
+   * const layer = await artboard.findLayer({ name: 'Share icon' })
+   *
+   * // Text layer by content
+   * const layer = await artboard.findLayer({
+   *   type: 'textLayer',
+   *   text: /click to dismiss/i,
+   * })
+   *
+   * // With timeout
+   * const { cancel, token } = createCancelToken()
+   * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
+   * const layer = await artboard.findLayer(
+   *   { name: 'Share icon' },
+   *   { cancelToken: token }
+   * )
+   * ```
    */
   async findLayer(
     selector: LayerSelector,
@@ -421,6 +525,26 @@ export class ArtboardFacade {
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // Layer by name
+   * const layer = await artboard.findLayers({ name: 'Share icon' })
+   *
+   * // Invisible text layers
+   * const layer = await artboard.findLayers({
+   *   type: 'textLayer',
+   *   visible: false,
+   * })
+   *
+   * // With timeout
+   * const { cancel, token } = createCancelToken()
+   * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
+   * const layer = await artboard.findLayers(
+   *   { name: 'Share icon' },
+   *   { cancelToken: token }
+   * )
+   * ```
    */
   async findLayers(
     selector: LayerSelector,
@@ -450,6 +574,12 @@ export class ArtboardFacade {
    * @category Layer Lookup
    * @param layerId A layer ID.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   * @returns The depth where the layer is located within the layer tree of the artboard. Root layers have the depth of 1.
+   *
+   * @example
+   * ```typescript
+   * const depth = await artboard.getLayerDepth('<ARTBOARD_ID>', '<LAYER_ID>')
+   * ```
    */
   async getLayerDepth(
     layerId: LayerId,
@@ -465,6 +595,11 @@ export class ArtboardFacade {
   /**
    * Returns whether the artboard represends a (main/master) component.
    * @category Data
+   *
+   * @example
+   * ```typescript
+   * const isComponentArtboard = artboard.isComponent()
+   * ```
    */
   isComponent() {
     return this._artboardEntity.isComponent()
@@ -482,6 +617,19 @@ export class ArtboardFacade {
    * @category Rendering
    * @param filePath The target location of the produced PNG image file.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // With default options (1x, whole artboard area)
+   * await artboard.renderToFile('./rendered/artboard.png')
+   *
+   * // With custom scale and crop
+   * await artboard.renderToFile('./rendered/artboard.png', {
+   *   scale: 4,
+   *   // The result is going to have the dimensions of 400x200 due to the 4x scale.
+   *   bounds: { left: 100, top: 0, width: 100, height: 50 },
+   * })
+   * ```
    */
   renderToFile(
     filePath: string,
@@ -513,6 +661,27 @@ export class ArtboardFacade {
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // With default options (1x, whole layer area)
+   * await artboard.renderLayerToFile(
+   *   '<LAYER_ID>',
+   *   './rendered/layer.png'
+   * )
+   *
+   * // With custom scale and crop and using the component background color
+   * await artboard.renderLayerToFile(
+   *   '<LAYER_ID>',
+   *   './rendered/layer.png',
+   *   {
+   *     scale: 2,
+   *     // The result is going to have the dimensions of 400x200 due to the 2x scale.
+   *     bounds: { left: 100, top: 0, width: 100, height: 50 },
+   *     includeComponentBackground: true,
+   *   }
+   * )
+   * ```
    */
   renderLayerToFile(
     layerId: LayerId,
@@ -552,6 +721,30 @@ export class ArtboardFacade {
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // With default options (1x, whole combined layer area)
+   * await artboard.renderLayersToFile(
+   *   ['<LAYER1>', '<LAYER2>'],
+   *   './rendered/layers.png'
+   * )
+   *
+   * // With custom scale and crop and using the custom layer configuration
+   * await artboard.renderLayersToFile(
+   *   ['<LAYER1>', '<LAYER2>'],
+   *   './rendered/layers.png',
+   *   {
+   *     scale: 2,
+   *     // The result is going to have the dimensions of 400x200 due to the 2x scale.
+   *     bounds: { left: 100, top: 0, width: 100, height: 50 },
+   *     layerAttributes: {
+   *       '<LAYER1>': { blendingMode: 'SOFT_LIGHT', includeComponentBackground: true },
+   *       '<LAYER2>': { opacity: 0.6 },
+   *     }
+   *   }
+   * )
+   * ```
    */
   renderLayersToFile(
     layerIds: Array<LayerId>,
@@ -579,6 +772,12 @@ export class ArtboardFacade {
    * @category Data
    * @param layerId The ID of the artboard layer to inspect.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const layerBounds = await artboard.getLayerBounds('<LAYER_ID>')
+   * const boundsWithEffects = layerBounds.fullBounds
+   * ```
    */
   getLayerBounds(
     layerId: LayerId,
@@ -598,6 +797,11 @@ export class ArtboardFacade {
    * @param x The X coordinate in the coordinate system of the artboard where to look for a layer.
    * @param y The Y coordinate in the coordinate system of the artboard where to look for a layer.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const layerId = await artboard.getLayerAtPosition(100, 200)
+   * ```
    */
   getLayerAtPosition(
     x: number,
@@ -618,6 +822,20 @@ export class ArtboardFacade {
    * @param bounds The area in the corrdinate system of the artboard where to look for layers.
    * @param options.partialOverlap Whether to also return layers which are only partially contained within the specified area.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // Layers fully contained in the area
+   * const layerIds = await artboard.getLayersInArea(
+   *   { left: 80, top: 150, width: 40, height: 30 }
+   * )
+   *
+   * // Layers fully or partially contained in the area
+   * const layerIds = await artboard.getLayersInArea(
+   *   { left: 80, top: 150, width: 40, height: 30 },
+   *   { partialOverlap: true }
+   * )
+   * ```
    */
   getLayersInArea(
     bounds: Bounds,

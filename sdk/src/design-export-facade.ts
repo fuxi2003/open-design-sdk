@@ -70,6 +70,17 @@ export class DesignExportFacade {
    * Returns the URL of the produced design file.
    * @category Serialization
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected. A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const url = await export.getResultUrl()
+   *
+   * const response = await fetch(url)
+   * if (response.status !== 200) throw new Error('Export result unavailable')
+   *
+   * const writeStream = fs.createWriteStream('./exports/design.sketch')
+   * response.pipe(writeStream)
+   * ```
    */
   async getResultUrl(
     options: {
@@ -94,6 +105,14 @@ export class DesignExportFacade {
    * Returns a readable binary stream of the produced design file.
    * @category Serialization
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected. A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const resultStream = await export.getResultStream()
+   *
+   * const writeStream = fs.createWriteStream('./exports/design.sketch')
+   * resultStream.pipe(writeStream)
+   * ```
    */
   async getResultStream(
     options: {
@@ -111,6 +130,11 @@ export class DesignExportFacade {
    * @category Serialization
    * @param filePath An absolute path to which to save the design file or a path relative to the current working directory.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. a partially downloaded file is not deleted). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * await export.exportDesignFile('./exports/design.sketch')
+   * ```
    */
   async exportDesignFile(
     filePath: string,

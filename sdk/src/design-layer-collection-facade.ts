@@ -122,6 +122,26 @@ export class DesignLayerCollectionFacade {
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the layers explictly included in the collection to search. By default, all levels are searched. `0` also means "no limit"; `1` means only the layers explicitly included in the collection should be searched.
+   *
+   * @example
+   * ```typescript
+   * // Layer by name from any artboard
+   * const layer = await collection.findLayer({ name: 'Share icon' })
+   *
+   * // Layer by name from a certain artboad subset
+   * const layer = await collection.findLayer({
+   *   name: 'Share icon',
+   *   artboardId: [ '<ID1>', '<ID2>' ],
+   * })
+   *
+   * // With timeout
+   * const { cancel, token } = createCancelToken()
+   * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
+   * const layer = await collection.findLayer(
+   *   { name: 'Share icon' },
+   *   { cancelToken: token }
+   * )
+   * ```
    */
   findLayer(
     selector: FileLayerSelector,
@@ -141,6 +161,26 @@ export class DesignLayerCollectionFacade {
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the layers explictly included in the collection to search. By default, all levels are searched. `0` also means "no limit"; `1` means only the layers explicitly included in the collection should be searched.
+   *
+   * @example
+   * ```typescript
+   * // Layers by name from all artboards
+   * const layers = await collection.findLayers({ name: 'Share icon' })
+   *
+   * // Invisible layers from all a certain artboard subset
+   * const layers = await collection.findLayers({
+   *   visible: false,
+   *   artboardId: [ '<ID1>', '<ID2>' ],
+   * })
+   *
+   * // With timeout
+   * const { cancel, token } = createCancelToken()
+   * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
+   * const layer = await collection.findLayers(
+   *   { type: 'shapeLayer' },
+   *   { cancelToken: token }
+   * )
+   * ```
    */
   findLayers(
     selector: FileLayerSelector,
@@ -159,6 +199,13 @@ export class DesignLayerCollectionFacade {
    *
    * @category Iteration
    * @param filter The filter to apply to the layers in the collection.
+   *
+   * @example
+   * ```typescript
+   * const textLayers = collection.filter((layer) => {
+   *   return layer.type === 'textLayer'
+   * })
+   * ```
    */
   filter(
     filter: (layer: LayerFacade, index: number) => boolean
@@ -182,6 +229,13 @@ export class DesignLayerCollectionFacade {
    *
    * @category Iteration
    * @param fn The function to apply to the layers in the collection.
+   *
+   * @example
+   * ```typescript
+   * collection.forEach((layer) => {
+   *   console.log(layer.name)
+   * })
+   * ```
    */
   forEach(
     fn: (layer: LayerFacade, index: number, layers: Array<LayerFacade>) => any
@@ -196,6 +250,14 @@ export class DesignLayerCollectionFacade {
    *
    * @category Iteration
    * @param mapper The mapper function to apply to the layers in the collection.
+   *
+   * @example
+   * ```typescript
+   * const textValues = collection.map((layer) => {
+   *   const text = layer.getText()
+   *   return text ? text.getTextContent() : null
+   * })
+   * ```
    */
   map<T>(
     mapper: (layer: LayerFacade, index: number, layers: Array<LayerFacade>) => T
@@ -210,6 +272,14 @@ export class DesignLayerCollectionFacade {
    *
    * @category Iteration
    * @param mapper The mapper function to apply to the layers in the collection.
+   *
+   * @example
+   * ```typescript
+   * const textValues = collection.flatMap((layer) => {
+   *   const text = layer.getText()
+   *   return text ? [ text.getTextContent() ] : []
+   * })
+   * ```
    */
   flatMap<T>(
     mapper: (
@@ -229,6 +299,14 @@ export class DesignLayerCollectionFacade {
    * @category Iteration
    * @param reducer The reducer function to apply to the layers in the collection.
    * @param initialValue The value passed as the first argument to the reducer function applied to the first layer in the collection.
+   *
+   * @example
+   * ```typescript
+   * const textValues = collection.reduce((values, layer) => {
+   *   const text = layer.getText()
+   *   return text ? values.concat([ text.getTextContent() ]) : values
+   * }, [])
+   * ```
    */
   reduce<T>(
     reducer: (state: T, layer: LayerFacade, index: number) => T,
@@ -244,6 +322,18 @@ export class DesignLayerCollectionFacade {
    *
    * @category Collection Manipulation
    * @param addedLayers The layer collection to concatenate with the original collection. A native `Array` of layer objects can be provided instead of an actual collection object.
+   *
+   * @example
+   * ```typescript
+   * // Merge two collections
+   * const textLayersFromA = await artboardA.findLayers({ type: 'textLayers' })
+   * const textLayersFromB = await artboardB.findLayers({ type: 'textLayers' })
+   * const textLayersFromAB = textLayersFromA.concat(textLayersFromB)
+   *
+   * // Append individual layers
+   * const extraLayer = await artboard.getLayerById('<ID>')
+   * const extendedCollection = collection.concat([ extraLayer ])
+   * ```
    */
   concat(
     addedLayers: DesignLayerCollectionFacade | Array<LayerFacade>
@@ -266,6 +356,14 @@ export class DesignLayerCollectionFacade {
    *
    * @category Collection Manipulation
    * @param options.depth The maximum nesting level within the layers explicitly included in the original collection to explicitly include in the new collection. `0` also means "no limit"; `1` means only the layers nested immediately in the collection layers should be included in the new colleciton.
+   *
+   * @example
+   * ```typescript
+   * const groupLayers = await artboard.findLayers({ type: 'groupLayer' })
+   *
+   * const groupLayersWithImmediateChildren = groupLayers.flatten({ depth: 1 })
+   * const groupLayersWithAllChildren = groupLayers.flatten()
+   * ```
    */
   flatten(options: { depth?: number } = {}): DesignLayerCollectionFacade {
     const flattenedLayerCollection = this._layerCollection.flatten(options)
@@ -283,6 +381,17 @@ export class DesignLayerCollectionFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within the layer to search for bitmap asset usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
+   *
+   * @example
+   * ```typescript
+   * // All bitmap assets from layers from any artboard
+   * const bitmapAssetDescs = await collection.getBitmapAssets()
+   *
+   * // Bitmap assets excluding pre-renredered bitmaps from layers from any artboards
+   * const bitmapAssetDescs = await collection.getBitmapAssets({
+   *   includePrerendered: false,
+   * })
+   * ```
    */
   getBitmapAssets(
     options: { depth?: number; includePrerendered?: boolean } = {}
@@ -301,6 +410,12 @@ export class DesignLayerCollectionFacade {
    *
    * @category Asset
    * @param options.depth The maximum nesting level within the layer to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
+   *
+   * @example
+   * ```typescript
+   * // All fonts from layers from any artboard
+   * const fontDescs = await design.getFonts()
+   * ```
    */
   getFonts(
     options: { depth?: number } = {}
@@ -336,6 +451,28 @@ export class DesignLayerCollectionFacade {
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // With default options (1x, whole combined layer area)
+   * await collection.renderToFile(
+   *   './rendered/collection.png'
+   * )
+   *
+   * // With custom scale and crop and using the custom layer configuration
+   * await collection.renderToFile(
+   *   './rendered/collection.png',
+   *   {
+   *     scale: 2,
+   *     // The result is going to have the dimensions of 400x200 due to the 2x scale.
+   *     bounds: { left: 100, top: 0, width: 100, height: 50 },
+   *     layerAttributes: {
+   *       '<LAYER1>': { blendingMode: 'SOFT_LIGHT', includeComponentBackground: true },
+   *       '<LAYER2>': { opacity: 0.6 },
+   *     }
+   *   }
+   * )
+   * ```
    */
   async renderToFile(
     filePath: string,

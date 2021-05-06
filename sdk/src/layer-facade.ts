@@ -71,6 +71,14 @@ export class LayerFacade {
    * See the [Octopus Format](https://opendesign.dev/docs/octopus-format) documentation page for more info.
    *
    * @category Data
+   *
+   * @example
+   * ```typescript
+   * const blendMode = layer.octopus['blendMode']
+   * const opacity = layer.octopus['opacity']
+   * const visible = layer.octopus['visible']
+   * const overrides = layer.octopus['overrides']
+   * ```
    */
   get octopus(): LayerOctopusData {
     return this._layerEntity.octopus
@@ -102,7 +110,13 @@ export class LayerFacade {
 
   /**
    * Returns the artboard object associated with the layer object.
+   *
    * @category Reference
+   *
+   * @example
+   * ```typescript
+   * const artboard = layer.getArtboard()
+   * ```
    */
   getArtboard(): ArtboardFacade | null {
     const artboardId = this.artboardId
@@ -116,7 +130,13 @@ export class LayerFacade {
 
   /**
    * Returns whether the layer is located at the first level within the layer tree of the artboard (i.e. it does not have a parent layer).
+   *
    * @category Layer Context
+   *
+   * @example
+   * ```typescript
+   * const root = layer.isRootLayer()
+   * ```
    */
   isRootLayer(): boolean {
     return this._layerEntity.isRootLayer()
@@ -128,6 +148,18 @@ export class LayerFacade {
    * Root (first-level) layers have depth of 1.
    *
    * @category Layer Context
+   *
+   * @example
+   * ```typescript
+   * const rootLayer = artboard.getRootLayers()[0]
+   * console.log(rootLayer.depth) // 1
+   *
+   * const nestedLayer = rootLayer.getNestedLayers()[0]
+   * console.log(nestedLayer.depth) // 2
+   *
+   * const deeperNestedLayer = nestedLayer.getNestedLayers()[0]
+   * console.log(deeperNestedLayer.depth) // 3
+   * ```
    */
   get depth(): number {
     return this._layerEntity.getDepth()
@@ -137,6 +169,18 @@ export class LayerFacade {
    * Returns the immediate parent layer object which contains the layer.
    *
    * @category Layer Lookup
+   *
+   * @example
+   * ```typescript
+   * const rootLayer = artboard.getRootLayers()[0]
+   * rootLayer.getParentLayer() // null
+   *
+   * const nestedLayer = rootLayer.getNestedLayers()[0]
+   * nestedLayer.getParentLayer() // rootLayer
+   *
+   * const deeperNestedLayer = nestedLayer.getNestedLayers()[0]
+   * deeperNestedLayer.getParentLayer() // nestedLayer
+   * ```
    */
   getParentLayer(): LayerFacade | null {
     const layerEntity = this._layerEntity.getParentLayer()
@@ -149,6 +193,18 @@ export class LayerFacade {
    * Returns all parent layer objects which contain the layer sorted from the immediate parent layer to the first-level (root) layer.
    *
    * @category Layer Lookup
+   *
+   * @example
+   * ```typescript
+   * const rootLayer = artboard.getRootLayers()[0]
+   * rootLayer.getParentLayers() // DesignLayerCollection []
+   *
+   * const nestedLayer = rootLayer.getNestedLayers()[0]
+   * nestedLayer.getParentLayers() // DesignLayerCollection [rootLayer]
+   *
+   * const deeperNestedLayer = nestedLayer.getNestedLayers()[0]
+   * deeperNestedLayer.getParentLayers() // DesignLayerCollection [nestedLayer, rootLayer]
+   * ```
    */
   getParentLayers(): DesignLayerCollectionFacade {
     const layerEntities = this._layerEntity.getParentLayers()
@@ -161,6 +217,18 @@ export class LayerFacade {
    * Returns the IDs of all parent layers which contain the layer sorted from the immediate parent layer to the first-level (root) layer.
    *
    * @category Layer Lookup
+   *
+   * @example
+   * ```typescript
+   * const rootLayer = artboard.getRootLayers()[0]
+   * rootLayer.getParentLayerIds() // DesignLayerCollection []
+   *
+   * const nestedLayer = rootLayer.getNestedLayers()[0]
+   * nestedLayer.getParentLayerIds() // DesignLayerCollection [rootLayer.id]
+   *
+   * const deeperNestedLayer = nestedLayer.getNestedLayers()[0]
+   * deeperNestedLayer.getParentLayerIds() // DesignLayerCollection [nestedLayer.id, rootLayer.id]
+   * ```
    */
   getParentLayerIds(): Array<LayerId> {
     return this._layerEntity.getParentLayerIds()
@@ -170,6 +238,20 @@ export class LayerFacade {
    * Returns the deepest parent layer objects which contains the layer and matches the provided criteria.
    *
    * @category Layer Lookup
+   *
+   * @example
+   * ```typescript
+   * const rootLayer = artboard.getRootLayers()[0]
+   * // Layer { id: 'x', type: 'groupLayer', name: 'A' }
+   *
+   * const nestedLayer1 = rootLayer.getNestedLayers()[0]
+   * // Layer { id: 'y', type: 'groupLayer', name: 'B' }
+   *
+   * const nestedLayer2 = nestedLayer1.getNestedLayers()[0]
+   * // Layer { id: 'z', type: 'groupLayer', name: 'A' }
+   *
+   * console.log(nestedLayer2.findParentLayer({ name: 'A' })) // Layer { id: 'z' }
+   * ```
    */
   findParentLayer(selector: LayerSelector): LayerFacade | null {
     const layerEntity = this._layerEntity.findParentLayer(selector)
@@ -182,6 +264,21 @@ export class LayerFacade {
    * Returns all parent layer objects which contain the layer and match the provided criteria sorted from the immediate parent layer to the first-level (root) layer.
    *
    * @category Layer Lookup
+   *
+   * @example
+   * ```typescript
+   * const rootLayer = artboard.getRootLayers()[0]
+   * // Layer { id: 'x', type: 'groupLayer', name: 'A' }
+   *
+   * const nestedLayer1 = rootLayer.getNestedLayers()[0]
+   * // Layer { id: 'y', type: 'groupLayer', name: 'B' }
+   *
+   * const nestedLayer2 = nestedLayer1.getNestedLayers()[0]
+   * // Layer { id: 'z', type: 'groupLayer', name: 'A' }
+   *
+   * console.log(nestedLayer2.findParentLayers({ name: 'A' }))
+   * // DesignLayerCollection [ Layer { id: 'z' }, Layer { id: 'x' } ]
+   * ```
    */
   findParentLayers(selector: LayerSelector): DesignLayerCollectionFacade {
     const layerEntities = this._layerEntity.findParentLayers(selector)
@@ -196,6 +293,15 @@ export class LayerFacade {
    * This usually applies to group layers and expanded/inlined component layers. Empty group layers return `false`.
    *
    * @category Layer Lookup
+   *
+   * @example
+   * ```typescript
+   * if (layer.hasNestedLayers()) {
+   *   console.log(layer.getNestedLayers()) // DesignLayerCollection [ ...(layers)... ]
+   * } else {
+   *   console.log(layer.getNestedLayers()) // DesignLayerCollection []
+   * }
+   * ```
    */
   hasNestedLayers(): boolean {
     return this._layerEntity.hasNestedLayers()
@@ -210,6 +316,31 @@ export class LayerFacade {
    *
    * @category Layer Lookup
    * @param options.depth The maximum nesting level within the layer to include in the collection. By default, only the immediate nesting level is included. `Infinity` can be specified to get all nesting levels.
+   *
+   * @example
+   * ```typescript
+   * // Layer tree:
+   * // a {
+   * //   b1 { c1, c2 },
+   * //   b2 { c3 }
+   * // }
+   *
+   * const layerA = artboard.getLayerById('a')
+   *
+   * // Immediate nesting level
+   * console.log(layerA.getNestedLayers())
+   * // DesignLayerCollection [ Layer { id: 'b1' }, Layer { id: 'b2' } ]
+   *
+   * // All nesting levels
+   * console.log(layerA.getNestedLayers({ depth: 0 }))
+   * // DesignLayerCollection [
+   * //   Layer { id: 'b1' },
+   * //   Layer { id: 'c1' },
+   * //   Layer { id: 'c2' },
+   * //   Layer { id: 'b2' },
+   * //   Layer { id: 'c3' },
+   * // ]
+   * ```
    */
   getNestedLayers(
     options: { depth?: number } = {}
@@ -228,6 +359,25 @@ export class LayerFacade {
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the layer to search. By default, all levels are searched. `0` also means "no limit"; `1` means only layers nested directly in the layer should be searched.
+   *
+   * @example
+   * ```typescript
+   * // Layer tree:
+   * // a {
+   * //   b1 { c1, c2 },
+   * //   b2 { c3 }
+   * // }
+   *
+   * const layerA = artboard.getLayerById('a')
+   *
+   * // All nesting levels
+   * console.log(layerA.findNestedLayer({ id: 'c1' }))
+   * // Layer { id: 'c1' },
+   *
+   * // Immediate nesting level
+   * console.log(layerA.findNestedLayer({ id: 'c1', depth: 0 }))
+   * // null
+   * ```
    */
   findNestedLayer(
     selector: LayerSelector,
@@ -247,6 +397,29 @@ export class LayerFacade {
    * @category Layer Lookup
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the layer to search. By default, all levels are searched. `0` also means "no limit"; `1` means only layers nested directly in the layer should be searched.
+   *
+   * @example
+   * ```typescript
+   * // Layer tree:
+   * // a {
+   * //   b1 { c1, c2 },
+   * //   b2 { c3 }
+   * // }
+   *
+   * const layerA = artboard.getLayerById('a')
+   *
+   * // All nesting levels
+   * console.log(layerA.findNestedLayers({ id: ['b1', 'c1', 'c3'] }))
+   * // DesignLayerCollection [
+   * //   Layer { id: 'b1' },
+   * //   Layer { id: 'c1' },
+   * //   Layer { id: 'c3' },
+   * // ]
+   *
+   * // Immediate nesting level
+   * console.log(layerA.findNestedLayers({ id: ['b1', 'c1', 'c3'], depth: 0 }))
+   * // DesignLayerCollection [ Layer { id: 'b1' } ]
+   * ```
    */
   findNestedLayers(
     selector: LayerSelector,
@@ -262,6 +435,15 @@ export class LayerFacade {
    * Returns whether the layer matches the provided selector.
    *
    * @param selector The selector against which to test the layer.
+   *
+   * @example
+   * ```typescript
+   * console.log(layer.name) // A
+   * layer.matches({ name: 'A' }) // true
+   *
+   * console.log(layer.getText().getTextContent()) // This is text.
+   * layer.matches({ text: 'This is text.' }) // true
+   * ```
    */
   matches(selector: FileLayerSelector): boolean {
     return this._layerEntity.matches(selector)
@@ -271,6 +453,17 @@ export class LayerFacade {
    * Returns whether the layer is masked/clipped by another layer.
    *
    * @category Layer Context
+   *
+   * @example
+   * ```typescript
+   * if (layer.isMasked()) {
+   *   layer.getMaskLayerId() // <MASK_ID>
+   *   layer.getMaskLayer() // Layer { id: '<MASK_ID>' }
+   * } else {
+   *   layer.getMaskLayerId() // null
+   *   layer.getMaskLayer() // null
+   * }
+   * ```
    */
   isMasked(): boolean {
     return this._layerEntity.isMasked()
@@ -280,6 +473,12 @@ export class LayerFacade {
    * Returns the layer which masks/clips the layer if there is one.
    *
    * @category Layer Lookup
+   *
+   * @example
+   * ```typescript
+   * layer.getMaskLayer() // Layer { id: '<MASK_ID>' }
+   * layer.getMaskLayerId() // <MASK_ID>
+   * ```
    */
   getMaskLayer(): LayerFacade | null {
     const layerEntity = this._layerEntity.getMaskLayer()
@@ -292,6 +491,11 @@ export class LayerFacade {
    * Returns the ID of the layer which masks/clips the layer if there is one.
    *
    * @category Layer Lookup
+   *
+   * @example
+   * ```typescript
+   * const maskLayerId = layer.getMaskLayerId()
+   * ```
    */
   getMaskLayerId(): LayerId | null {
     return this._layerEntity.getMaskLayerId()
@@ -301,6 +505,11 @@ export class LayerFacade {
    * Returns whether the layer represents an "inline artboard" (which is a feature used in Photoshop design files only).
    *
    * @category Layer Context
+   *
+   * @example
+   * ```typescript
+   * const isInline = layer.isInlineArtboard()
+   * ```
    */
   isInlineArtboard(): boolean {
     return this._layerEntity.isInlineArtboard()
@@ -310,6 +519,13 @@ export class LayerFacade {
    * Returns whether the layer is a component (instance of a main/master component).
    *
    * @category Layer Context
+   *
+   * @example
+   * ```typescript
+   * if (layer.isComponentInstance()) {
+   *   console.log(layer.getComponentArtboard()) // Artboard
+   * }
+   * ```
    */
   isComponentInstance(): boolean {
     return this._layerEntity.isComponentInstance()
@@ -323,6 +539,13 @@ export class LayerFacade {
    * Layers which do not represent a component (instance), see {@link LayerFacade.isComponentInstance}, return `false`.
    *
    * @category Layer Context
+   *
+   * @example
+   * ```typescript
+   * if (layer.hasComponentOverrides()) {
+   *   const overrides = layer.octopus['overrides']
+   * }
+   * ```
    */
   hasComponentOverrides(): boolean {
     return this._layerEntity.hasComponentOverrides()
@@ -334,6 +557,11 @@ export class LayerFacade {
    * Nothing is returned from layers which do not represent a component (instance), see {@link LayerFacade.isComponentInstance}.
    *
    * @category Reference
+   *
+   * @example
+   * ```typescript
+   * const componentArtboard = layer.getComponentArtboard()
+   * ```
    */
   getComponentArtboard(): ArtboardFacade | null {
     const componentArtboardEntity = this._layerEntity.getComponentArtboard()
@@ -350,6 +578,12 @@ export class LayerFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within the layer to search for bitmap asset usage. By default, all levels are searched. Specifying the depth of `0` leads to nested layer bitmap assets being omitted altogether.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
+   *
+   * @example
+   * ```typescript
+   * // Bitmap assets from the layer and all its nested layers
+   * const bitmapAssetDescs = await layer.getBitmapAssets()
+   * ```
    */
   getBitmapAssets(
     options: { depth?: number; includePrerendered?: boolean } = {}
@@ -362,6 +596,12 @@ export class LayerFacade {
    *
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to fonts used by nested layers being omitted altogether.
+   *
+   * @example
+   * ```typescript
+   * // Fonts from the layer and all its nested layers
+   * const fontDescs = await layer.getFonts()
+   * ```
    */
   getFonts(
     options: { depth?: number } = {}
@@ -373,6 +613,12 @@ export class LayerFacade {
    * Returns the bitmap asset of the layer if there is one.
    *
    * @category Asset
+   *
+   * @example
+   * ```typescript
+   * const bitmap = layer.getBitmap()
+   * const bitmapAssetName = bitmap?.getBitmapAssetName()
+   * ```
    */
   getBitmap(): IBitmap | null {
     return (
@@ -384,6 +630,12 @@ export class LayerFacade {
    * Returns the bitmap mask of the layer if there is one.
    *
    * @category Asset
+   *
+   * @example
+   * ```typescript
+   * const bitmapMask = layer.getBitmapMask()
+   * const bitmapMaskAssetName = bitmapMask?.getBitmap().getBitmapAssetName()
+   * ```
    */
   getBitmapMask(): IBitmapMask | null {
     return this._layerEntity.getBitmapMask()
@@ -395,6 +647,12 @@ export class LayerFacade {
    * Only non-bitmap layers (`type!=layer`) have prerendered assets. Bitmap assets of bitmap layers are not considered "pre-rendered".
    *
    * @category Asset
+   *
+   * @example
+   * ```typescript
+   * const prerendered = layer.isBitmapPrerendered()
+   * const originalBitmap = prerendered ? null : layer.getBitmap()
+   * ```
    */
   isBitmapPrerendered(): boolean {
     return Boolean(this._layerEntity.getPrerenderedBitmap())
@@ -418,6 +676,12 @@ export class LayerFacade {
    * Only text layers (`type=textLayer`) return text objects here.
    *
    * @category Data
+   *
+   * @example
+   * ```typescript
+   * const text = layer.getText()
+   * const textValue = text ? text.getTextContent() : null
+   * ```
    */
   getText(): IText | null {
     return this._layerEntity.getText()
@@ -429,6 +693,11 @@ export class LayerFacade {
    * Only text layers (`type=textLayer`) return text objects here. This is a shortcut for `.getText()?.getTextContent()`
    *
    * @category Data
+   *
+   * @example
+   * ```typescript
+   * const textValue = layer.getTextContent()
+   * ```
    */
   getTextContent(): string | null {
     const text = this.getText()
@@ -443,6 +712,12 @@ export class LayerFacade {
    * Note that there can be bitmap assets in case of pattern fill effects being applied.
    *
    * @category Data
+   *
+   * @example
+   * ```typescript
+   * const effects = layer.getEffects()
+   * const shadows = effects.octopus['shadows']
+   * ```
    */
   getEffects(): IEffects {
     return this._layerEntity.getEffects()
@@ -467,6 +742,25 @@ export class LayerFacade {
    * @param options.bounds The area to include. This can be used to either crop or expand (add empty space to) the default layer area.
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * // With default options (1x, whole layer area)
+   * await layer.renderToFile(
+   *   './rendered/layer.png'
+   * )
+   *
+   * // With custom scale and crop and using the component background color
+   * await layer.renderToFile(
+   *   './rendered/layer.png',
+   *   {
+   *     scale: 2,
+   *     // The result is going to have the dimensions of 400x200 due to the 2x scale.
+   *     bounds: { left: 100, top: 0, width: 100, height: 50 },
+   *     includeComponentBackground: true,
+   *   }
+   * )
+   * ```
    */
   async renderToFile(
     filePath: string,
@@ -501,6 +795,12 @@ export class LayerFacade {
    *
    * @category Data
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const layerBounds = await layer.getBounds()
+   * const boundsWithEffects = layerBounds.fullBounds
+   * ```
    */
   async getBounds(
     options: {
