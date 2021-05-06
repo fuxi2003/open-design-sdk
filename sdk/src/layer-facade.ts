@@ -420,6 +420,18 @@ export class LayerFacade {
   }
 
   /**
+   * Returns the text value of the layer if there is one.
+   *
+   * Only text layers (`type=textLayer`) return text objects here. This is a shortcut for `.getText()?.getTextContent()`
+   *
+   * @category Data
+   */
+  getTextContent(): string | null {
+    const text = this.getText()
+    return text ? text.getTextContent() : null
+  }
+
+  /**
    * Returns a layer effect aggregation object.
    *
    * Any layer can have various effects (such as shadows, borders or fills) applied to it.
