@@ -5,7 +5,7 @@ import type { ArtboardId, ComponentId, LayerId, PageId } from './ids.type'
 import type { ILayerCollection } from './layer-collection.iface'
 import type { ILayer } from './layer.iface'
 import type { ArtboardManifestData } from './manifest.type'
-import type { ArtboardOctopusData, RgbaColor } from './octopus.type'
+import type { OctopusDocument, RgbaColor } from './octopus.type'
 import type { IPage } from './page.iface'
 import type { LayerSelector } from './selectors.type'
 
@@ -27,8 +27,8 @@ export interface IArtboard {
 
   isLoaded(): boolean
   unload(): void
-  getOctopus(): ArtboardOctopusData | null
-  setOctopus(nextOctopus: ArtboardOctopusData): void
+  getOctopus(): OctopusDocument | null
+  setOctopus(nextOctopus: OctopusDocument): void
 
   getFile(): IFile | null
 

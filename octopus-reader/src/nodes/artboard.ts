@@ -12,7 +12,7 @@ import type { ILayer } from '../types/layer.iface'
 import type { ILayerCollection } from '../types/layer-collection.iface'
 import type { ArtboardManifestData } from '../types/manifest.type'
 import type {
-  ArtboardOctopusData,
+  OctopusDocument,
   Bounds,
   ComponentId,
   RgbaColor,
@@ -22,12 +22,12 @@ import { IPage } from '../types/page.iface'
 
 export class Artboard implements IArtboard {
   private _manifest: ArtboardManifestData
-  private _octopus: ArtboardOctopusData | null
+  private _octopus: OctopusDocument | null
   private _file: IFile | null
 
   constructor(
     id: ArtboardId,
-    octopus: ArtboardOctopusData | null,
+    octopus: OctopusDocument | null,
     params: Partial<{
       manifest: ArtboardManifestData
       pageId: PageId | null
@@ -90,7 +90,7 @@ export class Artboard implements IArtboard {
     return this._octopus
   }
 
-  setOctopus(nextOctopus: ArtboardOctopusData) {
+  setOctopus(nextOctopus: OctopusDocument) {
     this._octopus = nextOctopus
 
     this._manifest = this._createManifest(this._manifest, nextOctopus, {
@@ -218,7 +218,7 @@ export class Artboard implements IArtboard {
 
   _createManifest(
     prevManifest: ArtboardManifestData | null,
-    octopus: ArtboardOctopusData | null,
+    octopus: OctopusDocument | null,
     params: {
       id: ArtboardId
       pageId?: PageId | null

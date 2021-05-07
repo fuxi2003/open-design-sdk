@@ -8,7 +8,7 @@ import type { CancelToken } from '@avocode/cancel-token'
 import type {
   ArtboardId,
   ArtboardManifestData,
-  ArtboardOctopusData as ArtboardOctopusDataType,
+  OctopusDocument as OctopusDocumentType,
   IArtboard,
   LayerId,
   LayerSelector,
@@ -22,7 +22,7 @@ import type { BitmapAssetDescriptor } from './local/local-design'
 import type { PageFacade } from './page-facade'
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
-interface ArtboardOctopusData extends ArtboardOctopusDataType {}
+interface OctopusDocument extends OctopusDocumentType {}
 
 export type LayerAttributesConfig = {
   /** Whether to apply layer effects of the layer. Rendering of effects of nested layers is not affected. By defaults, effects of the layer are applied. */
@@ -83,7 +83,7 @@ export class ArtboardFacade {
     options: {
       cancelToken?: CancelToken | null
     } = {}
-  ): Promise<ArtboardOctopusData> {
+  ): Promise<OctopusDocument> {
     const artboardEntity = this._artboardEntity
     if (!artboardEntity.isLoaded()) {
       await this._designFacade.loadArtboard(this.id, options)

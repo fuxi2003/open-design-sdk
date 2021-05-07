@@ -26,7 +26,7 @@ import {
 
 import type {
   ArtboardId,
-  ArtboardOctopusData,
+  OctopusDocument,
   ManifestData,
   PageId,
 } from '@opendesign/octopus-reader'
@@ -183,7 +183,7 @@ export class LocalDesign {
     options: {
       cancelToken?: CancelToken | null
     } = {}
-  ): Promise<ArtboardOctopusData> {
+  ): Promise<OctopusDocument> {
     const cancelToken = createCancelToken.race([
       options.cancelToken,
       this._destroyToken,
@@ -192,7 +192,7 @@ export class LocalDesign {
     const contentFilename = this._getArtboardContentFilename(artboardId)
     const content = (await readJsonFile(contentFilename, {
       cancelToken,
-    })) as ArtboardOctopusData
+    })) as OctopusDocument
     return content
   }
 
@@ -205,7 +205,7 @@ export class LocalDesign {
 
   async saveArtboardContent(
     artboardId: ArtboardId,
-    content: ArtboardOctopusData,
+    content: OctopusDocument,
     options: {
       cancelToken?: CancelToken | null
     } = {}
@@ -250,7 +250,7 @@ export class LocalDesign {
     options: {
       cancelToken?: CancelToken | null
     } = {}
-  ): Promise<ArtboardOctopusData> {
+  ): Promise<OctopusDocument> {
     const cancelToken = createCancelToken.race([
       options.cancelToken,
       this._destroyToken,
@@ -259,7 +259,7 @@ export class LocalDesign {
     const contentFilename = this._getPageContentFilename(pageId)
     const content = (await readJsonFile(contentFilename, {
       cancelToken,
-    })) as ArtboardOctopusData
+    })) as OctopusDocument
     return content
   }
 
@@ -272,7 +272,7 @@ export class LocalDesign {
 
   async savePageContent(
     pageId: PageId,
-    content: ArtboardOctopusData,
+    content: OctopusDocument,
     options: {
       cancelToken?: CancelToken | null
     } = {}
@@ -369,7 +369,7 @@ export class LocalDesign {
 
   async saveBitmapAsset(
     bitmapAssetDesc: BitmapAssetDescriptor,
-    content: ArtboardOctopusData,
+    content: OctopusDocument,
     options: {
       cancelToken?: CancelToken | null
     } = {}

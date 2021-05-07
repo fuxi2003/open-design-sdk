@@ -17,8 +17,8 @@ export type ComponentId = string
  * @category Data
  * @octopusschema OctopusDocument
  */
-export type ArtboardOctopusData = components['schemas']['OctopusDocument']
-// type ArtboardOctopusData = {
+export type OctopusDocument = components['schemas']['OctopusDocument']
+// type OctopusDocument = {
 //   'bounds': Bounds
 //   'frame': { 'x': number; 'y': number }
 //   'layers'?: Array<LayerOctopusData>

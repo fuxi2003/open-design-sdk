@@ -7,7 +7,7 @@ import type { IArtboard } from '../types/artboard.iface'
 import type { IFile } from '../types/file.iface'
 import type { ArtboardId, PageId } from '../types/ids.type'
 import type { ArtboardManifestData, ManifestData } from '../types/manifest.type'
-import type { ArtboardOctopusData, ComponentId } from '../types/octopus.type'
+import type { OctopusDocument, ComponentId } from '../types/octopus.type'
 import type { IPage } from '../types/page.iface'
 
 export class FileData {
@@ -140,7 +140,7 @@ export class FileData {
 
   addArtboard(
     artboardId: ArtboardId,
-    octopus: ArtboardOctopusData | null,
+    octopus: OctopusDocument | null,
     params: Partial<{
       manifest: ArtboardManifestData
       pageId: PageId | null

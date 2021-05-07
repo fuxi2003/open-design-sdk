@@ -6,7 +6,7 @@ import { createTempFileTarget } from './temp-location'
 
 import type {
   ArtboardId,
-  ArtboardOctopusData,
+  OctopusDocument,
   ManifestData,
 } from '@opendesign/octopus-reader'
 import { basename, dirname } from 'path'
@@ -32,7 +32,7 @@ export async function createOctopusFile(filePath: string) {
   }
   await writeFile(`${octopusFilename}/manifest.json`, JSON.stringify(manifest))
 
-  const artboardOctopuses: Record<ArtboardId, ArtboardOctopusData> = {
+  const artboardOctopuses: Record<ArtboardId, OctopusDocument> = {
     'a': {
       'frame': { 'x': 0, 'y': 10 },
       'layers': [

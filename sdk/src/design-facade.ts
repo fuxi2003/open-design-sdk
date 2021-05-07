@@ -8,7 +8,7 @@ import { inspect } from 'util'
 import {
   createEmptyFile,
   ArtboardId,
-  ArtboardOctopusData,
+  OctopusDocument,
   ArtboardSelector,
   ComponentId,
   FileLayerSelector,
@@ -1499,7 +1499,7 @@ export class DesignFacade {
     options: {
       cancelToken?: CancelToken | null
     }
-  ): Promise<ArtboardOctopusData> {
+  ): Promise<OctopusDocument> {
     const localDesign = this._localDesign
     const apiDesign = this._apiDesign
 

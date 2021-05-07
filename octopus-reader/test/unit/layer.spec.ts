@@ -2,15 +2,12 @@ import { Artboard } from '../../src/nodes/artboard'
 import { Layer } from '../../src/nodes/layer'
 
 import { deepStrictEqual, ok, strictEqual, throws } from 'assert'
-import {
-  ArtboardOctopusData,
-  LayerOctopusData,
-} from '../../src/types/octopus.type'
+import { OctopusDocument, LayerOctopusData } from '../../src/types/octopus.type'
 
 describe('Layer', () => {
-  function createOctopus<T extends Partial<ArtboardOctopusData>>(
+  function createOctopus<T extends Partial<OctopusDocument>>(
     data: T
-  ): ArtboardOctopusData & T {
+  ): OctopusDocument & T {
     return {
       'frame': {
         'x': Math.round(Math.random() * 400),

@@ -11,10 +11,7 @@ import {
   singleInlineArtboardPhotoshopFileFixture,
 } from '../design-files/fixtures'
 
-import type {
-  ArtboardOctopusData,
-  ManifestData,
-} from '@opendesign/octopus-reader'
+import type { OctopusDocument, ManifestData } from '@opendesign/octopus-reader'
 import { ApiDesignInfo } from '../../src/local/local-design'
 
 describe('DesignFacade', () => {
@@ -233,7 +230,7 @@ describe('DesignFacade', () => {
       const [fixtureArtboardDesc] = singleArtboardSketchFileFixture.artboards
       ok(fixtureArtboardDesc)
 
-      const octopus: ArtboardOctopusData = JSON.parse(
+      const octopus: OctopusDocument = JSON.parse(
         readFileSync(
           `${filename}/artboards/${fixtureArtboardDesc.id}/data.json`,
           'utf8'
@@ -303,7 +300,7 @@ describe('DesignFacade', () => {
       const artboardOctopus = await artboardFacade?.getContent()
       ok(artboardOctopus)
 
-      const localOctopus: ArtboardOctopusData = JSON.parse(
+      const localOctopus: OctopusDocument = JSON.parse(
         readFileSync(
           `${filename}/artboards/${fixtureArtboardDesc.id}/data.json`,
           'utf8'

@@ -23,7 +23,7 @@ import type {
   PageId,
 } from '../types/ids.type'
 import type { IArtboard } from '../types/artboard.iface'
-import type { ArtboardOctopusData } from '../types/octopus.type'
+import type { OctopusDocument } from '../types/octopus.type'
 import type {
   ArtboardSelector,
   FileLayerSelector,
@@ -136,7 +136,7 @@ export class File implements IFile {
 
   addArtboard(
     artboardId: ArtboardId,
-    octopus: ArtboardOctopusData | null,
+    octopus: OctopusDocument | null,
     params: Partial<{
       manifest: ArtboardManifestData
       pageId: PageId | null

@@ -11,7 +11,7 @@ import { Sdk } from './sdk'
 import type { CancelToken } from '@avocode/cancel-token'
 export type {
   ArtboardId,
-  ArtboardOctopusData,
+  OctopusDocument,
   ArtboardSelector,
   ComponentId,
   FileLayerSelector,

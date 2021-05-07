@@ -5,7 +5,7 @@ import type { ArtboardId, ComponentId, LayerId, PageId } from './ids.type'
 import type { ILayer } from './layer.iface'
 import type { ILayerCollection } from './layer-collection.iface'
 import type { ArtboardManifestData, ManifestData } from './manifest.type'
-import type { ArtboardOctopusData } from './octopus.type'
+import type { OctopusDocument } from './octopus.type'
 import type { IPage } from './page.iface'
 import type {
   ArtboardSelector,
@@ -43,7 +43,7 @@ export interface IFile {
    */
   addArtboard(
     artboardId: ArtboardId,
-    octopus: ArtboardOctopusData,
+    octopus: OctopusDocument,
     params?: Partial<{
       manifest: ArtboardManifestData
       pageId: PageId | null
