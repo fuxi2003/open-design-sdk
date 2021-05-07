@@ -18,14 +18,6 @@ export type ComponentId = string
  * @octopusschema OctopusDocument
  */
 export type OctopusDocument = components['schemas']['OctopusDocument']
-// type OctopusDocument = {
-//   'bounds': Bounds
-//   'frame': { 'x': number; 'y': number }
-//   'layers'?: Array<LayerOctopusData>
-//   'hasBackgroundColor'?: boolean
-//   'backgroundColor'?: RgbaColor | null
-//   'symbolID'?: ComponentId | null
-// }
 
 export type Bounds = {
   left?: number
@@ -90,40 +82,3 @@ export type BorderEffectOctopusData =
 export type LayerOctopusData = NonNullable<
   components['schemas']['OctopusDocument']['layers']
 >[0]
-// export type LayerOctopusData = {
-//   'id': LayerId
-//   'name': string | null
-//   'type': 'layer' | 'shapeLayer' | 'textLayer' | 'groupLayer'
-//   'layers'?: Array<LayerOctopusData>
-//   'clipped'?: boolean
-//   'maskedBy'?: LayerId | null
-//   'symbolID'?: string | null
-//   'documentId'?: string | null
-//   'overrides'?: Array<unknown>
-//   'bitmap'?: {
-//     'filename': string
-//     'bounds': Bounds
-//     'metadata'?: BitmapMetadata
-//   }
-//   'text'?: {
-//     'value': string
-//     'defaultStyle'?: {
-//       'font'?: FontData
-//     }
-//     'styles'?: Array<{
-//       'ranges': Array<{ 'from': number; 'to': number }>
-//       'font'?: FontData
-//     }>
-//   }
-//   'shape'?: {
-//     'path'?: Path
-//     'paths'?: Array<Path>
-//   }
-//   'effects'?: {
-//     'fills'?: Array<FillEffectOctopusData>
-//     'borders'?: Array<BorderEffectOctopusData>
-//   }
-//   'artboard'?: {
-//     'color': RgbaColor
-//   }
-// }
