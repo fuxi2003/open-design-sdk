@@ -286,7 +286,8 @@ export class Layer implements ILayer {
 
   getComponentArtboard(): IArtboard | null {
     const componentArtboardId = this.octopus['documentId']
-    if (!componentArtboardId) {
+    const componentId = this.octopus['symbolID']
+    if (!componentArtboardId && !componentId) {
       return null
     }
 
@@ -302,7 +303,11 @@ export class Layer implements ILayer {
       )
     }
 
-    return file.getArtboardById(componentArtboardId)
+    return componentArtboardId
+      ? file.getArtboardById(componentArtboardId)
+      : componentId
+      ? file.getArtboardByComponentId(componentId)
+      : null
   }
 
   hasComponentOverrides(): boolean {
