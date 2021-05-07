@@ -50,6 +50,34 @@ export class OpenDesignApi implements IOpenDesignApi {
     this._destroyTokenController.cancel('The API has been destroyed.')
   }
 
+  async getDesignList(options: {
+    cancelToken?: CancelToken | null
+  }): Promise<Array<ApiDesign>> {
+    const cancelToken = createCancelToken.race([
+      options.cancelToken,
+      this._destroyTokenController.token,
+    ])
+
+    const res = await get(this._apiRoot, '/designs', {}, this._getAuthInfo(), {
+      console: this._console,
+      ...options,
+      cancelToken,
+    })
+
+    if (res.statusCode !== 200) {
+      throw new OpenDesignApiError(res, 'Cannot fetch design list')
+    }
+
+    const designInfoList =
+      'designs' in res.body ? (res.body['designs'] as Array<Design>) : []
+
+    return designInfoList.map((designInfo) => {
+      return new ApiDesign(designInfo, {
+        openDesignApi: this,
+      })
+    })
+  }
+
   async getDesignById(
     designId: DesignId,
     options: {

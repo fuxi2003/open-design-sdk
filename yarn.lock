@@ -1739,10 +1739,10 @@ onigasm@^2.2.5:
   dependencies:
     lru-cache "^5.1.1"
 
-open-design-api-types@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/open-design-api-types/-/open-design-api-types-0.3.0.tgz#1f299a287fe97da9fd512c2154b7bc16ebb24dff"
-  integrity sha512-n9KfT67VGsC6O3ysrwuu8v9MWkB7385TVRAiMTJvpIH/6W6nQZSoWPK/kl2nEejb4XPqQa7Vm/93y03W4d1w5A==
+open-design-api-types@0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/open-design-api-types/-/open-design-api-types-0.3.3.tgz#bf9a0be5629cb38c8647f0653c538b0fe2727931"
+  integrity sha512-LmE9dakCr9KiCsVqEOgWvWZWxfJITKGXvu/HF/tnfxtbYaph92+/EXLzN1uZB0Uhcc/lCdKNfWVqhbAEqd8Izg==
 
 optionator@^0.8.1:
   version "0.8.3"

@@ -66,6 +66,10 @@ export interface IOpenDesignApi {
 
   // - Design Structure
 
+  getDesignList(options: {
+    cancelToken?: CancelToken | null
+  }): Promise<Array<IApiDesign>>
+
   getDesignById(
     designId: DesignId,
     options?: {

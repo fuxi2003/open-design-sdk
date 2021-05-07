@@ -6,6 +6,8 @@ import {
 import { inspect } from 'util'
 import { v4 as uuid } from 'uuid'
 
+import { DesignListItemFacade } from './design-list-item-facade'
+
 import type { CancelToken } from '@avocode/cancel-token'
 import type {
   DesignImportFormatEnum,
@@ -562,6 +564,51 @@ export class Sdk {
       exports,
       cancelToken: params.cancelToken || null,
     })
+  }
+
+  /**
+   * Fetches the list of previously imported designs from the API.
+   *
+   * Data of the designs themselves are not downloaded at this point. Each item in the design list can be expanded to a full-featured design entity.
+   *
+   * The design list contains both processed and unprocessed designs.
+   *
+   * The API has to be configured when using this method.
+   *
+   * @example
+   * const designList = await sdk.fetchDesignList()
+   * const designItem = designList.find((design) => design.name === 'My design')
+   * // Expand the design list item to a full design entity
+   * const design = await designItem.fetchDesign()
+   * // Continue working with the processed design
+   * const artboards = design.getArtboards()
+   *
+   * @category Server Side Design File Usage
+   * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected. A cancellation token can be created via {@link createCancelToken}.
+   * @returns An array of design list item objects which can be used for retrieving the designs using the API.
+   */
+  async fetchDesignList(
+    options: {
+      cancelToken?: CancelToken | null
+    } = {}
+  ): Promise<Array<DesignListItemFacade>> {
+    if (this.isDestroyed()) {
+      throw new Error('The SDK has been destroyed.')
+    }
+
+    const openDesignApi = this._openDesignApi
+    if (!openDesignApi) {
+      throw new Error('Open Design API is not configured.')
+    }
+
+    const apiDesigns = await openDesignApi.getDesignList(options)
+    const designDescs = apiDesigns.map((apiDesign) => {
+      return new DesignListItemFacade(apiDesign, {
+        sdk: this,
+      })
+    })
+
+    return designDescs
   }
 
   /**
