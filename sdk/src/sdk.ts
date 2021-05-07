@@ -567,9 +567,7 @@ export class Sdk {
   /**
    * Fetches a previously imported design from the API.
    *
-   * The API has to be configured when using this method.
-   *
-   * The design is automatically uploaded to the API and local caching is established in case the local cache is configured.
+   * The API has to be configured when using this method. Local caching is established in case the local cache is configured.
    *
    * @example
    * ```typescript
