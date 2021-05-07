@@ -17,6 +17,7 @@ export type {
   FileLayerSelector,
   IBitmap,
   IBitmapMask,
+  IText,
   LayerId,
   LayerOctopusData,
   LayerSelector,
