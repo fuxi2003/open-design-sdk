@@ -789,7 +789,7 @@ export class LayerFacade {
   }
 
   /**
-   * Returns various bounds the layer.
+   * Returns various bounds of the layer.
    *
    * The rendering engine and the local cache have to be configured when using this method.
    *
