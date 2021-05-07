@@ -27,7 +27,9 @@ export function createFlattenedLayers(
   const depth = params.depth || Infinity
 
   return layerDataList.flatMap((layerData) => {
-    const nestedLayerDataList = layerData['layers'] || []
+    const nestedLayerDataList =
+      'layers' in layerData ? layerData['layers'] || [] : []
+
     return [
       createLayer(layerData, params),
       ...(depth <= 1

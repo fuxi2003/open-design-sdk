@@ -1,4 +1,4 @@
-import type { components } from 'open-design-api-types'
+import type { components } from 'open-design-api-types/typescript/octopus'
 
 /**
  * An artboard ID.
@@ -19,27 +19,17 @@ export type ComponentId = string
  */
 export type OctopusDocument = components['schemas']['OctopusDocument']
 
-export type Bounds = {
-  left?: number
-  top?: number
-  width?: number
-  height?: number
-}
+export type Bounds = components['schemas']['Bounds']
 
-export type RgbaColor = { 'r': number; 'g': number; 'b': number; 'a': number }
+export type RgbaColor = components['schemas']['Color']
 
-export type BorderRadiuses = {
-  topLeft?: number
-  topRight?: number
-  bottomRight?: number
-  bottomLeft?: number
-}
+export type BorderRadiuses = components['schemas']['ShapeRectCornerRadius']
 
-export type Path = {
-  'radius'?: BorderRadiuses
-}
+export type Path = components['schemas']['ShapePath']
 
-export type BitmapMetadata = Record<string, unknown>
+export type BitmapMetadata = NonNullable<
+  components['schemas']['Bitmap']['metadata']
+>
 
 /**
  * A layer ID.
@@ -47,23 +37,28 @@ export type BitmapMetadata = Record<string, unknown>
  */
 export type LayerId = string
 
-export type FontData = {
-  'name': string
-  'postScriptName'?: string
-  'syntheticPostScriptName'?: boolean
-  'type': string
-}
+export type FontData = components['schemas']['Font']
 
-export type PatternOctopusData = {
-  'filename': string
-}
+export type PatternOctopusData = components['schemas']['EffectAbstractPattern']
 
-export type ColorFillEffectOctopusData = { 'color': RgbaColor }
-export type ColorBorderEffectOctopusData = { 'color': RgbaColor }
-export type GradientFillEffectOctopusData = { 'gradient': unknown }
-export type GradientBorderEffectOctopusData = { 'gradient': unknown }
-export type PatternFillEffectOctopusData = { 'pattern': PatternOctopusData }
-export type PatternBorderEffectOctopusData = { 'pattern': PatternOctopusData }
+export type ColorFillEffectOctopusData = components['schemas']['EffectFill'] & {
+  'color': RgbaColor
+}
+export type ColorBorderEffectOctopusData = components['schemas']['EffectBorder'] & {
+  'color': RgbaColor
+}
+export type GradientFillEffectOctopusData = components['schemas']['EffectFill'] & {
+  'gradient': components['schemas']['EffectAbstractGradient']
+}
+export type GradientBorderEffectOctopusData = components['schemas']['EffectBorder'] & {
+  'gradient': components['schemas']['EffectAbstractGradient']
+}
+export type PatternFillEffectOctopusData = components['schemas']['EffectFill'] & {
+  'pattern': components['schemas']['EffectAbstractPattern']
+}
+export type PatternBorderEffectOctopusData = components['schemas']['EffectBorder'] & {
+  'pattern': components['schemas']['EffectAbstractPattern']
+}
 
 export type FillEffectOctopusData =
   | ColorFillEffectOctopusData
@@ -79,6 +74,6 @@ export type BorderEffectOctopusData =
  * @category Data
  * @octopusschema Layer
  */
-export type LayerOctopusData = NonNullable<
-  components['schemas']['OctopusDocument']['layers']
->[0]
+export type LayerOctopusData = components['schemas']['Layer']
+
+export type Text = components['schemas']['Text']

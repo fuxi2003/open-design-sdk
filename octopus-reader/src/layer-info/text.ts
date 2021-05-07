@@ -1,13 +1,15 @@
 import { memoize } from '../utils/memoize'
 
+import type { components } from 'open-design-api-types/typescript/octopus'
 import type { TextFontDescriptor } from '../types/fonts.type'
-import type { LayerOctopusData } from '../types/octopus.type'
 import type { IText } from '../types/text.iface'
 
 export class Text implements IText {
-  readonly octopus: NonNullable<LayerOctopusData['text']>
+  readonly octopus: NonNullable<components['schemas']['TextLayer']['text']>
 
-  constructor(textDesc: NonNullable<LayerOctopusData['text']>) {
+  constructor(
+    textDesc: NonNullable<components['schemas']['TextLayer']['text']>
+  ) {
     this.octopus = textDesc
   }
 

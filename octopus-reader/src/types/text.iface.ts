@@ -1,8 +1,8 @@
 import type { TextFontDescriptor } from './fonts.type'
-import type { LayerOctopusData } from './octopus.type'
+import type { Text } from './octopus.type'
 
 export interface IText {
-  readonly octopus: NonNullable<LayerOctopusData['text']>
+  readonly octopus: Text
 
   getTextContent(): string
   getFonts(options?: Partial<{ depth: number }>): Array<TextFontDescriptor>

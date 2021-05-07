@@ -24,7 +24,7 @@ import type {
 import type { LayerId } from '../types/ids.type'
 import type { ILayer } from '../types/layer.iface'
 import type { ILayerCollection } from '../types/layer-collection.iface'
-import type { LayerOctopusData } from '../types/octopus.type'
+import type { ComponentId, LayerOctopusData } from '../types/octopus.type'
 import type { FileLayerSelector, LayerSelector } from '../types/selectors.type'
 import type { IShape } from '../types/shape.iface'
 import type { IText } from '../types/text.iface'
@@ -146,7 +146,11 @@ export class Layer implements ILayer {
   }
 
   hasNestedLayers(): boolean {
-    return Boolean(this.octopus['layers'] && this.octopus['layers'].length > 0)
+    return Boolean(
+      'layers' in this.octopus &&
+        this.octopus['layers'] &&
+        this.octopus['layers'].length > 0
+    )
   }
 
   getNestedLayers = memoize(
@@ -184,8 +188,11 @@ export class Layer implements ILayer {
 
   _getDirectlyNestedLayers = memoize(
     (): ILayerCollection => {
+      const nestedLayerDataList =
+        'layers' in this.octopus ? this.octopus['layers'] || [] : []
+
       return new LayerCollection(
-        createLayers(this.octopus['layers'] || [], {
+        createLayers(nestedLayerDataList, {
           parentLayerId: this.id,
           artboard: this._artboard,
         })
@@ -277,15 +284,23 @@ export class Layer implements ILayer {
   }
 
   isInlineArtboard(): boolean {
-    return Boolean(this.octopus['artboard'])
+    return Boolean('artboard' in this.octopus && this.octopus['artboard'])
   }
 
   isComponentInstance(): boolean {
-    return Boolean(this.octopus['symbolID'] || this.octopus['documentId'])
+    return Boolean(
+      this.octopus['symbolID'] ||
+        ('documentId' in this.octopus && this.octopus['documentId'])
+    )
+  }
+
+  getComponentId(): ComponentId | null {
+    return this.octopus['symbolID'] || null
   }
 
   getComponentArtboard(): IArtboard | null {
-    const componentArtboardId = this.octopus['documentId']
+    const componentArtboardId =
+      'documentId' in this.octopus ? this.octopus['documentId'] : null
     const componentId = this.octopus['symbolID']
     if (!componentArtboardId && !componentId) {
       return null
@@ -339,7 +354,9 @@ export class Layer implements ILayer {
   })
 
   getText = memoize((): IText | null => {
-    return this.octopus['text'] ? new Text(this.octopus['text']) : null
+    return 'text' in this.octopus && this.octopus['text']
+      ? new Text(this.octopus['text'])
+      : null
   })
 
   getEffects = memoize(

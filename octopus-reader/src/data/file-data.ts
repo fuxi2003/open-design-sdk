@@ -7,7 +7,7 @@ import type { IArtboard } from '../types/artboard.iface'
 import type { IFile } from '../types/file.iface'
 import type { ArtboardId, PageId } from '../types/ids.type'
 import type { ArtboardManifestData, ManifestData } from '../types/manifest.type'
-import type { OctopusDocument, ComponentId } from '../types/octopus.type'
+import type { ComponentId, OctopusDocument } from '../types/octopus.type'
 import type { IPage } from '../types/page.iface'
 
 export class FileData {

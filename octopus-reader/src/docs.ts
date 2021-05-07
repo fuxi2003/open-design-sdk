@@ -6,11 +6,19 @@ import type { ILayer } from './types/layer.iface'
 import type { IPage } from './types/page.iface'
 import type { IText } from './types/text.iface'
 
-import type { OctopusDocument } from './types/octopus.type'
+import type { components } from 'open-design-api-types/typescript/octopus'
 import type { ArtboardManifestData, ManifestData } from './types/manifest.type'
 
 export * from './index'
 
 export type { IArtboard, IBitmap, IEffects, IFile, ILayer, IPage, IText }
 
-export type { ArtboardManifestData, OctopusDocument, ManifestData }
+type LayerOctopusData = components['schemas']['Layer']
+type OctopusDocument = components['schemas']['OctopusDocument']
+
+export type {
+  ArtboardManifestData,
+  LayerOctopusData,
+  OctopusDocument,
+  ManifestData,
+}

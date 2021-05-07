@@ -25,7 +25,12 @@ import type { BitmapAssetDescriptor } from './local/local-design'
 export type { FontDescriptor }
 
 // HACK: This makes TypeDoc not inline the whole type in the documentation.
-interface LayerOctopusData extends LayerOctopusDataType {}
+/**
+ * @octopusschema Layer
+ */
+type LayerOctopusData = LayerOctopusDataType & {
+  type: LayerOctopusDataType['type']
+}
 
 export class LayerFacade {
   private _layerEntity: ILayer
