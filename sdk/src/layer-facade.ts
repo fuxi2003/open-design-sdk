@@ -661,7 +661,7 @@ export class LayerFacade {
   /**
    * Returns a vector shape object of the layer if there is one.
    *
-   * Only shape layers (`type=shapeLayer`) return shape objects here.
+   * For non-shape layers (`type!=shapeLayer`), the returned shape acts as a vector mask.
    *
    * @internal
    * @category Data
