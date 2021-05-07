@@ -2,10 +2,31 @@ import type { Bounds } from './bounds.type'
 import type { LayerAttributesConfig } from './layer-attributes.type'
 
 export type LayerBounds = {
+  /**
+   * Area in which the complete layer content (without effects) is located.
+   */
   bounds: Bounds
+
+  /**
+   * Area in which the complete layer content and its effects are located.
+   */
   fullBounds: Bounds
+
+  /**
+   * Area which has to be rerendered when the layer visibility is toggled.
+   */
   affectedBounds: Bounds
+
+  /**
+   * Area of the layer the user would likely consider the actual layer area.
+   *
+   * The layer content can overflow outside of these bound just as there can be empty space around the layer content.
+   */
   logicalBounds: Bounds
+
+  /**
+   * Area in which the layer content would be located had it not been transformed (rotated).
+   */
   untransformedBounds: Bounds
 }
 

@@ -23,7 +23,7 @@ export type {
   PageId,
   PageSelector,
 } from '@opendesign/octopus-reader'
-export type { BlendingMode } from '@opendesign/rendering'
+export type { BlendingMode, Bounds, LayerBounds } from '@opendesign/rendering'
 
 export type { ArtboardFacade, LayerAttributesConfig } from './artboard-facade'
 export type { DesignExportFacade } from './design-export-facade'
