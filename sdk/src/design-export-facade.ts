@@ -9,6 +9,7 @@ export class DesignExportFacade {
   private _sdk: Sdk
   private _designExport: IApiDesignExport
 
+  /** @internal */
   constructor(designExport: IApiDesignExport, params: { sdk: Sdk }) {
     this._sdk = params.sdk
     this._designExport = designExport
