@@ -20,6 +20,9 @@ export function populatePathPattern<Pattern extends string>(
 ): string {
   return keys(pathParams).reduce((pathResult: string, paramName) => {
     const paramValue = pathParams[paramName]
-    return pathResult.replace(`{${paramName}}`, String(paramValue))
+    return pathResult.replace(
+      `{${paramName}}`,
+      encodeURIComponent(String(paramValue))
+    )
   }, pathPattern)
 }
