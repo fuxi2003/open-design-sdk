@@ -155,19 +155,29 @@ export class OpenDesignApi implements IOpenDesignApi {
       }
     )
 
-    if (res.statusCode !== 200 && res.statusCode !== 202) {
+    const body = res.body
+    const designSummaryOrProcessing = 'status' in body ? body : null
+
+    if (
+      !designSummaryOrProcessing ||
+      designSummaryOrProcessing['status'] === 'failed'
+    ) {
       this._console.error('OpenDesignApi#getDesignSummary()', { designId }, res)
       throw new OpenDesignApiError(res, 'Cannot fetch design')
     }
 
-    if (res.statusCode === 202) {
+    if (
+      res.statusCode === 202 ||
+      designSummaryOrProcessing['status'] !== 'done' ||
+      !('artboards' in designSummaryOrProcessing)
+    ) {
       await sleep(1000)
       cancelToken.throwIfCancelled()
 
       return this.getDesignSummary(designId)
     }
 
-    return res.body as DesignSummary
+    return designSummaryOrProcessing
   }
 
   async importDesignFile(
