@@ -23,6 +23,7 @@ export interface IBitmap {
    * Returns internal metadata the rendering engine uses to properly render the image.
    *
    * @category Data
+   * @internal
    */
   getBitmapMetadata(): BitmapMetadata | null
 }
