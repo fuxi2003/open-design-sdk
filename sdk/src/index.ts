@@ -139,5 +139,5 @@ function createOpenDesignApi(params: {
   return openDesignApi
 }
 
-export { DesignFileManager, LocalDesignManager, OpenDesignApi, Sdk }
+export { Sdk }
 export { createCancelToken, CancelToken }
