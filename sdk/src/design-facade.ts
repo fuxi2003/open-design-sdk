@@ -1541,7 +1541,7 @@ export class DesignFacade {
    *
    * @category Asset
    * @param bitmapAssetDescs A list of bitmap assets to download. When not provided, all bitmap assets of the design are downloaded.
-   * @returns The locations of the bitmap assets within the file system.
+   * @returns The locations of the bitmap assets within the file system. Keys of the produced object are the `name` values from the provided bitmap asset descriptors (or all bitmap asset names by default).
    *
    * @example
    * ```typescript
@@ -1558,7 +1558,7 @@ export class DesignFacade {
     options: {
       cancelToken?: CancelToken | null
     } = {}
-  ): Promise<{ [assetName in BitmapAssetDescriptor['name']]: string }> {
+  ): Promise<Record<string, string>> {
     bitmapAssetDescs = bitmapAssetDescs || (await this.getBitmapAssets())
 
     const filenames = await sequence(
