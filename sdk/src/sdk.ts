@@ -576,12 +576,14 @@ export class Sdk {
    * The API has to be configured when using this method.
    *
    * @example
+   * ```typescript
    * const designList = await sdk.fetchDesignList()
    * const designItem = designList.find((design) => design.name === 'My design')
    * // Expand the design list item to a full design entity
    * const design = await designItem.fetchDesign()
    * // Continue working with the processed design
    * const artboards = design.getArtboards()
+   * ```
    *
    * @category Server Side Design File Usage
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected. A cancellation token can be created via {@link createCancelToken}.
