@@ -111,19 +111,27 @@ export class OpenDesignApi implements IOpenDesignApi {
         'Cannot fetch design due to missing permissions'
       )
     }
-    if (res.statusCode !== 200 && res.statusCode !== 202) {
-      this._console.error('OpenDesignApi#getDesignById()', { designId }, res)
+
+    const body = res.body
+    const designOrProcessing = 'status' in body ? body : null
+
+    if (!designOrProcessing || designOrProcessing['status'] === 'failed') {
+      this._console.error('OpenDesignApi#getDesignSummary()', { designId }, res)
       throw new OpenDesignApiError(res, 'Cannot fetch design')
     }
 
-    if (res.statusCode === 202) {
+    if (
+      res.statusCode === 202 ||
+      designOrProcessing['status'] !== 'done' ||
+      !('completed_at' in designOrProcessing)
+    ) {
       await sleep(1000)
       cancelToken.throwIfCancelled()
 
       return this.getDesignById(designId)
     }
 
-    const apiDesign = new ApiDesign(res.body as Design, {
+    const apiDesign = new ApiDesign(designOrProcessing, {
       openDesignApi: this,
     })
 
@@ -154,6 +162,15 @@ export class OpenDesignApi implements IOpenDesignApi {
         cancelToken,
       }
     )
+
+    // @ts-ignore
+    if (res.statusCode === 401 || res.statusCode === 403) {
+      this._console.error('OpenDesignApi#getDesignById()', { designId }, res)
+      throw new OpenDesignApiError(
+        res,
+        'Cannot fetch design due to missing permissions'
+      )
+    }
 
     const body = res.body
     const designSummaryOrProcessing = 'status' in body ? body : null
