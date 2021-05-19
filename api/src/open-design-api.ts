@@ -2,6 +2,7 @@ import createCancelToken, { CancelToken } from '@avocode/cancel-token'
 import { fetch, get, getStream, post, postMultipart } from './utils/fetch'
 import { sleep } from './utils/sleep'
 import cplus from 'cplus'
+import PQueue from 'p-queue'
 
 import { ApiDesign } from './api-design'
 import { ApiDesignExport } from './api-design-export'
@@ -26,6 +27,8 @@ export class OpenDesignApi implements IOpenDesignApi {
 
   private _console: Console
   private _destroyTokenController = createCancelToken()
+
+  private _requestQueue = new PQueue({ concurrency: 10 })
 
   constructor(params: {
     apiRoot: string
@@ -58,11 +61,13 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await get(this._apiRoot, '/designs', {}, this._getAuthInfo(), {
-      console: this._console,
-      ...options,
-      cancelToken,
-    })
+    const res = await this._requestQueue.add(() =>
+      get(this._apiRoot, '/designs', {}, this._getAuthInfo(), {
+        console: this._console,
+        ...options,
+        cancelToken,
+      })
+    )
 
     if (res.statusCode !== 200) {
       throw new OpenDesignApiError(res, 'Cannot fetch design list')
@@ -89,18 +94,20 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await get(
-      this._apiRoot,
-      '/designs/{design_id}',
-      {
-        'design_id': designId,
-      },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        ...options,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      get(
+        this._apiRoot,
+        '/designs/{design_id}',
+        {
+          'design_id': designId,
+        },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          ...options,
+          cancelToken,
+        }
+      )
     )
 
     // @ts-ignore
@@ -149,18 +156,20 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await get(
-      this._apiRoot,
-      '/designs/{design_id}/summary',
-      {
-        'design_id': designId,
-      },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        ...options,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      get(
+        this._apiRoot,
+        '/designs/{design_id}/summary',
+        {
+          'design_id': designId,
+        },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          ...options,
+          cancelToken,
+        }
+      )
     )
 
     // @ts-ignore
@@ -209,19 +218,21 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await postMultipart(
-      this._apiRoot,
-      '/designs/upload',
-      {},
-      {
-        'file': designFileStream,
-        ...(options.format ? { 'format': options.format } : {}),
-      },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      postMultipart(
+        this._apiRoot,
+        '/designs/upload',
+        {},
+        {
+          'file': designFileStream,
+          ...(options.format ? { 'format': options.format } : {}),
+        },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          cancelToken,
+        }
+      )
     )
 
     if (res.statusCode !== 201) {
@@ -245,19 +256,21 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await post(
-      this._apiRoot,
-      '/designs/link',
-      {},
-      {
-        'url': url,
-        ...(options.format ? { 'format': options.format } : {}),
-      },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      post(
+        this._apiRoot,
+        '/designs/link',
+        {},
+        {
+          'url': url,
+          ...(options.format ? { 'format': options.format } : {}),
+        },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          cancelToken,
+        }
+      )
     )
 
     if (res.statusCode !== 201) {
@@ -281,21 +294,23 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await post(
-      this._apiRoot,
-      '/designs/figma-link',
-      {},
-      {
-        'figma_token': params.figmaToken,
-        'figma_filekey': params.figmaFileKey,
-        ...(params.figmaIds ? { 'figma_ids': params.figmaIds } : {}),
-        ...(params.name ? { 'design_name': params.name } : {}),
-      },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      post(
+        this._apiRoot,
+        '/designs/figma-link',
+        {},
+        {
+          'figma_token': params.figmaToken,
+          'figma_filekey': params.figmaFileKey,
+          ...(params.figmaIds ? { 'figma_ids': params.figmaIds } : {}),
+          ...(params.name ? { 'design_name': params.name } : {}),
+        },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          cancelToken,
+        }
+      )
     )
 
     if (res.statusCode !== 201) {
@@ -320,22 +335,24 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await post(
-      this._apiRoot,
-      '/designs/figma-link',
-      {},
-      {
-        'figma_token': params.figmaToken,
-        'figma_filekey': params.figmaFileKey,
-        'exports': params.exports,
-        ...(params.figmaIds ? { 'figma_ids': params.figmaIds } : {}),
-        ...(params.name ? { 'design_name': params.name } : {}),
-      },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      post(
+        this._apiRoot,
+        '/designs/figma-link',
+        {},
+        {
+          'figma_token': params.figmaToken,
+          'figma_filekey': params.figmaFileKey,
+          'exports': params.exports,
+          ...(params.figmaIds ? { 'figma_ids': params.figmaIds } : {}),
+          ...(params.name ? { 'design_name': params.name } : {}),
+        },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          cancelToken,
+        }
+      )
     )
 
     if (res.statusCode !== 201) {
@@ -368,16 +385,18 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await get(
-      this._apiRoot,
-      '/designs/{design_id}/artboards/{artboard_id}/content',
-      { 'design_id': designId, 'artboard_id': artboardId },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        ...options,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      get(
+        this._apiRoot,
+        '/designs/{design_id}/artboards/{artboard_id}/content',
+        { 'design_id': designId, 'artboard_id': artboardId },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          ...options,
+          cancelToken,
+        }
+      )
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
@@ -407,16 +426,18 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await getStream(
-      this._apiRoot,
-      '/designs/{design_id}/artboards/{artboard_id}/content',
-      { 'design_id': designId, 'artboard_id': artboardId },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        ...options,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      getStream(
+        this._apiRoot,
+        '/designs/{design_id}/artboards/{artboard_id}/content',
+        { 'design_id': designId, 'artboard_id': artboardId },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          ...options,
+          cancelToken,
+        }
+      )
     )
 
     if (res.statusCode !== 200 && res.statusCode !== 202) {
@@ -450,16 +471,18 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await post(
-      this._apiRoot,
-      '/designs/{design_id}/exports',
-      { 'design_id': designId },
-      { 'format': params.format },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      post(
+        this._apiRoot,
+        '/designs/{design_id}/exports',
+        { 'design_id': designId },
+        { 'format': params.format },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          cancelToken,
+        }
+      )
     )
 
     if (res.statusCode !== 201) {
@@ -492,16 +515,18 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await get(
-      this._apiRoot,
-      '/designs/{design_id}/exports/{export_id}',
-      { 'design_id': designId, 'export_id': designExportId },
-      this._getAuthInfo(),
-      {
-        console: this._console,
-        ...options,
-        cancelToken,
-      }
+    const res = await this._requestQueue.add(() =>
+      get(
+        this._apiRoot,
+        '/designs/{design_id}/exports/{export_id}',
+        { 'design_id': designId, 'export_id': designExportId },
+        this._getAuthInfo(),
+        {
+          console: this._console,
+          ...options,
+          cancelToken,
+        }
+      )
     )
 
     if (res.statusCode !== 200) {
@@ -554,9 +579,11 @@ export class OpenDesignApi implements IOpenDesignApi {
       this._destroyTokenController.token,
     ])
 
-    const res = await fetch(bitmapKey, {
-      cancelToken,
-    })
+    const res = await this._requestQueue.add(() =>
+      fetch(bitmapKey, {
+        cancelToken,
+      })
+    )
     if (res.status !== 200 || !res.body) {
       this._console.debug('ApiDesign#getBitmapAssetStream()', {
         bitmapKey,
