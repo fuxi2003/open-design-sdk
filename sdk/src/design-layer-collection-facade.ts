@@ -123,18 +123,21 @@ export class DesignLayerCollectionFacade {
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the layers explictly included in the collection to search. By default, all levels are searched. `0` also means "no limit"; `1` means only the layers explicitly included in the collection should be searched.
    *
-   * @example
+   * @example Layer by name from any artboard
    * ```typescript
-   * // Layer by name from any artboard
    * const layer = await collection.findLayer({ name: 'Share icon' })
+   * ```
    *
-   * // Layer by name from a certain artboad subset
+   * @example Layer by name from a certain artboad subset
+   * ```typescript
    * const layer = await collection.findLayer({
    *   name: 'Share icon',
    *   artboardId: [ '<ID1>', '<ID2>' ],
    * })
+   * ```
    *
-   * // With timeout
+   * @example With timeout
+   * ```typescript
    * const { cancel, token } = createCancelToken()
    * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
    * const layer = await collection.findLayer(
@@ -162,18 +165,21 @@ export class DesignLayerCollectionFacade {
    * @param selector A layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the layers explictly included in the collection to search. By default, all levels are searched. `0` also means "no limit"; `1` means only the layers explicitly included in the collection should be searched.
    *
-   * @example
+   * @example Layers by name from all artboards
    * ```typescript
-   * // Layers by name from all artboards
    * const layers = await collection.findLayers({ name: 'Share icon' })
+   * ```
    *
-   * // Invisible layers from all a certain artboard subset
+   * @example Invisible layers from all a certain artboard subset
+   * ```typescript
    * const layers = await collection.findLayers({
    *   visible: false,
    *   artboardId: [ '<ID1>', '<ID2>' ],
    * })
+   * ```
    *
-   * // With timeout
+   * @example With timeout
+   * ```typescript
    * const { cancel, token } = createCancelToken()
    * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
    * const layer = await collection.findLayers(
@@ -323,14 +329,15 @@ export class DesignLayerCollectionFacade {
    * @category Collection Manipulation
    * @param addedLayers The layer collection to concatenate with the original collection. A native `Array` of layer objects can be provided instead of an actual collection object.
    *
-   * @example
+   * @example Merge two collections
    * ```typescript
-   * // Merge two collections
    * const textLayersFromA = await artboardA.findLayers({ type: 'textLayers' })
    * const textLayersFromB = await artboardB.findLayers({ type: 'textLayers' })
    * const textLayersFromAB = textLayersFromA.concat(textLayersFromB)
+   * ```
    *
-   * // Append individual layers
+   * @example Append individual layers
+   * ```typescript
    * const extraLayer = await artboard.getLayerById('<ID>')
    * const extendedCollection = collection.concat([ extraLayer ])
    * ```
@@ -382,12 +389,13 @@ export class DesignLayerCollectionFacade {
    * @param options.depth The maximum nesting level within the layer to search for bitmap asset usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    *
-   * @example
+   * @example All bitmap assets from layers from any artboard
    * ```typescript
-   * // All bitmap assets from layers from any artboard
    * const bitmapAssetDescs = await collection.getBitmapAssets()
+   * ```
    *
-   * // Bitmap assets excluding pre-renredered bitmaps from layers from any artboards
+   * @example Bitmap assets excluding pre-renredered bitmaps from layers from any artboards
+   * ```typescript
    * const bitmapAssetDescs = await collection.getBitmapAssets({
    *   includePrerendered: false,
    * })
@@ -411,9 +419,8 @@ export class DesignLayerCollectionFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within the layer to search for font usage. By default, all levels are searched. Specifying the depth of `0` leads to bitmap assets of layers nested in the explicitly included layers being omitted altogether.
    *
-   * @example
+   * @example All fonts from layers from any artboard
    * ```typescript
-   * // All fonts from layers from any artboard
    * const fontDescs = await design.getFonts()
    * ```
    */
@@ -452,14 +459,15 @@ export class DesignLayerCollectionFacade {
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example With default options (1x, whole combined layer area)
    * ```typescript
-   * // With default options (1x, whole combined layer area)
    * await collection.renderToFile(
    *   './rendered/collection.png'
    * )
+   * ```
    *
-   * // With custom scale and crop and using the custom layer configuration
+   * @example With custom scale and crop and using the custom layer configuration
+   * ```typescript
    * await collection.renderToFile(
    *   './rendered/collection.png',
    *   {

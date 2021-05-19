@@ -133,16 +133,19 @@ export class Sdk {
    * @category Configuration
    * @returns An absolute path to the working directory. Defaults to the current process working directory (`process.cwd()` in node.js) when the workspace directory is not configured via {@link Sdk.setWorkingDirectory}.
    *
-   * @example
+   * @example Default directory (the process working directory)
    * ```typescript
-   * // Default directory (the process working directory)
    * sdk.getWorkingDirectory() // == process.cwd()
+   * ```
    *
-   * // Custom directory (relative path to the process working directory)
+   * @example Custom directory (relative path to the process working directory)
+   * ```typescript
    * sdk.setWorkingDirectory('data')
    * sdk.getWorkingDirectory() // == path.join(process.cwd(), 'data')
+   * ```
    *
-   * // Custom directory (absolute path)
+   * @example Custom directory (absolute path)
+   * ```typescript
    * sdk.setWorkingDirectory('/tmp/data')
    * sdk.getWorkingDirectory() // == '/tmp/data'
    * ```
@@ -167,17 +170,20 @@ export class Sdk {
    * @category Configuration
    * @param workingDirectory An absolute path to the directory or a path relative to the process working directory (`process.cwd()` in node.js). When `null` is provided, the working directory is reset to the process working directory.
    *
-   * @exmaple
+   * @exmaple Custom directory (relative path to the process working directory)
    * ```typescript
-   * // Custom directory (relative path to the process working directory)
    * sdk.setWorkingDirectory('data')
    * sdk.getWorkingDirectory() // == path.join(process.cwd(), 'data')
+   * ```
    *
-   * // Custom directory (absolute path)
+   * @example Custom directory (absolute path)
+   * ```typescript
    * sdk.setWorkingDirectory('/tmp/data')
    * sdk.getWorkingDirectory() // == '/tmp/data'
+   * ```
    *
-   * // Reset to the default directory (the process working directory)
+   * @example Reset to the default directory (the process working directory)
+   * ```typescript
    * sdk.setWorkingDirectory(null)
    * sdk.getWorkingDirectory() // == process.cwd()
    * ```
@@ -229,9 +235,8 @@ export class Sdk {
    *
    * This configuration can be overriden/extended for each individual design via {@link DesignFacade.setFallbackFonts}. Fonts provided to an individual design are preferred over fonts specified here.
    *
-   * @example
+   * @example Set preferred fallback fonts
    * ```typescript
-   * // Set preferred fallback fonts
    * sdk.setFallbackFonts(['Arial', 'Courier-Bold'])
    * ```
    *

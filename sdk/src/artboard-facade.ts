@@ -395,12 +395,13 @@ export class ArtboardFacade {
    * @param options.depth The maximum nesting level of layers within the artboard to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in the artboard should be included.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example All layers (from all nesting levels)
    * ```typescript
-   * // All layers (from all nesting levels)
    * const allLayers = await artboard.getFlattenedLayers()
+   * ```
    *
-   * // Layers from the first three nesting levels (root layers + 2 levels)
+   * @example Layers from the first three nesting levels (root layers + 2 levels)
+   * ```typescript
    * const layers = await artboard.getFlattenedLayers({ depth: 3 })
    * ```
    */
@@ -433,11 +434,13 @@ export class ArtboardFacade {
    * @param layerId A layer ID.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example Single layer
    * ```typescript
    * const layerA = await artboard.getLayerById('a')
+   * ```
    *
-   * // Multiple layers
+   * @example Multiple layers
+   * ```typescript
    * const [ layerA, layerB, layerC ] = await Promise.all([
    *   artboard.getLayerById('a'),
    *   artboard.getLayerById('b'),
@@ -481,18 +484,21 @@ export class ArtboardFacade {
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example Layer by name
    * ```typescript
-   * // Layer by name
    * const layer = await artboard.findLayer({ name: 'Share icon' })
+   * ```
    *
-   * // Text layer by content
+   * @example Text layer by content
+   * ```typescript
    * const layer = await artboard.findLayer({
    *   type: 'textLayer',
    *   text: /click to dismiss/i,
    * })
+   * ```
    *
-   * // With timeout
+   * @example With timeout
+   * ```typescript
    * const { cancel, token } = createCancelToken()
    * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
    * const layer = await artboard.findLayer(
@@ -526,18 +532,21 @@ export class ArtboardFacade {
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in the artboard should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example Layer by name
    * ```typescript
-   * // Layer by name
    * const layer = await artboard.findLayers({ name: 'Share icon' })
+   * ```
    *
-   * // Invisible text layers
+   * @example Invisible text layers
+   * ```typescript
    * const layer = await artboard.findLayers({
    *   type: 'textLayer',
    *   visible: false,
    * })
+   * ```
    *
-   * // With timeout
+   * @example With timeout
+   * ```typescript
    * const { cancel, token } = createCancelToken()
    * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
    * const layer = await artboard.findLayers(
@@ -618,12 +627,13 @@ export class ArtboardFacade {
    * @param filePath The target location of the produced PNG image file.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example With default options (1x, whole artboard area)
    * ```typescript
-   * // With default options (1x, whole artboard area)
    * await artboard.renderToFile('./rendered/artboard.png')
+   * ```
    *
-   * // With custom scale and crop
+   * @example With custom scale and crop
+   * ```typescript
    * await artboard.renderToFile('./rendered/artboard.png', {
    *   scale: 4,
    *   // The result is going to have the dimensions of 400x200 due to the 4x scale.
@@ -662,15 +672,16 @@ export class ArtboardFacade {
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example With default options (1x, whole layer area)
    * ```typescript
-   * // With default options (1x, whole layer area)
    * await artboard.renderLayerToFile(
    *   '<LAYER_ID>',
    *   './rendered/layer.png'
    * )
+   * ```
    *
-   * // With custom scale and crop and using the component background color
+   * @example With custom scale and crop and using the component background color
+   * ```typescript
    * await artboard.renderLayerToFile(
    *   '<LAYER_ID>',
    *   './rendered/layer.png',
@@ -722,15 +733,16 @@ export class ArtboardFacade {
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example With default options (1x, whole combined layer area)
    * ```typescript
-   * // With default options (1x, whole combined layer area)
    * await artboard.renderLayersToFile(
    *   ['<LAYER1>', '<LAYER2>'],
    *   './rendered/layers.png'
    * )
+   * ```
    *
-   * // With custom scale and crop and using the custom layer configuration
+   * @example With custom scale and crop and using the custom layer configuration
+   * ```typescript
    * await artboard.renderLayersToFile(
    *   ['<LAYER1>', '<LAYER2>'],
    *   './rendered/layers.png',
@@ -824,13 +836,14 @@ export class ArtboardFacade {
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the artboards is not uncached when newly cached). A cancellation token can be created via {@link createCancelToken}.
    *
    * @example
-   * ```typescript
-   * // Layers fully contained in the area
+   * ```typescript Layers fully contained in the area
    * const layerIds = await artboard.getLayersInArea(
    *   { left: 80, top: 150, width: 40, height: 30 }
    * )
+   * ```
    *
-   * // Layers fully or partially contained in the area
+   * @example
+   * ```typescript Layers fully or partially contained in the area
    * const layerIds = await artboard.getLayersInArea(
    *   { left: 80, top: 150, width: 40, height: 30 },
    *   { partialOverlap: true }

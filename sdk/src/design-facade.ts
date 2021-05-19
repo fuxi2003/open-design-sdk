@@ -538,15 +538,18 @@ export class DesignFacade {
    * @param options.depth The maximum nesting level of layers within pages and artboards to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in artboards should be included.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example All layers from all artboards
    * ```typescript
-   * // All layers from all artboards
    * const layers = await design.getFlattenedLayers()
+   * ```
    *
-   * // Root layers from all artboards
+   * @example Root layers from all artboards
+   * ```typescript
    * const rootLayers = await design.getFlattenedLayers({ depth: 1 })
+   * ```
    *
-   * // With timeout
+   * @example With timeout
+   * ```typescript
    * const { cancel, token } = createCancelToken()
    * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
    * const layers = await design.getFlattenedLayers({ cancelToken: token })
@@ -581,8 +584,10 @@ export class DesignFacade {
    * @example
    * ```typescript
    * const layer = await design.findLayerById('<ID>')
+   * ```
    *
-   * // With timeout
+   * @example With timeout
+   * ```typescript
    * const { cancel, token } = createCancelToken()
    * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
    * const layer = await design.findLayerById('<ID>', { cancelToken: token })
@@ -620,8 +625,10 @@ export class DesignFacade {
    * @example
    * ```typescript
    * const layers = await design.findLayersById('<ID>')
+   * ```
    *
-   * // With timeout
+   * @example With timeout
+   * ```typescript
    * const { cancel, token } = createCancelToken()
    * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
    * const layers = await design.findLayersById('<ID>', { cancelToken: token })
@@ -653,18 +660,21 @@ export class DesignFacade {
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example Layer by name from any artboard
    * ```typescript
-   * // Layer by name from any artboard
    * const layer = await design.findLayer({ name: 'Share icon' })
+   * ```
    *
-   * // Layer by name from a certain artboad subset
+   * @example Layer by name from a certain artboad subset
+   * ```typescript
    * const layer = await design.findLayer({
    *   name: 'Share icon',
    *   artboardId: [ '<ID1>', '<ID2>' ],
    * })
+   * ```
    *
-   * // With timeout
+   * @example With timeout
+   * ```typescript
    * const { cancel, token } = createCancelToken()
    * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
    * const layer = await design.findLayer(
@@ -701,18 +711,21 @@ export class DesignFacade {
    * @param options.depth The maximum nesting level within page and artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example Layers by name from all artboards
    * ```typescript
-   * // Layers by name from all artboards
    * const layers = await design.findLayers({ name: 'Share icon' })
+   * ```
    *
-   * // Invisible layers from all a certain artboard subset
+   * @example Invisible layers from all a certain artboard subset
+   * ```typescript
    * const layers = await design.findLayers({
    *   visible: false,
    *   artboardId: [ '<ID1>', '<ID2>' ],
    * })
+   * ```
    *
-   * // With timeout
+   * @example With timeout
+   * ```typescript
    * const { cancel, token } = createCancelToken()
    * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
    * const layer = await design.findLayers(
@@ -747,12 +760,13 @@ export class DesignFacade {
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example All bitmap assets from all artboards
    * ```typescript
-   * // All bitmap assets from all artboards
    * const bitmapAssetDescs = await design.getBitmapAssets()
+   * ```
    *
-   * // Bitmap assets excluding pre-rendered bitmaps from all artboards
+   * @example Bitmap assets excluding pre-rendered bitmaps from all artboards
+   * ```typescript
    * const bitmapAssetDescs = await design.getBitmapAssets({
    *   includePrerendered: false,
    * })
@@ -789,9 +803,8 @@ export class DesignFacade {
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example All fonts from all artboards
    * ```typescript
-   * // All fonts from all artboards
    * const fontDescs = await design.getFonts()
    * ```
    */
@@ -883,12 +896,13 @@ export class DesignFacade {
    * @param options.bounds The area (in the coordinate system of the artboard) to include. This can be used to either crop or expand (add empty space to) the default artboard area.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example With default options (1x, whole artboard area)
    * ```typescript
-   * // With default options (1x, whole artboard area)
    * await design.renderArtboardToFile('<ARTBOARD_ID>', './rendered/artboard.png')
+   * ```
    *
-   * // With custom scale and crop
+   * @example With custom scale and crop
+   * ```typescript
    * await design.renderArtboardToFile('<ARTBOARD_ID>', './rendered/artboard.png', {
    *   scale: 4,
    *   // The result is going to have the dimensions of 400x200 due to the 4x scale.
@@ -939,12 +953,13 @@ export class DesignFacade {
    * @param options.bounds The area (in the coordinate system of the page) to include. This can be used to either crop or expand (add empty space to) the default page area.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example With default options (1x, whole page area)
    * ```typescript
-   * // With default options (1x, whole page area)
    * await design.renderPageToFile('<PAGE_ID>', './rendered/page.png')
+   * ```
    *
-   * // With custom scale and crop
+   * @example With custom scale and crop
+   * ```typescript
    * await design.renderPageToFile('<PAGE_ID>', './rendered/page.png', {
    *   scale: 2,
    *   // The result is going to have the dimensions of 400x200 due to the 2x scale.
@@ -994,15 +1009,16 @@ export class DesignFacade {
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
    * @example
-   * ```typescript
-   * // With default options (1x, whole layer area)
+   * ```typescript With default options (1x, whole layer area)
    * await design.renderArtboardLayerToFile(
    *   '<ARTBOARD_ID>',
    *   '<LAYER_ID>',
    *   './rendered/layer.png'
    * )
+   * ```
    *
-   * // With custom scale and crop and using the component background color
+   * @example With custom scale and crop and using the component background color
+   * ```typescript
    * await design.renderArtboardLayerToFile(
    *   '<ARTBOARD_ID>',
    *   '<LAYER_ID>',
@@ -1097,16 +1113,17 @@ export class DesignFacade {
    * @param options.layerAttributes Layer-specific options to use for the rendering instead of the default values.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example With default options (1x, whole combined layer area)
    * ```typescript
-   * // With default options (1x, whole combined layer area)
    * await design.renderArtboardLayersToFile(
    *   '<ARTBOARD_ID>',
    *   ['<LAYER1>', '<LAYER2>'],
    *   './rendered/layers.png'
    * )
+   * ```
    *
-   * // With custom scale and crop and using the custom layer configuration
+   * @example With custom scale and crop and using the custom layer configuration
+   * ```typescript
    * await design.renderArtboardLayersToFile(
    *   '<ARTBOARD_ID>',
    *   ['<LAYER1>', '<LAYER2>'],
@@ -1324,15 +1341,16 @@ export class DesignFacade {
    * @param options.partialOverlap Whether to also return layers which are only partially contained within the specified area.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example Layers fully contained in the area
    * ```typescript
-   * // Layers fully contained in the area
    * const layerIds = await design.getArtboardLayersInArea(
    *   '<ARTBOARD_ID>',
    *   { left: 80, top: 150, width: 40, height: 30 }
    * )
+   * ```
    *
-   * // Layers fully or partially contained in the area
+   * @example Layers fully or partially contained in the area
+   * ```typescript
    * const layerIds = await design.getArtboardLayersInArea(
    *   '<ARTBOARD_ID>',
    *   { left: 80, top: 150, width: 40, height: 30 },
@@ -1543,12 +1561,13 @@ export class DesignFacade {
    * @param bitmapAssetDescs A list of bitmap assets to download. When not provided, all bitmap assets of the design are downloaded.
    * @returns The locations of the bitmap assets within the file system. Keys of the produced object are the `name` values from the provided bitmap asset descriptors (or all bitmap asset names by default).
    *
-   * @example
+   * @example Download all assets
    * ```typescript
-   * // Download all assets
    * const bitmapAssetFilenames = await design.downloadBitmapAssets()
+   * ```
    *
-   * // Download specific assets
+   * @example Download specific assets
+   * ```typescript
    * const bitmapAssetDescs = await design.getBitmapAssets({ depth: 1 })
    * const bitmapAssetFilenames = await design.downloadBitmapAssets(bitmapAssetDescs)
    * ```
@@ -1738,9 +1757,8 @@ export class DesignFacade {
    * @category Serialization
    * @param filePath An absolute path to which to save the design file or a path relative to the current working directory.
    *
-   * @example
+   * @example Export a Figma design as a Sketch design file (the only supported conversion)
    * ```typescript
-   * // Export a Figma design as a Sketch design file (the only supported conversion)
    * await design.exportDesignFile('./exports/design.sketch')
    * ```
    */

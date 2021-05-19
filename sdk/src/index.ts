@@ -47,20 +47,21 @@ export type { PageFacade } from './page-facade'
  * - Local system fonts can be used for rendering design by default.
  * - A local cache is available by default.
  *
- * @example
+ * @example Full SDK
  * ```typescript
- * // Full SDK
  * const sdk = createSdk({
  *   token: '<TOKEN>',
  * })
- *
- * // Full SDK with all logs for debugging purposes
+ * ```
+ * @example Full SDK with all logs for debugging purposes
+ * ```typescript
  * const sdk = createSdk({
  *   token: '<TOKEN>',
  *   console: { level: 'debug' }
  * })
- *
- * // SDK without the local rendering engine
+ * ```
+ * @example SDK without the local rendering engine
+ * ```typescript
  * const sdk = createSdk({
  *   token: '<TOKEN>',
  *   rendering: false,

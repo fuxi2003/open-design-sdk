@@ -748,14 +748,15 @@ export class LayerFacade {
    * @param options.scale The scale (zoom) factor to use for rendering instead of the default 1x factor.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
    *
-   * @example
+   * @example With default options (1x, whole layer area)
    * ```typescript
-   * // With default options (1x, whole layer area)
    * await layer.renderToFile(
    *   './rendered/layer.png'
    * )
+   * ```
    *
-   * // With custom scale and crop and using the component background color
+   * @example With custom scale and crop and using the component background color
+   * ```typescript
    * await layer.renderToFile(
    *   './rendered/layer.png',
    *   {
