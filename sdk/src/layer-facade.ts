@@ -439,6 +439,7 @@ export class LayerFacade {
   /**
    * Returns whether the layer matches the provided selector.
    *
+   * @category Layer Lookup
    * @param selector The selector against which to test the layer.
    *
    * @example

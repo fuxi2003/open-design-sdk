@@ -801,6 +801,8 @@ export class Sdk {
    *
    * This mechanism is analogous to the standard `AbortSignal`/`AbortController` API with the difference that a cancellation reason can be specified. The created tokens are also somehow compatible with the standard API by exposing the standard `AbortSignal` as `token.signal`, just as it is possible to create a `CancelToken` from an `AbortSignal` via `createCancelToken.fromSignal()`.
    *
+   * @category Utility
+   *
    * @example
    * ```typescript
    * const controller = sdk.createCancelToken()

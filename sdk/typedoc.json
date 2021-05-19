@@ -13,7 +13,8 @@
     "Asset",
     "Iteration",
     "Collection Manipulation",
-    "Rendering"
+    "Rendering",
+    "Utility"
   ],
   "entryPoints": ["./src/index.ts"],
   "readme": "none",
