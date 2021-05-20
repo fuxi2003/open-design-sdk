@@ -70,6 +70,11 @@ export class PageFacade {
   /**
    * Returns the design object associated with the page object.
    * @category Reference
+   *
+   * @example
+   * ```typescript
+   * const design = page.getDesign()
+   * ```
    */
   getDesign(): DesignFacade {
     return this._designFacade
@@ -77,7 +82,13 @@ export class PageFacade {
 
   /**
    * Returns whether the page content and the content of all artboards the page contains are loaded in memory from the API, a local `.octopus` file or a local cache.
+   *
    * @category Status
+   *
+   * @example
+   * ```typescript
+   * const loaded = page.isLoaded()
+   * ```
    */
   isLoaded(): boolean {
     const artboards = this.getArtboards()
@@ -100,6 +111,11 @@ export class PageFacade {
    * Returns a list of artboard object the page contains. These can be used to work with artboard contents.
    *
    * @category Artboard Lookup
+   *
+   * @example
+   * ```typescript
+   * const artboards = page.getArtboards()
+   * ```
    */
   getArtboards(): Array<ArtboardFacade> {
     return this._designFacade.getPageArtboards(this.id)
@@ -110,6 +126,11 @@ export class PageFacade {
    *
    * @category Artboard Lookup
    * @param artboardId An artboard ID.
+   *
+   * @example
+   * ```typescript
+   * const artboard = page.getArtboardById('<ARTBOARD_ID>')
+   * ```
    */
   getArtboardById(artboardId: ArtboardId): ArtboardFacade | null {
     const artboard = this._designFacade.getArtboardById(artboardId)
@@ -124,6 +145,11 @@ export class PageFacade {
    * Returns (main/master) component artboard objects the page contains. These can be used to work with artboard contents.
    *
    * @category Artboard Lookup
+   *
+   * @example
+   * ```typescript
+   * const componentArtboards = page.getComponentArtboards()
+   * ```
    */
   getComponentArtboards(): Array<ArtboardFacade> {
     return this.getArtboards().filter((artboard) => {
@@ -136,6 +162,11 @@ export class PageFacade {
    *
    * @category Artboard Lookup
    * @param componentId A component ID.
+   *
+   * @example
+   * ```typescript
+   * const artboard = page.getArtboardByComponentId('<COMPONENT_ID>')
+   * ```
    */
   getArtboardByComponentId(componentId: ComponentId): ArtboardFacade | null {
     const artboard = this._designFacade.getArtboardByComponentId(componentId)
@@ -151,6 +182,13 @@ export class PageFacade {
    *
    * @category Artboard Lookup
    * @param selector An artboard selector. All specified fields must be matched by the result.
+   *
+   * @example
+   * ```typescript
+   * const productArtboard = page.findArtboard({ name: /Product/i })
+   * const productArtboard = page.findArtboard((artboard) => /Product/i.test(artboard.name))
+   * const oneOfArtboards123 = page.findArtboard({ id: ['<ID1>', '<ID2>', '<ID3>'] })
+   * ```
    */
   findArtboard(
     selector: ArtboardSelector | ((artboard: ArtboardFacade) => boolean)
@@ -180,6 +218,13 @@ export class PageFacade {
    *
    * @category Artboard Lookup
    * @param selector An artboard selector. All specified fields must be matched by the results.
+   *
+   * @example
+   * ```typescript
+   * const productArtboards = page.findArtboards({ name: /Product/i })
+   * const productArtboards = page.findArtboards((artboard) => /Product/i.test(artboard.name))
+   * const artboards123 = page.findArtboards({ id: ['<ID1>', '<ID2>', '<ID3>'] })
+   * ```
    */
   findArtboards(
     selector: ArtboardSelector | ((artboard: ArtboardFacade) => boolean)
@@ -210,6 +255,18 @@ export class PageFacade {
    * @param options.depth The maximum nesting level within page and artboard layers to search for bitmap asset usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.includePrerendered Whether to also include "pre-rendered" bitmap assets. These assets can be produced by the rendering engine (if configured; future functionality) but are available as assets for either performance reasons or due to the some required data (such as font files) potentially not being available. By default, pre-rendered assets are included.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example All bitmap assets from all artboards on the page
+   * ```typescript
+   * const bitmapAssetDescs = await page.getBitmapAssets()
+   * ```
+   *
+   * @example Bitmap assets excluding pre-rendered bitmaps from all artboards on the page
+   * ```typescript
+   * const bitmapAssetDescs = await page.getBitmapAssets({
+   *   includePrerendered: false,
+   * })
+   * ```
    */
   async getBitmapAssets(
     options: {
@@ -239,6 +296,11 @@ export class PageFacade {
    * @category Asset
    * @param options.depth The maximum nesting level within page and artboard layers to search for font usage. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example All fonts from all artboards on the page
+   * ```typescript
+   * const fontDescs = await page.getFonts()
+   * ```
    */
   async getFonts(
     options: {
@@ -267,6 +329,23 @@ export class PageFacade {
    * @category Layer Lookup
    * @param options.depth The maximum nesting level of layers within the artboards to include in the collection. By default, all levels are included. `0` also means "no limit"; `1` means only root layers in the artboard should be included.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example All layers from all artboards on the page
+   * ```typescript
+   * const layers = await page.getFlattenedLayers()
+   * ```
+   *
+   * @example Root layers from all artboards on the page
+   * ```typescript
+   * const rootLayers = await page.getFlattenedLayers({ depth: 1 })
+   * ```
+   *
+   * @example With timeout
+   * ```typescript
+   * const { cancel, token } = createCancelToken()
+   * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
+   * const layers = await page.getFlattenedLayers({ cancelToken: token })
+   * ```
    */
   async getFlattenedLayers(
     options: {
@@ -285,7 +364,7 @@ export class PageFacade {
   }
 
   /**
-   * Returns the first layer object which has the specified ID within the artboards of the page.
+   * Returns the first layer object which has the specified ID within the artboards on the page.
    *
    * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes. This is the reason the method is not prefixed with "get".
    *
@@ -295,6 +374,18 @@ export class PageFacade {
    * @param layerId A layer ID.
    * @param options.depth The maximum nesting level within artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const layer = await page.findLayerById('<ID>')
+   * ```
+   *
+   * @example With timeout
+   * ```typescript
+   * const { cancel, token } = createCancelToken()
+   * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
+   * const layer = await page.findLayerById('<ID>', { cancelToken: token })
+   * ```
    */
   async findLayerById(
     layerId: LayerId,
@@ -320,7 +411,7 @@ export class PageFacade {
   }
 
   /**
-   * Returns a collection of all layer objects which have the specified ID within the artboards of the page.
+   * Returns a collection of all layer objects which have the specified ID within the artboards on the page.
    *
    * Layer IDs are unique within individual artboards but different artboards can potentially have layer ID clashes.
    *
@@ -330,6 +421,18 @@ export class PageFacade {
    * @param layerId A layer ID.
    * @param options.depth The maximum nesting level within artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example
+   * ```typescript
+   * const layers = await page.findLayersById('<ID>')
+   * ```
+   *
+   * @example With timeout
+   * ```typescript
+   * const { cancel, token } = createCancelToken()
+   * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
+   * const layers = await page.findLayersById('<ID>', { cancelToken: token })
+   * ```
    */
   async findLayersById(
     layerId: LayerId,
@@ -360,6 +463,36 @@ export class PageFacade {
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example Layer by name from any artboard on the page
+   * ```typescript
+   * const layer = await page.findLayer({ name: 'Share icon' })
+   * ```
+   *
+   * @example Layer by function selector from any artboard on the page
+   * ```typescript
+   * const shareIconLayer = await page.findLayer((layer) => {
+   *   return layer.name === 'Share icon'
+   * })
+   * ```
+   *
+   * @example Layer by name from a certain artboad subset within the page
+   * ```typescript
+   * const layer = await page.findLayer({
+   *   name: 'Share icon',
+   *   artboardId: [ '<ID1>', '<ID2>' ],
+   * })
+   * ```
+   *
+   * @example With timeout
+   * ```typescript
+   * const { cancel, token } = createCancelToken()
+   * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
+   * const layer = await page.findLayer(
+   *   { name: 'Share icon' },
+   *   { cancelToken: token }
+   * )
+   * ```
    */
   async findLayer(
     selector: FileLayerSelector | ((layer: LayerFacade) => boolean),
@@ -398,6 +531,36 @@ export class PageFacade {
    * @param selector A design-wide layer selector. All specified fields must be matched by the result.
    * @param options.depth The maximum nesting level within the artboard layers to search. By default, all levels are searched. `0` also means "no limit"; `1` means only root layers in artboards should be searched.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example Layers by name from all artboards on the page
+   * ```typescript
+   * const layers = await page.findLayers({ name: 'Share icon' })
+   * ```
+   *
+   * @example Layers by function selector from all artboards on the page
+   * ```typescript
+   * const shareIconLayers = await page.findLayers((layer) => {
+   *   return layer.name === 'Share icon'
+   * })
+   * ```
+   *
+   * @example Invisible layers from all a certain artboard subset within the page
+   * ```typescript
+   * const layers = await page.findLayers({
+   *   visible: false,
+   *   artboardId: [ '<ID1>', '<ID2>' ],
+   * })
+   * ```
+   *
+   * @example With timeout
+   * ```typescript
+   * const { cancel, token } = createCancelToken()
+   * setTimeout(cancel, 5000) // Throw an OperationCancelled error in 5 seconds.
+   * const layer = await page.findLayers(
+   *   { type: 'shapeLayer' },
+   *   { cancelToken: token }
+   * )
+   * ```
    */
   async findLayers(
     selector: FileLayerSelector | ((layer: LayerFacade) => boolean),
@@ -436,6 +599,20 @@ export class PageFacade {
    * @category Rendering
    * @param filePath The target location of the produced PNG image file.
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the created image file is not deleted when cancelled during actual rendering). A cancellation token can be created via {@link createCancelToken}.
+   *
+   * @example With default options (1x, whole page area)
+   * ```typescript
+   * await page.renderPageToFile('./rendered/page.png')
+   * ```
+   *
+   * @example With custom scale and crop
+   * ```typescript
+   * await page.renderPageToFile('./rendered/page.png', {
+   *   scale: 2,
+   *   // The result is going to have the dimensions of 400x200 due to the 2x scale.
+   *   bounds: { left: 100, top: 0, width: 100, height: 50 },
+   * })
+   * ```
    */
   renderToFile(
     filePath: string,
