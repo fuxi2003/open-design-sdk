@@ -453,10 +453,17 @@ export class DesignFacade {
    * @example
    * ```typescript
    * const productArtboard = design.findArtboard({ name: /Product/i })
+   * const productArtboard = design.findArtboard((artboard) => /Product/i.test(artboard.name))
    * const oneOfArtboards123 = design.findArtboard({ id: ['<ID1>', '<ID2>', '<ID3>'] })
    * ```
    */
-  findArtboard(selector: ArtboardSelector): ArtboardFacade | null {
+  findArtboard(
+    selector: ArtboardSelector | ((artboard: ArtboardFacade) => boolean)
+  ): ArtboardFacade | null {
+    if (typeof selector === 'function') {
+      return this.getArtboards().find(selector) || null
+    }
+
     const entity = this._getDesignEntity()
     const artboardEntity = entity.findArtboard(selector)
 
@@ -472,10 +479,17 @@ export class DesignFacade {
    * @example
    * ```typescript
    * const productArtboards = design.findArtboards({ name: /Product/i })
+   * const productArtboards = design.findArtboards((artboard) => /Product/i.test(artboard.name))
    * const artboards123 = design.findArtboards({ id: ['<ID1>', '<ID2>', '<ID3>'] })
    * ```
    */
-  findArtboards(selector: ArtboardSelector): Array<ArtboardFacade> {
+  findArtboards(
+    selector: ArtboardSelector | ((artboard: ArtboardFacade) => boolean)
+  ): Array<ArtboardFacade> {
+    if (typeof selector === 'function') {
+      return this.getArtboards().filter((artboard) => selector(artboard))
+    }
+
     const entity = this._getDesignEntity()
     const artboardEntities = entity.findArtboards(selector)
 
@@ -495,10 +509,17 @@ export class DesignFacade {
    * @example
    * ```typescript
    * const mobilePage = design.findPage({ name: /mobile/i })
+   * const mobilePage = design.findPage((page) => /mobile/i.test(page.name))
    * const oneOfPages123 = design.findPage({ id: ['<ID1>', '<ID2>', '<ID3>'] })
    * ```
    */
-  findPage(selector: PageSelector): PageFacade | null {
+  findPage(
+    selector: PageSelector | ((page: PageFacade) => boolean)
+  ): PageFacade | null {
+    if (typeof selector === 'function') {
+      return this.getPages().find(selector) || null
+    }
+
     const entity = this._getDesignEntity()
     const pageEntity = entity.findPage(selector)
 
@@ -514,10 +535,17 @@ export class DesignFacade {
    * @example
    * ```typescript
    * const mobilePages = design.findPages({ name: /mobile/i })
+   * const mobilePages = design.findPages((page) => /mobile/i.test(page.name))
    * const pages123 = design.findPages({ id: ['<ID1>', '<ID2>', '<ID3>'] })
    * ```
    */
-  findPages(selector: PageSelector): Array<PageFacade> {
+  findPages(
+    selector: PageSelector | ((page: PageFacade) => boolean)
+  ): Array<PageFacade> {
+    if (typeof selector === 'function') {
+      return this.getPages().filter((page) => selector(page))
+    }
+
     const entity = this._getDesignEntity()
     const pageEntities = entity.findPages(selector)
 

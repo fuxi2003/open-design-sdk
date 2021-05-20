@@ -62,9 +62,9 @@ export interface IFile {
   /** @category Page Lookup */
   getPageById(pageId: PageId): IPage | null
   /** @category Page Lookup */
-  findPage(selector: PageSelector): IPage | null
+  findPage(selector: PageSelector | ((page: IPage) => boolean)): IPage | null
   /** @category Page Lookup */
-  findPages(selector: PageSelector): Array<IPage>
+  findPages(selector: PageSelector | ((page: IPage) => boolean)): Array<IPage>
 
   /** @category Artboard Lookup */
   getArtboards(): Array<IArtboard>
@@ -77,9 +77,13 @@ export interface IFile {
   /** @category Artboard Lookup */
   getArtboardByComponentId(componentId: ComponentId): IArtboard | null
   /** @category Artboard Lookup */
-  findArtboard(selector: ArtboardSelector): IArtboard | null
+  findArtboard(
+    selector: ArtboardSelector | ((artboard: IArtboard) => boolean)
+  ): IArtboard | null
   /** @category Artboard Lookup */
-  findArtboards(selector: ArtboardSelector): Array<IArtboard>
+  findArtboards(
+    selector: ArtboardSelector | ((artboard: IArtboard) => boolean)
+  ): Array<IArtboard>
 
   /** @category Layer Lookup */
   getFlattenedLayers(options?: Partial<{ depth: number }>): ILayerCollection

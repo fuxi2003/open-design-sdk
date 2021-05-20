@@ -22,8 +22,12 @@ export interface IPage {
   getComponentArtboards(): Array<IArtboard>
   getArtboardById(artboardId: ArtboardId): IArtboard | null
   getArtboardByComponentId(componentId: ComponentId): IArtboard | null
-  findArtboard(selector: ArtboardSelector): IArtboard | null
-  findArtboards(selector: ArtboardSelector): Array<IArtboard>
+  findArtboard(
+    selector: ArtboardSelector | ((artboard: IArtboard) => boolean)
+  ): IArtboard | null
+  findArtboards(
+    selector: ArtboardSelector | ((artboard: IArtboard) => boolean)
+  ): Array<IArtboard>
 
   getBitmapAssets(
     options?: Partial<{ includePrerendered: boolean }>

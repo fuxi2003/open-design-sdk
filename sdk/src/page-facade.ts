@@ -152,14 +152,18 @@ export class PageFacade {
    * @category Artboard Lookup
    * @param selector An artboard selector. All specified fields must be matched by the result.
    */
-  findArtboard(selector: ArtboardSelector): ArtboardFacade | null {
-    const selectorKeys = Object.keys(selector)
-    if (
-      selectorKeys.length === 1 &&
-      selectorKeys[0] === 'id' &&
-      typeof selector['id'] === 'string'
-    ) {
-      return this.getArtboardById(selector['id'])
+  findArtboard(
+    selector: ArtboardSelector | ((artboard: ArtboardFacade) => boolean)
+  ): ArtboardFacade | null {
+    if (typeof selector === 'object') {
+      const selectorKeys = Object.keys(selector)
+      if (
+        selectorKeys.length === 1 &&
+        selectorKeys[0] === 'id' &&
+        typeof selector['id'] === 'string'
+      ) {
+        return this.getArtboardById(selector['id'])
+      }
     }
 
     const matchingArtboards = this._designFacade.findArtboards(selector)
@@ -177,15 +181,19 @@ export class PageFacade {
    * @category Artboard Lookup
    * @param selector An artboard selector. All specified fields must be matched by the results.
    */
-  findArtboards(selector: ArtboardSelector): Array<ArtboardFacade> {
-    const selectorKeys = Object.keys(selector)
-    if (
-      selectorKeys.length === 1 &&
-      selectorKeys[0] === 'id' &&
-      typeof selector['id'] === 'string'
-    ) {
-      const artboard = this.getArtboardById(selector['id'])
-      return artboard ? [artboard] : []
+  findArtboards(
+    selector: ArtboardSelector | ((artboard: ArtboardFacade) => boolean)
+  ): Array<ArtboardFacade> {
+    if (typeof selector === 'object') {
+      const selectorKeys = Object.keys(selector)
+      if (
+        selectorKeys.length === 1 &&
+        selectorKeys[0] === 'id' &&
+        typeof selector['id'] === 'string'
+      ) {
+        const artboard = this.getArtboardById(selector['id'])
+        return artboard ? [artboard] : []
+      }
     }
 
     return this._designFacade.findArtboards(selector).filter((artboard) => {

@@ -173,18 +173,26 @@ export class File implements IFile {
     return artboardsByComponentId[componentId] || null
   }
 
-  findArtboard(selector: ArtboardSelector): IArtboard | null {
-    const selectorKeys = Object.keys(selector)
-    if (
-      selectorKeys.length === 1 &&
-      selectorKeys[0] === 'id' &&
-      typeof selector['id'] === 'string'
-    ) {
-      return this.getArtboardById(selector['id'])
+  findArtboard(
+    selector: ArtboardSelector | ((artboard: IArtboard) => boolean)
+  ): IArtboard | null {
+    if (typeof selector === 'object') {
+      const selectorKeys = Object.keys(selector)
+      if (
+        selectorKeys.length === 1 &&
+        selectorKeys[0] === 'id' &&
+        typeof selector['id'] === 'string'
+      ) {
+        return this.getArtboardById(selector['id'])
+      }
     }
 
     for (const artboard of this.getArtboards()) {
-      if (matchArtboard(selector, artboard)) {
+      if (
+        typeof selector === 'function'
+          ? selector(artboard)
+          : matchArtboard(selector, artboard)
+      ) {
         return artboard
       }
     }
@@ -192,19 +200,25 @@ export class File implements IFile {
     return null
   }
 
-  findArtboards(selector: ArtboardSelector): Array<IArtboard> {
-    const selectorKeys = Object.keys(selector)
-    if (
-      selectorKeys.length === 1 &&
-      selectorKeys[0] === 'id' &&
-      typeof selector['id'] === 'string'
-    ) {
-      const artboard = this.getArtboardById(selector['id'])
-      return artboard ? [artboard] : []
+  findArtboards(
+    selector: ArtboardSelector | ((artboard: IArtboard) => boolean)
+  ): Array<IArtboard> {
+    if (typeof selector === 'object') {
+      const selectorKeys = Object.keys(selector)
+      if (
+        selectorKeys.length === 1 &&
+        selectorKeys[0] === 'id' &&
+        typeof selector['id'] === 'string'
+      ) {
+        const artboard = this.getArtboardById(selector['id'])
+        return artboard ? [artboard] : []
+      }
     }
 
     return this.getArtboards().filter((artboard) => {
-      return matchArtboard(selector, artboard)
+      return typeof selector === 'function'
+        ? selector(artboard)
+        : matchArtboard(selector, artboard)
     })
   }
 
