@@ -9,6 +9,7 @@ import type { CancelToken } from '@avocode/cancel-token'
 import type {
   ArtboardId,
   ArtboardManifestData,
+  ArtboardSelector,
   OctopusDocument as OctopusDocumentType,
   IArtboard,
   LayerId,
@@ -161,6 +162,22 @@ export class ArtboardFacade {
    */
   getDesign(): DesignFacade {
     return this._designFacade
+  }
+
+  /**
+   * Returns whether the artboard matches the provided selector.
+   *
+   * @category Artboard Lookup
+   * @param selector The selector against which to test the artboard.
+   *
+   * @example
+   * ```typescript
+   * console.log(artboard.name) // A
+   * artboard.matches({ name: 'A' }) // true
+   * ```
+   */
+  matches(selector: ArtboardSelector): boolean {
+    return this._artboardEntity.matches(selector)
   }
 
   /** @internal */

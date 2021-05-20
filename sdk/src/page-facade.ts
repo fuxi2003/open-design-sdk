@@ -12,6 +12,7 @@ import type {
   FileLayerSelector,
   IPage,
   LayerId,
+  PageSelector,
 } from '@opendesign/octopus-reader'
 import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
@@ -105,6 +106,22 @@ export class PageFacade {
         return artboard.load(options)
       })
     )
+  }
+
+  /**
+   * Returns whether the page matches the provided selector.
+   *
+   * @category Page Lookup
+   * @param selector The selector against which to test the page.
+   *
+   * @example
+   * ```typescript
+   * console.log(page.name) // A
+   * page.matches({ name: 'A' }) // true
+   * ```
+   */
+  matches(selector: PageSelector): boolean {
+    return this._pageEntity.matches(selector)
   }
 
   /**
