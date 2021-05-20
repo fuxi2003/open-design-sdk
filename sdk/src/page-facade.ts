@@ -1,4 +1,5 @@
 import { inspect } from 'util'
+import { enumerablizeWithPrototypeGetters } from './utils/object'
 
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
@@ -24,6 +25,8 @@ export class PageFacade {
   constructor(pageEntity: IPage, params: { designFacade: DesignFacade }) {
     this._pageEntity = pageEntity
     this._designFacade = params.designFacade
+
+    enumerablizeWithPrototypeGetters(this)
   }
 
   /**
@@ -55,10 +58,7 @@ export class PageFacade {
 
   /** @internal */
   toJSON() {
-    return {
-      id: this.id,
-      name: this.name,
-    }
+    return { ...this }
   }
 
   /** @internal */
