@@ -1,5 +1,6 @@
 import { inspect } from 'util'
 import { enumerablizeWithPrototypeGetters } from './utils/object'
+import { createLayerEntitySelector } from './utils/selector-utils'
 
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 import { LayerFacade } from './layer-facade'
@@ -489,6 +490,13 @@ export class ArtboardFacade {
    * const layer = await artboard.findLayer({ name: 'Share icon' })
    * ```
    *
+   * @example Layer by function selector
+   * ```typescript
+   * const shareIconLayer = await design.findLayer((layer) => {
+   *   return layer.name === 'Share icon'
+   * })
+   * ```
+   *
    * @example Text layer by content
    * ```typescript
    * const layer = await artboard.findLayer({
@@ -508,7 +516,7 @@ export class ArtboardFacade {
    * ```
    */
   async findLayer(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: LayerFacade) => boolean),
     options: {
       depth?: number
       cancelToken?: CancelToken | null
@@ -518,7 +526,15 @@ export class ArtboardFacade {
 
     await this.load({ cancelToken })
 
-    const layerEntity = this._artboardEntity.findLayer(selector, layerOptions)
+    const entitySelector = createLayerEntitySelector(
+      this._designFacade,
+      selector
+    )
+    const layerEntity = this._artboardEntity.findLayer(
+      entitySelector,
+      layerOptions
+    )
+
     return layerEntity ? this.getLayerById(layerEntity.id) : null
   }
 
@@ -535,6 +551,13 @@ export class ArtboardFacade {
    * @example Layer by name
    * ```typescript
    * const layer = await artboard.findLayers({ name: 'Share icon' })
+   * ```
+   *
+   * @example Layers by function selector
+   * ```typescript
+   * const shareIconLayers = await design.findLayers((layer) => {
+   *   return layer.name === 'Share icon'
+   * })
    * ```
    *
    * @example Invisible text layers
@@ -556,7 +579,7 @@ export class ArtboardFacade {
    * ```
    */
   async findLayers(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: LayerFacade) => boolean),
     options: {
       depth?: number
       cancelToken?: CancelToken | null
@@ -566,10 +589,15 @@ export class ArtboardFacade {
 
     await this.load({ cancelToken })
 
+    const entitySelector = createLayerEntitySelector(
+      this._designFacade,
+      selector
+    )
     const layerCollection = this._artboardEntity.findLayers(
-      selector,
+      entitySelector,
       layerOptions
     )
+
     return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })

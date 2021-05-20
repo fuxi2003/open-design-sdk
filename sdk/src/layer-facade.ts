@@ -1,5 +1,6 @@
 import { inspect } from 'util'
 import { enumerablizeWithPrototypeGetters } from './utils/object'
+import { createLayerEntitySelector } from './utils/selector-utils'
 
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
@@ -382,13 +383,27 @@ export class LayerFacade {
    * // Immediate nesting level
    * console.log(layerA.findNestedLayer({ id: 'c1', depth: 0 }))
    * // null
+   *
+   * // Function selectors
+   * console.log(layerA.findNestedLayer((layer) => {
+   *   return layer.id === 'c1'
+   * }))
+   * // Layer { id: 'c1' },
    * ```
    */
   findNestedLayer(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: LayerFacade) => boolean),
     options: { depth?: number } = {}
   ): LayerFacade | null {
-    const layerEntity = this._layerEntity.findNestedLayer(selector, options)
+    const entitySelector = createLayerEntitySelector(
+      this._designFacade,
+      selector
+    )
+    const layerEntity = this._layerEntity.findNestedLayer(
+      entitySelector,
+      options
+    )
+
     return layerEntity
       ? new LayerFacade(layerEntity, { designFacade: this._designFacade })
       : null
@@ -424,13 +439,27 @@ export class LayerFacade {
    * // Immediate nesting level
    * console.log(layerA.findNestedLayers({ id: ['b1', 'c1', 'c3'], depth: 0 }))
    * // DesignLayerCollection [ Layer { id: 'b1' } ]
+   *
+   * // Function selectors
+   * console.log(layerA.findNestedLayers((layer) => {
+   *   return layer.id === 'b1' || layer.id === 'c1'
+   * }))
+   * // DesignLayerCollection [ Layer { id: 'b1' }, Layer { id: 'c1' } ]
    * ```
    */
   findNestedLayers(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: LayerFacade) => boolean),
     options: { depth?: number } = {}
   ): DesignLayerCollectionFacade {
-    const layerEntities = this._layerEntity.findNestedLayers(selector, options)
+    const entitySelector = createLayerEntitySelector(
+      this._designFacade,
+      selector
+    )
+    const layerEntities = this._layerEntity.findNestedLayers(
+      entitySelector,
+      options
+    )
+
     return new DesignLayerCollectionFacade(layerEntities, {
       designFacade: this._designFacade,
     })

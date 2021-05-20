@@ -1,5 +1,6 @@
 import { inspect } from 'util'
 import { enumerablizeWithPrototypeGetters } from './utils/object'
+import { createLayerEntitySelector } from './utils/selector-utils'
 
 import { DesignLayerCollectionFacade } from './design-layer-collection-facade'
 
@@ -353,7 +354,7 @@ export class PageFacade {
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayer(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layer: LayerFacade) => boolean),
     options: {
       depth?: number
       cancelToken?: CancelToken | null
@@ -363,7 +364,12 @@ export class PageFacade {
 
     await this.load({ cancelToken })
 
-    const layerEntity = this._pageEntity.findLayer(selector, layerOptions)
+    const entitySelector = createLayerEntitySelector(
+      this._designFacade,
+      selector
+    )
+    const layerEntity = this._pageEntity.findLayer(entitySelector, layerOptions)
+
     const layerFacade =
       layerEntity && layerEntity.artboardId
         ? this._designFacade.getArtboardLayerFacade(
@@ -386,7 +392,7 @@ export class PageFacade {
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayers(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layer: LayerFacade) => boolean),
     options: {
       depth?: number
       cancelToken?: CancelToken | null
@@ -396,7 +402,15 @@ export class PageFacade {
 
     await this.load({ cancelToken })
 
-    const layerCollection = this._pageEntity.findLayers(selector, layerOptions)
+    const entitySelector = createLayerEntitySelector(
+      this._designFacade,
+      selector
+    )
+    const layerCollection = this._pageEntity.findLayers(
+      entitySelector,
+      layerOptions
+    )
+
     return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })

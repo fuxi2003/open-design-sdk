@@ -1,6 +1,7 @@
 import { inspect } from 'util'
 import { memoize } from './utils/memoize'
 import { enumerablizeWithPrototypeGetters } from './utils/object'
+import { createLayerEntitySelector } from './utils/selector-utils'
 
 import type { CancelToken } from '@avocode/cancel-token'
 import {
@@ -128,6 +129,13 @@ export class DesignLayerCollectionFacade {
    * const layer = await collection.findLayer({ name: 'Share icon' })
    * ```
    *
+   * @example Layer by function selector from any artboard
+   * ```typescript
+   * const shareIconLayer = await collection.findLayer((layer) => {
+   *   return layer.name === 'Share icon'
+   * })
+   * ```
+   *
    * @example Layer by name from a certain artboad subset
    * ```typescript
    * const layer = await collection.findLayer({
@@ -147,10 +155,15 @@ export class DesignLayerCollectionFacade {
    * ```
    */
   findLayer(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layer: LayerFacade) => boolean),
     options: { depth?: number } = {}
   ): LayerFacade | null {
-    const layerEntity = this._layerCollection.findLayer(selector, options)
+    const entitySelector = createLayerEntitySelector(
+      this._designFacade,
+      selector
+    )
+    const layerEntity = this._layerCollection.findLayer(entitySelector, options)
+
     return layerEntity ? this._resolveArtboardLayer(layerEntity) : null
   }
 
@@ -168,6 +181,13 @@ export class DesignLayerCollectionFacade {
    * @example Layers by name from all artboards
    * ```typescript
    * const layers = await collection.findLayers({ name: 'Share icon' })
+   * ```
+   *
+   * @example Layers by function selector from all artboards
+   * ```typescript
+   * const shareIconLayers = await collection.findLayers((layer) => {
+   *   return layer.name === 'Share icon'
+   * })
    * ```
    *
    * @example Invisible layers from all a certain artboard subset
@@ -189,10 +209,18 @@ export class DesignLayerCollectionFacade {
    * ```
    */
   findLayers(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layer: LayerFacade) => boolean),
     options: { depth?: number } = {}
   ): DesignLayerCollectionFacade {
-    const layerCollection = this._layerCollection.findLayers(selector, options)
+    const entitySelector = createLayerEntitySelector(
+      this._designFacade,
+      selector
+    )
+    const layerCollection = this._layerCollection.findLayers(
+      entitySelector,
+      options
+    )
+
     return new DesignLayerCollectionFacade(layerCollection, {
       designFacade: this._designFacade,
     })

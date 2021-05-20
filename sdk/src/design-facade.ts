@@ -24,6 +24,7 @@ import { sequence } from './utils/async'
 import { memoize } from './utils/memoize'
 import { getDesignFormatByFileName } from './utils/design-format-utils'
 import { enumerablizeWithPrototypeGetters } from './utils/object'
+import { createLayerEntitySelector } from './utils/selector-utils'
 
 import type { CancelToken } from '@avocode/cancel-token'
 import type { IApiDesign } from '@opendesign/api'
@@ -665,6 +666,13 @@ export class DesignFacade {
    * const layer = await design.findLayer({ name: 'Share icon' })
    * ```
    *
+   * @example Layer by function selector from any artboard
+   * ```typescript
+   * const shareIconLayer = await design.findLayer((layer) => {
+   *   return layer.name === 'Share icon'
+   * })
+   * ```
+   *
    * @example Layer by name from a certain artboad subset
    * ```typescript
    * const layer = await design.findLayer({
@@ -684,13 +692,15 @@ export class DesignFacade {
    * ```
    */
   async findLayer(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layer: LayerFacade) => boolean),
     options: { depth?: number; cancelToken?: CancelToken | null } = {}
   ): Promise<LayerFacade | null> {
     await this.load({ cancelToken: options.cancelToken || null })
 
+    const entitySelector = createLayerEntitySelector(this, selector)
     const entity = this._getDesignEntity()
-    const layerEntity = entity.findLayer(selector, {
+
+    const layerEntity = entity.findLayer(entitySelector, {
       depth: options.depth || 0,
     })
     const artboardId = layerEntity ? layerEntity.artboardId : null
@@ -716,6 +726,13 @@ export class DesignFacade {
    * const layers = await design.findLayers({ name: 'Share icon' })
    * ```
    *
+   * @example Layers by function selector from all artboards
+   * ```typescript
+   * const shareIconLayers = await design.findLayers((layer) => {
+   *   return layer.name === 'Share icon'
+   * })
+   * ```
+   *
    * @example Invisible layers from all a certain artboard subset
    * ```typescript
    * const layers = await design.findLayers({
@@ -735,13 +752,15 @@ export class DesignFacade {
    * ```
    */
   async findLayers(
-    selector: FileLayerSelector,
+    selector: FileLayerSelector | ((layer: LayerFacade) => boolean),
     options: { depth?: number; cancelToken?: CancelToken | null } = {}
   ): Promise<DesignLayerCollectionFacade> {
     await this.load({ cancelToken: options.cancelToken || null })
 
+    const entitySelector = createLayerEntitySelector(this, selector)
     const entity = this._getDesignEntity()
-    const layerCollection = entity.findLayers(selector, {
+
+    const layerCollection = entity.findLayers(entitySelector, {
       depth: options.depth || 0,
     })
 

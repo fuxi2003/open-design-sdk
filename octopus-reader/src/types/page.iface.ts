@@ -43,11 +43,11 @@ export interface IPage {
     options?: Partial<{ depth: number }>
   ): ILayerCollection
   findLayer(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options?: Partial<{ depth: number }>
   ): ILayer | null
   findLayers(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options?: Partial<{ depth: number }>
   ): ILayerCollection
 }
