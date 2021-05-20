@@ -68,11 +68,12 @@ export class DesignListItemFacade {
    * The API has to be configured when using this method. Local caching is established in case the local cache is configured.
    *
    * @example
+   * ```typescript
    * const design = await designListItem.fetchDesign()
    *
    * // Continue working with the processed design
    * const artboards = design.getArtboards()
-   *
+   * ```
    *
    * @category Server Side Design File Usage
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. the local cache is not cleared once created). A cancellation token can be created via {@link createCancelToken}.
