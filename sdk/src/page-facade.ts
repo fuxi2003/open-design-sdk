@@ -7,9 +7,9 @@ import type {
   ArtboardId,
   ArtboardSelector,
   ComponentId,
+  FileLayerSelector,
   IPage,
   LayerId,
-  LayerSelector,
 } from '@opendesign/octopus-reader'
 import type { ArtboardFacade } from './artboard-facade'
 import type { DesignFacade } from './design-facade'
@@ -353,7 +353,7 @@ export class PageFacade {
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayer(
-    selector: LayerSelector,
+    selector: FileLayerSelector,
     options: {
       depth?: number
       cancelToken?: CancelToken | null
@@ -386,7 +386,7 @@ export class PageFacade {
    * @param options.cancelToken A cancellation token which aborts the asynchronous operation. When the token is cancelled, the promise is rejected and side effects are not reverted (e.g. newly cached artboards are not uncached). A cancellation token can be created via {@link createCancelToken}.
    */
   async findLayers(
-    selector: LayerSelector,
+    selector: FileLayerSelector,
     options: {
       depth?: number
       cancelToken?: CancelToken | null
