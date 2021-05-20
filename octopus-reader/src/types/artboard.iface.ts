@@ -7,7 +7,7 @@ import type { ILayer } from './layer.iface'
 import type { ArtboardManifestData } from './manifest.type'
 import type { OctopusDocument, RgbaColor } from './octopus.type'
 import type { IPage } from './page.iface'
-import type { LayerSelector } from './selectors.type'
+import type { ArtboardSelector, LayerSelector } from './selectors.type'
 
 export type ArtboardBounds = {
   'left': number
@@ -24,6 +24,8 @@ export interface IArtboard {
 
   getManifest(): ArtboardManifestData
   setManifest(nextManifest: ArtboardManifestData): void
+
+  matches(selector: ArtboardSelector): boolean
 
   isLoaded(): boolean
   unload(): void

@@ -6,7 +6,11 @@ import { ArtboardId, ComponentId, LayerId, PageId } from '../types/ids.type'
 import { ILayer } from '../types/layer.iface'
 import { LayerCollection } from '../collections/layer-collection'
 import { IPage } from '../types/page.iface'
-import { ArtboardSelector, LayerSelector } from '../types/selectors.type'
+import {
+  ArtboardSelector,
+  LayerSelector,
+  PageSelector,
+} from '../types/selectors.type'
 import {
   findLayer,
   findLayerById,
@@ -17,6 +21,7 @@ import {
   getFonts,
 } from '../utils/aggregation'
 import { matchArtboard } from '../utils/artboard-lookup'
+import { matchPage } from '../utils/page-lookup'
 
 export class Page implements IPage {
   readonly id: PageId
@@ -37,6 +42,10 @@ export class Page implements IPage {
 
   set name(nextName: string | null) {
     this._name = nextName
+  }
+
+  matches(selector: PageSelector): boolean {
+    return matchPage(selector, this)
   }
 
   unloadArtboards() {

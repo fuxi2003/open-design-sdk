@@ -1,5 +1,6 @@
 import { LayerCollection } from '../collections/layer-collection'
 
+import { matchArtboard } from '../utils/artboard-lookup'
 import { createFlattenedLayers, createLayers } from '../utils/layer-factories'
 import { memoize } from '../utils/memoize'
 
@@ -17,7 +18,7 @@ import type {
   ComponentId,
   RgbaColor,
 } from '../types/octopus.type'
-import type { LayerSelector } from '../types/selectors.type'
+import type { ArtboardSelector, LayerSelector } from '../types/selectors.type'
 import { IPage } from '../types/page.iface'
 
 export class Artboard implements IArtboard {
@@ -76,6 +77,10 @@ export class Artboard implements IArtboard {
 
   get name(): string | null {
     return this._manifest['artboard_name'] || null
+  }
+
+  matches(selector: ArtboardSelector): boolean {
+    return matchArtboard(selector, this)
   }
 
   isLoaded(): boolean {
