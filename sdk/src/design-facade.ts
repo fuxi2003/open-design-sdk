@@ -1950,7 +1950,7 @@ export class DesignFacade {
 
     const localDesign = this._localDesign
     if (!localDesign) {
-      throw new Error('The rendering engine is not configured')
+      throw new Error('Local cache is not configured')
     }
 
     const artboard = this.getArtboardById(artboardId)
