@@ -71,7 +71,7 @@ export function findLayersById(
 
 export function findLayer(
   artboards: Array<IArtboard>,
-  selector: LayerSelector,
+  selector: LayerSelector | ((layer: ILayer) => boolean),
   options: Partial<{ depth: number }> = {}
 ): ILayer | null {
   const depthWithinArtboard = options.depth || Infinity
@@ -88,7 +88,7 @@ export function findLayer(
 
 export function findLayers(
   artboards: Array<IArtboard>,
-  selector: LayerSelector,
+  selector: LayerSelector | ((layer: ILayer) => boolean),
   options: Partial<{ depth: number }> = {}
 ): Array<ILayer> {
   const depthWithinArtboard = options.depth || Infinity

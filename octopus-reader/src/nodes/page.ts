@@ -167,14 +167,14 @@ export class Page implements IPage {
   }
 
   findLayer(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options: Partial<{ depth: number }> = {}
   ): ILayer | null {
     return findLayer(this.getArtboards(), selector, options)
   }
 
   findLayers(
-    selector: LayerSelector,
+    selector: LayerSelector | ((layer: ILayer) => boolean),
     options: Partial<{ depth: number }> = {}
   ): LayerCollection {
     const layers = findLayers(this.getArtboards(), selector, options)
